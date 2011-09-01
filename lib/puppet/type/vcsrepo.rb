@@ -99,4 +99,21 @@ Puppet::Type.newtype(:vcsrepo) do
     end
   end
 
+  # Autorequire the nearest ancestor directory found in the catalog.
+  # Taken from puppet/type/file in the puppet source
+  autorequire(:file) do
+    basedir = ::File.dirname(self[:path])
+    if basedir != self[:path]
+      parents = []
+      until basedir == parents.last
+        parents << basedir
+        basedir = ::File.dirname(basedir)
+      end
+      # The filename of the first ancestor found, or nil
+      parents.find { |dir| catalog.resource(:file, dir) }
+    else
+      nil
+    end
+  end
+
 end
