@@ -40,7 +40,7 @@ Puppet::Type.type(:vcsrepo).provide(:svn, :parent => Puppet::Provider::Vcsrepo) 
       end
     end
   end
-  
+
   def buildargs
     args = ['--non-interactive']
     if @resource.value(:basic_auth_username) && @resource.value(:basic_auth_password)
@@ -57,7 +57,7 @@ Puppet::Type.type(:vcsrepo).provide(:svn, :parent => Puppet::Provider::Vcsrepo) 
       svn(*args)[/^Last Changed Rev:\s+(\d+)/m, 1]
     end
   end
-  
+
   def revision
     args = buildargs.push('info')
     at_path do
