@@ -116,5 +116,4 @@ Puppet::Type.type(:vcsrepo).provide(:cvs, :parent => Puppet::Provider::Vcsrepo) 
       set_ownership
     end
   end
-
 end
