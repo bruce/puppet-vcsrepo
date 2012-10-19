@@ -94,9 +94,9 @@ describe_provider :vcsrepo, :hg, :resource => {:path => '/tmp/vcsrepo'} do
     end
     it "should use 'hg update ---clean -r'" do
       expects_chdir
-      provider.expects('hg').with('pull')
-      provider.expects('hg').with('merge')
-      provider.expects('hg').with('update', '--clean', '-r', @revision)
+      provider.expects(:hg).with('pull')
+      provider.expects(:hg).with('merge')
+      provider.expects(:hg).with('update', '--clean', '-r', @revision)
       provider.revision = @revision
     end
   end

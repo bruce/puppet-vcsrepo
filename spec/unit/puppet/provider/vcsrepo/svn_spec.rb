@@ -56,7 +56,7 @@ describe_provider :vcsrepo, :svn, :resource => {:path => '/tmp/vcsrepo'} do
 
   describe "checking the revision property" do
     before do
-      provider.expects('svn').with('--non-interactive', 'info').returns(fixture(:svn_info))
+      provider.expects(:svn).with('--non-interactive', 'info').returns(fixture(:svn_info))
     end
     it "should use 'svn info'" do
       expects_chdir
@@ -70,7 +70,7 @@ describe_provider :vcsrepo, :svn, :resource => {:path => '/tmp/vcsrepo'} do
     end
     it "should use 'svn update'" do
       expects_chdir
-      provider.expects('svn').with('--non-interactive', 'update', '-r', @revision)
+      provider.expects(:svn).with('--non-interactive', 'update', '-r', @revision)
       provider.revision = @revision
     end
   end

@@ -92,7 +92,7 @@ describe_provider :vcsrepo, :cvs, :resource => {:path => '/tmp/vcsrepo'} do
 
     it "should use 'cvs update -dr'" do
       expects_chdir
-      provider.expects('cvs').with('update', '-dr', @tag, '.')
+      provider.expects(:cvs).with('update', '-dr', @tag, '.')
       provider.revision = @tag
     end
   end
