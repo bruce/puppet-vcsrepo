@@ -1,4 +1,4 @@
-require 'pathname'; Pathname.new(__FILE__).realpath.ascend { |x| begin; require (x + 'spec_helper.rb'); break; rescue LoadError; end }
+require 'spec_helper'
 
 describe_provider :vcsrepo, :cvs, :resource => {:path => '/tmp/vcsrepo'} do
 
