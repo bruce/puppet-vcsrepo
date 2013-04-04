@@ -1,13 +1,25 @@
 ---
-language: java
+branches:
+  only:
+  - master
 notifications:
- email:
-   on_success: never
-   on_failure: always
-script:
+  email: false
+language: ruby
+script: 'rake spec'
+after_success:
 - git clone -q git://github.com/puppetlabs/ghpublisher.git .forge-releng
 - .forge-releng/publish
+rvm:
+- 1.8.7
+- 1.9.3
 env:
- global:
- - PUBLISHER_LOGIN=rcoleman
-  - secure: "g2IiwsXB/FNJ6jPTxhUGiK4/zjmzN3Gv2jc65wfJumxIi3yBabi8nN/PZjzt\ntqHnhtVBH5TpJ2GADCGtcVWO0Yb1/pS2l4+oHmr93/5tG/OZsUT+tFvp2FAL\nU2yK6Nhw1zreQ5TtV8xu0CMGw+45kblqz3R7mViLS44dKLQ3whM="
+  matrix:
+  - PUPPET_VERSION=2.6.18
+  - PUPPET_VERSION=2.7.21
+  - PUPPET_VERSION=3.1.1
+  global:
+  - PUBLISHER_LOGIN=puppetlabs
+  - secure: |-
+      ZiIkYd9+CdPzpwSjFPnVkCx1FIlipxpbdyD33q94h2Tj5zXjNb1GXizVy0NR
+      kVxGhU5Ld8y9z8DTqKRgCI1Yymg3H//OU++PKLOQj/X5juWVR4URBNPeBOzu
+      IJBDl1MADKA4i1+jAZPpz4mTvTtKS4pWKErgCSmhSfsY1hs7n6c=
