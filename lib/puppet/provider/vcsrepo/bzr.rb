@@ -54,10 +54,10 @@ Puppet::Type.type(:vcsrepo).provide(:bzr, :parent => Puppet::Provider::Vcsrepo) 
     end
   end
 
-  def latest 
+  def latest
     at_path do
       bzr('version-info', ':parent')[/^revision-id:\s+(\S+)/, 1]
-    end 
+    end
   end
 
   def latest?
