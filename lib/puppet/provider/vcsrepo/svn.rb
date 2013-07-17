@@ -4,7 +4,7 @@ Puppet::Type.type(:vcsrepo).provide(:svn, :parent => Puppet::Provider::Vcsrepo) 
   desc "Supports Subversion repositories"
 
   optional_commands :svn      => 'svn',
-           :svnadmin => 'svnadmin'
+                    :svnadmin => 'svnadmin'
 
   has_features :filesystem_types, :reference_tracking, :basic_auth
 
