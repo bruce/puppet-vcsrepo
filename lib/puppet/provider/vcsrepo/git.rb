@@ -203,7 +203,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
     FileUtils.mv(tempdir, File.join(@resource.value(:path), '.git'))
     if commits_in?(File.join(@resource.value(:path), '.git'))
       reset('HEAD')
-      git_with_identity('checkout', '-f')
+      git_with_identity('checkout', '--force')
       update_owner_and_excludes
     end
   end
