@@ -32,7 +32,7 @@ Puppet::Type.newtype(:vcsrepo) do
           "The repository tracks multiple remote repositories"
   
   feature :configuration,
-	  "The configuration directory to use"
+          "The configuration directory to use"
 
   feature :cvs_rsh,
           "The provider understands the CVS_RSH environment variable"
