@@ -120,7 +120,7 @@ Puppet::Type.type(:vcsrepo).provide(:cvs, :parent => Puppet::Provider::Vcsrepo) 
   def runcvs(*args)
     if @resource.value(:cvs_rsh)
       debug "Using CVS_RSH = " + @resource.value(:cvs_rsh)
-      e = { :CVS_RSH => @resource.value(:cvs_rsh) } 
+      e = { :CVS_RSH => @resource.value(:cvs_rsh) }
     else
       e = {}
     end
@@ -129,5 +129,4 @@ Puppet::Type.type(:vcsrepo).provide(:cvs, :parent => Puppet::Provider::Vcsrepo) 
       Puppet.debug cvs *args
     end
   end
-                                        
 end

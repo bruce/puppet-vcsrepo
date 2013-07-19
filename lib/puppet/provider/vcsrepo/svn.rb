@@ -56,7 +56,7 @@ Puppet::Type.type(:vcsrepo).provide(:svn, :parent => Puppet::Provider::Vcsrepo) 
     if @resource.value(:configuration)
       args.push('--config-dir', @resource.value(:configuration))
     end
-    
+
     return args
   end
 

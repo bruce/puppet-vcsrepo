@@ -66,7 +66,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
           fail("#{@resource.value(:revision)} is not a local or remote ref")
         end
 
-        # $ git ls-remote --heads --tags origin feature/cvs 
+        # $ git ls-remote --heads --tags origin feature/cvs
         # 7d4244b35e72904e30130cad6d2258f901c16f1a	refs/heads/feature/cvs
         canonical = remote_ref.split.first
       end
