@@ -239,9 +239,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
     # git < 1.6 returns '#{@resource.value(:remote)}/#{revision}'
     # git 1.6+ returns 'remotes/#{@resource.value(:remote)}/#{revision}'
     branch = at_path { branches.grep /(remotes\/)?#{@resource.value(:remote)}\/#{revision}/ }
-    if branch.length > 0
-      return branch
-    end
+    branch unless branch.empty?
   end
 
   def local_branch_revision?(revision = @resource.value(:revision))
