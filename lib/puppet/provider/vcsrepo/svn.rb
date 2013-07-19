@@ -22,14 +22,12 @@ Puppet::Type.type(:vcsrepo).provide(:svn, :parent => Puppet::Provider::Vcsrepo) 
 
   def working_copy_exists?
     if File.directory?(@resource.value(:path))
-      if File.directory?(File.join(@resource.value(:path), '.svn'))
-        return true
-      end
-      if svnlook('uuid',@resource.value(:path))
-        return true
-      end
+      # :path is an svn checkout
+      return true if File.directory?(File.join(@resource.value(:path), '.svn'))
+      # :path is an svn server
+      return true if svnlook('uuid', @resource.value(:path))
     end
-    return false
+    false
   end
 
   def exists?
@@ -42,11 +40,7 @@ Puppet::Type.type(:vcsrepo).provide(:svn, :parent => Puppet::Provider::Vcsrepo) 
 
   def latest?
     at_path do
-      if self.revision < self.latest then
-        return false
-      else
-        return true
-      end
+      self.revision >= self.latest
     end
   end
 
@@ -66,7 +60,7 @@ Puppet::Type.type(:vcsrepo).provide(:svn, :parent => Puppet::Provider::Vcsrepo) 
       args.push('--config-dir', @resource.value(:configuration))
     end
 
-    return args
+    args
   end
 
   def latest
