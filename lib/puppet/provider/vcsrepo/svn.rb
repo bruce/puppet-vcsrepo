@@ -85,7 +85,11 @@ Puppet::Type.type(:vcsrepo).provide(:svn, :parent => Puppet::Provider::Vcsrepo) 
   end
 
   def revision=(desired)
-    args = buildargs.push('switch', '-r', desired, @resource.value(:source))
+    args = if @resource.value(:source)
+             buildargs.push('switch', '-r', desired, @resource.value(:source))
+           else
+             buildargs.push('update', '-r', desired)
+           end
     at_path do
       svn(*args)
     end
