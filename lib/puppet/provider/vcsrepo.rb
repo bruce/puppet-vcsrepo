@@ -19,7 +19,10 @@ class Puppet::Provider::Vcsrepo < Puppet::Provider
 
   def path_empty?
     # Path is empty if the only entries are '.' and '..'
-    Dir.entries(@resource.value(:path)).size == 2
+    d = Dir.new(@resource.value(:path))
+    d.read # should return '.'
+    d.read # should return '..'
+    d.read.nil?
   end
 
   # Note: We don't rely on Dir.chdir's behavior of automatically returning the
