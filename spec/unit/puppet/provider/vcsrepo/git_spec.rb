@@ -316,5 +316,30 @@ describe Puppet::Type.type(:vcsrepo).provider(:git_provider) do
     end
   end
 
+  describe 'latest' do
+    before do
+      provider.expects(:get_revision).returns('master')
+      expects_chdir
+    end
+    context 'on master' do
+      it do
+        provider.expects(:git).with('branch', '-a').returns(fixture(:git_branch_a))
+        provider.latest.should == 'master'
+      end
+    end
+    context 'no branch' do
+      it do
+        provider.expects(:git).with('branch', '-a').returns(fixture(:git_branch_none))
+        provider.latest.should == 'master'
+      end
+    end
+    context 'feature/bar' do
+      it do
+        provider.expects(:git).with('branch', '-a').returns(fixture(:git_branch_feature_bar))
+        provider.latest.should == 'master'
+      end
+    end
+  end
+
 
 end
