@@ -341,5 +341,26 @@ describe Puppet::Type.type(:vcsrepo).provider(:git_provider) do
     end
   end
 
+  describe 'convert_working_copy_to_bare' do
+    it do
+      FileUtils.expects(:mv)
+      FileUtils.expects(:rm_rf)
+      FileUtils.expects(:mv)
+
+      provider.instance_eval { convert_working_copy_to_bare }
+    end
+  end
+
+  describe 'convert_bare_to_working_copy' do
+    it do
+      FileUtils.expects(:mv)
+      FileUtils.expects(:mkdir)
+      FileUtils.expects(:mv)
+      provider.expects(:commits_in?).returns(true)
+      expects_chdir
+
+      provider.instance_eval { convert_bare_to_working_copy }
+    end
+  end
 
 end
