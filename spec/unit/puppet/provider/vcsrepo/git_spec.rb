@@ -343,9 +343,9 @@ describe Puppet::Type.type(:vcsrepo).provider(:git_provider) do
 
   describe 'convert_working_copy_to_bare' do
     it do
-      FileUtils.expects(:mv)
-      FileUtils.expects(:rm_rf)
-      FileUtils.expects(:mv)
+      FileUtils.expects(:mv).returns(true)
+      FileUtils.expects(:rm_rf).returns(true)
+      FileUtils.expects(:mv).returns(true)
 
       provider.instance_eval { convert_working_copy_to_bare }
     end
@@ -353,11 +353,14 @@ describe Puppet::Type.type(:vcsrepo).provider(:git_provider) do
 
   describe 'convert_bare_to_working_copy' do
     it do
-      FileUtils.expects(:mv)
-      FileUtils.expects(:mkdir)
-      FileUtils.expects(:mv)
+      FileUtils.expects(:mv).returns(true)
+      FileUtils.expects(:mkdir).returns(true)
+      FileUtils.expects(:mv).returns(true)
       provider.expects(:commits_in?).returns(true)
-      expects_chdir
+      # If you forget to stub these out you lose 3 hours of rspec work.
+      provider.expects(:reset).with('HEAD').returns(true)
+      provider.expects(:git_with_identity).returns(true)
+      provider.expects(:update_owner_and_excludes).returns(true)
 
       provider.instance_eval { convert_bare_to_working_copy }
     end
