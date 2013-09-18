@@ -296,4 +296,25 @@ describe Puppet::Type.type(:vcsrepo).provider(:git_provider) do
     end
   end
 
+  describe 'latest?' do
+    before do
+      expects_chdir('/tmp/test')
+    end
+    context 'when true' do
+      it do
+        provider.expects(:revision).returns('testrev')
+        provider.expects(:latest).returns('testrev')
+        provider.latest?.should be_true
+      end
+    end
+    context 'when false' do
+      it do
+        provider.expects(:revision).returns('master')
+        provider.expects(:latest).returns('testrev')
+        provider.latest?.should be_false
+      end
+    end
+  end
+
+
 end
