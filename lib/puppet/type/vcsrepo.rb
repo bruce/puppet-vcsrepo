@@ -191,4 +191,8 @@ Puppet::Type.newtype(:vcsrepo) do
     desc "The value to be used for the CVS_RSH environment variable."
   end
 
+  autorequire(:package) do
+    ['git', 'git-core']
+  end
+
 end
