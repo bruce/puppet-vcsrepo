@@ -314,7 +314,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
 
         return ret
       end
-    elsif @resource.value(:user)
+    elsif @resource.value(:user) and @resource.value(:user) != Facter['id'].value
       su(@resource.value(:user), '-c', "git #{args.join(' ')}" )
     else
       git(*args)

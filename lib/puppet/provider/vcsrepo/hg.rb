@@ -105,7 +105,7 @@ Puppet::Type.type(:vcsrepo).provide(:hg, :parent => Puppet::Provider::Vcsrepo) d
     if @resource.value(:identity)
       args += ["--ssh", "ssh -oStrictHostKeyChecking=no -oPasswordAuthentication=no -oKbdInteractiveAuthentication=no -oChallengeResponseAuthentication=no -i #{@resource.value(:identity)}"]
     end
-    if @resource.value(:user)
+    if @resource.value(:user) and @resource.value(:user) != Facter['id'].value
       args.map! { |a| if a =~ /\s/ then "'#{a}'" else a end }  # Adds quotes to arguments with whitespaces.
       su(@resource.value(:user), '-c', "hg #{args.join(' ')}")
     else
