@@ -39,9 +39,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
 
   def latest
     branch = on_branch?
-    if branch == 'master'
-      return get_revision("#{@resource.value(:remote)}/HEAD")
-    elsif branch == '(no branch)'
+    if branch == '(no branch)'
       return get_revision('HEAD')
     else
       return get_revision("#{@resource.value(:remote)}/%s" % branch)
