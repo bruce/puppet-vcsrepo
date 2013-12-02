@@ -39,7 +39,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
 
   def latest
     branch = on_branch?
-    if branch == '(no branch)'
+    if branch == ''
       return get_revision('HEAD')
     else
       return get_revision("#{@resource.value(:remote)}/%s" % branch)
@@ -253,7 +253,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
   end
 
   def on_branch?
-    at_path { git_with_identity('branch', '-a') }.split(/\n/).grep(/\*/).first.to_s.gsub('*', '').strip
+    at_path { git_with_identity('rev-parse', '--abbrev-ref', 'HEAD') }
   end
 
   def tags
