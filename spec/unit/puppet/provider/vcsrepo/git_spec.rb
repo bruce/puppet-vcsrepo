@@ -323,19 +323,19 @@ describe Puppet::Type.type(:vcsrepo).provider(:git_provider) do
     end
     context 'on master' do
       it do
-        provider.expects(:git).with('branch', '-a').returns(fixture(:git_branch_a))
+        provider.expects(:git).with('rev-parse', '--abbrev-ref', 'HEAD').returns(fixture(:git_branch_a))
         provider.latest.should == 'master'
       end
     end
     context 'no branch' do
       it do
-        provider.expects(:git).with('branch', '-a').returns(fixture(:git_branch_none))
+        provider.expects(:git).with('rev-parse', '--abbrev-ref', 'HEAD').returns(fixture(:git_branch_none))
         provider.latest.should == 'master'
       end
     end
     context 'feature/bar' do
       it do
-        provider.expects(:git).with('branch', '-a').returns(fixture(:git_branch_feature_bar))
+        provider.expects(:git).with('rev-parse', '--abbrev-ref', 'HEAD').returns(fixture(:git_branch_feature_bar))
         provider.latest.should == 'master'
       end
     end
