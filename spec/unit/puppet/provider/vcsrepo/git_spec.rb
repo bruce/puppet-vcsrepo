@@ -296,6 +296,18 @@ describe Puppet::Type.type(:vcsrepo).provider(:git_provider) do
     end
   end
 
+  context "retrieving the current revision" do
+    before do
+      expects_chdir
+      provider.expects(:git).with('rev-parse', '--abbrev-ref', 'HEAD').returns("foo\n")
+    end
+
+    it "will strip trailing newlines" do
+      provider.expects(:get_revision).with('origin/foo')
+      provider.latest
+    end
+  end
+
   describe 'latest?' do
     before do
       expects_chdir('/tmp/test')
