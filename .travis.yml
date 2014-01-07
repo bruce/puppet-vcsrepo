@@ -29,3 +29,7 @@ matrix:
       env: PUPPET_GEM_VERSION="~> 2.7.0"
 notifications:
   email: false
+# Temporary workaround for broken Rubygems on Travis
+before_install:
+  - gem update --system 2.1.11
+  - gem --version
