@@ -6,7 +6,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
   ##TODO modify the commands below so that the su - is included
   optional_commands :git => 'git',
                     :su  => 'su'
-  has_features :bare_repositories, :reference_tracking, :ssh_identity, :multiple_remotes, :user
+  has_features :bare_repositories, :reference_tracking, :ssh_identity, :multiple_remotes, :user, :depth
 
   def create
     if !@resource.value(:source)
@@ -131,6 +131,9 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
   def clone_repository(source, path)
     check_force
     args = ['clone']
+    if @resource.value(:depth) and @resource.value(:depth).to_i > 0
+      args.push('--depth', @resource.value(:depth).to_s)
+    end
     if @resource.value(:ensure) == :bare
       args << '--bare'
     end

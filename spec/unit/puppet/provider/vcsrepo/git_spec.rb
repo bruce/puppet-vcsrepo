@@ -31,6 +31,20 @@ describe Puppet::Type.type(:vcsrepo).provider(:git_provider) do
       end
     end
 
+    context "with shallow clone enable" do
+      it "should execute 'git clone --depth 1'" do
+        resource[:revision] = 'only/remote'
+        resource[:depth] = 1
+        Dir.expects(:chdir).with('/').at_least_once.yields
+        Dir.expects(:chdir).with('/tmp/test').at_least_once.yields
+        provider.expects(:git).with('clone', '--depth', '1', resource.value(:source), resource.value(:path))
+        provider.expects(:update_submodules)
+        provider.expects(:git).with('branch', '-a').returns(resource.value(:revision))
+        provider.expects(:git).with('checkout', '--force', resource.value(:revision))
+        provider.create
+      end
+    end
+
     context "with a revision that is not a remote branch" do
       it "should execute 'git clone' and 'git reset --hard'" do
         resource[:revision] = 'a-commit-or-tag'

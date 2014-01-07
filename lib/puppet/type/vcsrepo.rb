@@ -37,6 +37,9 @@ Puppet::Type.newtype(:vcsrepo) do
   feature :cvs_rsh,
           "The provider understands the CVS_RSH environment variable"
 
+  feature :depth,
+          "The provider can do shallow clones"
+
   ensurable do
     attr_accessor :latest
 
@@ -189,6 +192,10 @@ Puppet::Type.newtype(:vcsrepo) do
 
   newparam :cvs_rsh, :required_features => [:cvs_rsh] do
     desc "The value to be used for the CVS_RSH environment variable."
+  end
+
+  newparam :depth, :required_features => [:depth] do
+    desc "The value to be used to do a shallow clone."
   end
 
   autorequire(:package) do
