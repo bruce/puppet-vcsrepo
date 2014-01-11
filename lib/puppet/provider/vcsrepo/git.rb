@@ -105,10 +105,10 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
   end
 
   def update_remote_origin_url
-    current = git_with_identity('config', 'remote.origin.url')
+    current = git_with_identity('config', "remote.#{@resource.value(:remote)}.url")
     unless @resource.value(:source).nil?
       if current.nil? or current.strip != @resource.value(:source)
-        git_with_identity('config', 'remote.origin.url', @resource.value(:source))
+        git_with_identity('config', "remote.#{@resource.value(:remote)}.url", @resource.value(:source))
       end
     end
   end
@@ -136,6 +136,9 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
     end
     if @resource.value(:ensure) == :bare
       args << '--bare'
+    end
+    if @resource.value(:remote) != 'origin'
+      args.push('--origin', @resource.value(:remote))
     end
     if !File.exist?(File.join(@resource.value(:path), '.git'))
       args.push(source, path)
