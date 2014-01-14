@@ -24,8 +24,10 @@ Puppet::Type.type(:vcsrepo).provide(:svn, :parent => Puppet::Provider::Vcsrepo) 
     if File.directory?(@resource.value(:path))
       # :path is an svn checkout
       return true if File.directory?(File.join(@resource.value(:path), '.svn'))
-      # :path is an svn server
-      return true if svnlook('uuid', @resource.value(:path))
+      if File.directory?(File.join(@resource.value(:path), 'format'))
+        # :path is an svn server
+        return true if svnlook('uuid', @resource.value(:path))
+      end
     end
     false
   end
