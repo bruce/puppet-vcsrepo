@@ -32,16 +32,16 @@ describe Puppet::Type.type(:vcsrepo).provider(:git_provider) do
     end
 
     context "with a remote not named 'origin'" do
-        it "should execute 'git clone --origin not_origin" do
-            resource[:remote] = 'not_origin'
-            Dir.expects(:chdir).with('/').at_least_once.yields
-            Dir.expects(:chdir).with('/tmp/test').at_least_once.yields
-            provider.expects(:git).with('clone', '--origin', 'not_origin', resource.value(:source), resource.value(:path))
-            provider.expects(:update_submodules)
-            provider.expects(:git).with('branch', '-a').returns(resource.value(:revision))
-            provider.expects(:git).with('checkout', '--force', resource.value(:revision))
-            provider.create
-        end
+      it "should execute 'git clone --origin not_origin" do
+        resource[:remote] = 'not_origin'
+        Dir.expects(:chdir).with('/').at_least_once.yields
+        Dir.expects(:chdir).with('/tmp/test').at_least_once.yields
+        provider.expects(:git).with('clone', '--origin', 'not_origin', resource.value(:source), resource.value(:path))
+        provider.expects(:update_submodules)
+        provider.expects(:git).with('branch', '-a').returns(resource.value(:revision))
+        provider.expects(:git).with('checkout', '--force', resource.value(:revision))
+        provider.create
+      end
     end
 
     context "with shallow clone enable" do
