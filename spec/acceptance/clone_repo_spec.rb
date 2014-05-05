@@ -184,6 +184,13 @@ describe 'clones a remote repo' do
   end
 
   context 'with an owner' do
+    pp = <<-EOS
+    user { 'vagrant':
+      ensure => present,
+    }
+    EOS
+
+    apply_manifest(pp, :catch_failures => true)
     it 'clones a repo' do
       pp = <<-EOS
       vcsrepo { "#{tmpdir}/testrepo_owner":
@@ -206,6 +213,14 @@ describe 'clones a remote repo' do
   end
 
   context 'with a group' do
+    pp = <<-EOS
+    group { 'vagrant':
+      ensure => present,
+    }
+    EOS
+
+    apply_manifest(pp, :catch_failures => true)
+
     it 'clones a repo' do
       pp = <<-EOS
       vcsrepo { "/#{tmpdir}/testrepo_group":
