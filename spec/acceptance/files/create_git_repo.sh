@@ -34,3 +34,6 @@ cd ..
 git --git-dir=testrepo/.git config core.bare true
 cp -r testrepo/.git testrepo.git
 rm -rf testrepo
+cd testrepo.git
+touch git-daemon-export-ok
+git update-server-info
