@@ -29,8 +29,6 @@ hosts.each do |host|
       # copy ssl keys
       scp_to(host, "#{my_root}/acceptance/files/server.crt", tmpdir)
       scp_to(host, "#{my_root}/acceptance/files/server.key", tmpdir)
-
-      host.execute("nohup git daemon  --detach --base-path=/#{tmpdir}")
       # }}}
     end
 
@@ -96,6 +94,7 @@ hosts.each do |host|
     context 'using git protocol' do
       before(:all) do
         on(host,apply_manifest("file {'#{tmpdir}/testrepo': ensure => directory, purge => true, recurse => true, recurselimit => 1, force => true; }"))
+        host.execute("nohup git daemon  --detach --base-path=/#{tmpdir}")
       end
 
       it 'should have HEAD pointing to master' do
@@ -115,6 +114,9 @@ hosts.each do |host|
         it { should contain 'ref: refs/heads/master' }
       end
 
+      after(:all) do
+        host.execute('pkill -9 git')
+      end
     end
 
   end
