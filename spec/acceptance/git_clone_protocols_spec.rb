@@ -68,6 +68,31 @@ hosts.each do |host|
 
     end
 
+    context 'using local protocol (file path)' do
+      before(:all) do
+        on(host,apply_manifest("file {'#{tmpdir}/testrepo': ensure => directory, purge => true, recurse => true, recurselimit => 1, force => true; }"))
+      end
+
+      it 'should have HEAD pointing to master' do
+        pp = <<-EOS
+        vcsrepo { "#{tmpdir}/testrepo":
+          ensure => present,
+          provider => git,
+          source => "#{tmpdir}/testrepo.git",
+        }
+        EOS
+
+        # Run it twice and test for idempotency
+        on(host,apply_manifest(pp, :catch_failures => true))
+        on(host,apply_manifest(pp, :catch_changes => true))
+      end
+
+      describe file("#{tmpdir}/testrepo/.git/HEAD") do
+        it { should contain 'ref: refs/heads/master' }
+      end
+
+    end
+
     context 'using git protocol' do
       before(:all) do
         on(host,apply_manifest("file {'#{tmpdir}/testrepo': ensure => directory, purge => true, recurse => true, recurselimit => 1, force => true; }"))
