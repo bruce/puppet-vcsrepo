@@ -7,7 +7,7 @@ hosts.each do |host|
 
     before(:all) do
       # {{{ setup
-      on(host,apply_manifest("user{'testuser': ensure => present, }"))
+      on(host,apply_manifest("user{'testuser': ensure => present, managehome => true }"))
       on(host,apply_manifest("user{'vagrant': ensure => present, }"))
       # install git
       install_package(host, 'git')
@@ -34,7 +34,7 @@ hosts.each do |host|
 
     after(:all) do
       # {{{ teardown
-      on(host,apply_manifest("user{'testuser': ensure => absent,}"))
+      on(host,apply_manifest("user{'testuser': ensure => absent, managehome => true }"))
       # }}}
     end
 
