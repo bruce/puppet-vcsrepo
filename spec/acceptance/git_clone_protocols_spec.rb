@@ -154,5 +154,50 @@ hosts.each do |host|
       end
     end
 
+    context 'using https protocol' do
+      before(:all) do
+        on(host,apply_manifest("file {'#{tmpdir}/testrepo': ensure => directory, purge => true, recurse => true, recurselimit => 1, force => true; }"))
+        daemon =<<-EOF
+        require 'webrick'
+        require 'webrick/https'
+        server = WEBrick::HTTPServer.new(
+        :Port               => 8443,
+        :DocumentRoot       => "#{tmpdir}",
+        :SSLEnable          => true,
+        :SSLVerifyClient    => OpenSSL::SSL::VERIFY_NONE,
+        :SSLCertificate     => OpenSSL::X509::Certificate.new(  File.open("#{tmpdir}/server.crt").read),
+        :SSLPrivateKey      => OpenSSL::PKey::RSA.new(          File.open("#{tmpdir}/server.key").read),
+        :SSLCertName        => [ [ "CN",WEBrick::Utils::getservername ] ])
+        WEBrick::Daemon.start
+        server.start
+        EOF
+        create_remote_file(host, '/tmp/daemon.rb', daemon)
+        on(host, "ruby /tmp/daemon.rb")
+      end
+
+      it 'should have HEAD pointing to master' do
+        # howto whitelist ssl cert
+        pp = <<-EOS
+        vcsrepo { "#{tmpdir}/testrepo":
+          ensure => present,
+          provider => git,
+          source => "https://#{host}:8443/testrepo.git",
+        }
+        EOS
+
+        # Run it twice and test for idempotency
+        apply_manifest(pp, :catch_failures => true)
+        apply_manifest(pp, :catch_changes => true)
+      end
+
+      describe file("#{tmpdir}/testrepo/.git/HEAD") do
+        it { should contain 'ref: refs/heads/master' }
+      end
+
+      after(:all) do
+        host.execute('pkill -9 ruby')
+      end
+    end
+
   end
 end
