@@ -14,12 +14,14 @@ hosts.each do |host|
       install_package(host, 'git-daemon')
       # create ssh keys
       host.execute('mkdir -p /home/testuser/.ssh')
-      host.execute('ssh-keygen -q -t rsa -f /home/testuser/.ssh/id_rsa -N ""')
+      host.execute('ssh-keygen -q -t rsa -f /root/.ssh/id_rsa -N ""')
 
       # copy public key to authorized_keys
-      host.execute('cat /home/testuser/.ssh/id_rsa.pub > /home/testuser/.ssh/authorized_keys')
-      host.execute('echo -e "Host localhost\n\tStrictHostKeyChecking no\n" > /home/testuser/.ssh/config')
+      host.execute('cat /root/.ssh/id_rsa.pub >> /home/testuser/.ssh/authorized_keys')
+      host.execute('echo -e "Host *\n\tStrictHostKeyChecking no\n" >> /home/testuser/.ssh/config')
+      host.execute('echo -e "Host *\n\tStrictHostKeyChecking no\n" >> /root/.ssh/config')
       host.execute('chown -R testuser:testuser /home/testuser/.ssh')
+      host.execute('chown -R root:root /root/.ssh')
 
       # create git repo
       my_root = File.expand_path(File.join(File.dirname(__FILE__), '..'))
@@ -35,6 +37,8 @@ hosts.each do |host|
     after(:all) do
       # {{{ teardown
       on(host,apply_manifest("user{'testuser': ensure => absent, managehome => true }"))
+      on(host,apply_manifest("file{'/root/.ssh/id_rsa': ensure => absent, force => true }"))
+      on(host,apply_manifest("file{'/root/.ssh/id_rsa.pub': ensure => absent, force => true }"))
       # }}}
     end
 
@@ -196,6 +200,29 @@ hosts.each do |host|
 
       after(:all) do
         host.execute('pkill -9 ruby')
+      end
+    end
+
+    context 'using ssh protocol' do
+      before(:all) do
+        on(host,apply_manifest("file {'#{tmpdir}/testrepo': ensure => directory, purge => true, recurse => true, recurselimit => 1, force => true; }"))
+      end
+      it 'should have HEAD pointing to master' do
+        pp = <<-EOS
+        vcsrepo { "#{tmpdir}/testrepo":
+          ensure => present,
+          provider => git,
+          source => "ssh://root@#{host}#{tmpdir}/testrepo.git",
+        }
+        EOS
+
+        # Run it twice and test for idempotency
+        apply_manifest(pp, :catch_failures => true)
+        apply_manifest(pp, :catch_changes => true)
+      end
+
+      describe file("#{tmpdir}/testrepo/.git/HEAD") do
+        it { should contain 'ref: refs/heads/master' }
       end
     end
 
