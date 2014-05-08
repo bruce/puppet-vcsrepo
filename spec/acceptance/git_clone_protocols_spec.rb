@@ -13,20 +13,20 @@ hosts.each do |host|
       install_package(host, 'git')
       install_package(host, 'git-daemon')
       # create ssh keys
-      host.execute('mkdir -p /home/testuser/.ssh')
-      host.execute('ssh-keygen -q -t rsa -f /root/.ssh/id_rsa -N ""')
+      on(host, 'mkdir -p /home/testuser/.ssh')
+      on(host, 'ssh-keygen -q -t rsa -f /root/.ssh/id_rsa -N ""')
 
       # copy public key to authorized_keys
-      host.execute('cat /root/.ssh/id_rsa.pub >> /home/testuser/.ssh/authorized_keys')
-      host.execute('echo -e "Host *\n\tStrictHostKeyChecking no\n" >> /home/testuser/.ssh/config')
-      host.execute('echo -e "Host *\n\tStrictHostKeyChecking no\n" >> /root/.ssh/config')
-      host.execute('chown -R testuser:testuser /home/testuser/.ssh')
-      host.execute('chown -R root:root /root/.ssh')
+      on(host, 'cat /root/.ssh/id_rsa.pub >> /home/testuser/.ssh/authorized_keys')
+      on(host, 'echo -e "Host *\n\tStrictHostKeyChecking no\n" >> /home/testuser/.ssh/config')
+      on(host, 'echo -e "Host *\n\tStrictHostKeyChecking no\n" >> /root/.ssh/config')
+      on(host, 'chown -R testuser:testuser /home/testuser/.ssh')
+      on(host, 'chown -R root:root /root/.ssh')
 
       # create git repo
       my_root = File.expand_path(File.join(File.dirname(__FILE__), '..'))
       scp_to(host, "#{my_root}/acceptance/files/create_git_repo.sh", tmpdir)
-      host.execute("cd #{tmpdir} && ./create_git_repo.sh")
+      on(host, "cd #{tmpdir} && ./create_git_repo.sh")
 
       # copy ssl keys
       scp_to(host, "#{my_root}/acceptance/files/server.crt", tmpdir)
@@ -98,7 +98,7 @@ hosts.each do |host|
     context 'using git protocol' do
       before(:all) do
         apply_manifest_on(host, "file {'#{tmpdir}/testrepo': ensure => directory, purge => true, recurse => true, recurselimit => 1, force => true; }")
-        host.execute("nohup git daemon  --detach --base-path=/#{tmpdir}")
+        on(host, "nohup git daemon  --detach --base-path=/#{tmpdir}")
       end
 
       it 'should have HEAD pointing to master' do
@@ -119,7 +119,7 @@ hosts.each do |host|
       end
 
       after(:all) do
-        host.execute('pkill -9 git')
+        on(host, 'pkill -9 git')
       end
     end
 
@@ -154,7 +154,7 @@ hosts.each do |host|
       end
 
       after(:all) do
-        host.execute('pkill -9 ruby')
+        on(host, 'pkill -9 ruby')
       end
     end
 
@@ -199,7 +199,7 @@ hosts.each do |host|
       end
 
       after(:all) do
-        host.execute('pkill -9 ruby')
+        on(host, 'pkill -9 ruby')
       end
     end
 
