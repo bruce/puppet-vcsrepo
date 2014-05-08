@@ -7,8 +7,8 @@ hosts.each do |host|
 
     before(:all) do
       # {{{ setup
-      on(host,apply_manifest("user{'testuser': ensure => present, managehome => true }"))
-      on(host,apply_manifest("user{'vagrant': ensure => present, }"))
+      apply_manifest_on(host, "user{'testuser': ensure => present, managehome => true }")
+      apply_manifest_on(host, "user{'vagrant': ensure => present, }")
       # install git
       install_package(host, 'git')
       install_package(host, 'git-daemon')
@@ -36,9 +36,9 @@ hosts.each do |host|
 
     after(:all) do
       # {{{ teardown
-      on(host,apply_manifest("user{'testuser': ensure => absent, managehome => true }"))
-      on(host,apply_manifest("file{'/root/.ssh/id_rsa': ensure => absent, force => true }"))
-      on(host,apply_manifest("file{'/root/.ssh/id_rsa.pub': ensure => absent, force => true }"))
+      apply_manifest_on(host, "user{'testuser': ensure => absent, managehome => true }")
+      apply_manifest_on(host, "file{'/root/.ssh/id_rsa': ensure => absent, force => true }")
+      apply_manifest_on(host, "file{'/root/.ssh/id_rsa.pub': ensure => absent, force => true }")
       # }}}
     end
 
@@ -47,7 +47,7 @@ hosts.each do |host|
 
     context 'using local protocol (file URL)' do
       before(:all) do
-        on(host,apply_manifest("file {'#{tmpdir}/testrepo': ensure => directory, purge => true, recurse => true, recurselimit => 1, force => true; }"))
+        apply_manifest_on(host, "file {'#{tmpdir}/testrepo': ensure => directory, purge => true, recurse => true, recurselimit => 1, force => true; }")
       end
 
       it 'should have HEAD pointing to master' do
@@ -60,8 +60,8 @@ hosts.each do |host|
         EOS
 
         # Run it twice and test for idempotency
-        on(host,apply_manifest(pp, :catch_failures => true))
-        on(host,apply_manifest(pp, :catch_changes => true))
+        apply_manifest_on(host, pp, :catch_failures => true)
+        apply_manifest_on(host, pp, :catch_changes => true)
       end
 
       describe file("#{tmpdir}/testrepo/.git/HEAD") do
@@ -72,7 +72,7 @@ hosts.each do |host|
 
     context 'using local protocol (file path)' do
       before(:all) do
-        on(host,apply_manifest("file {'#{tmpdir}/testrepo': ensure => directory, purge => true, recurse => true, recurselimit => 1, force => true; }"))
+        apply_manifest_on(host, "file {'#{tmpdir}/testrepo': ensure => directory, purge => true, recurse => true, recurselimit => 1, force => true; }")
       end
 
       it 'should have HEAD pointing to master' do
@@ -85,8 +85,8 @@ hosts.each do |host|
         EOS
 
         # Run it twice and test for idempotency
-        on(host,apply_manifest(pp, :catch_failures => true))
-        on(host,apply_manifest(pp, :catch_changes => true))
+        apply_manifest_on(host, pp, :catch_failures => true)
+        apply_manifest_on(host, pp, :catch_changes => true)
       end
 
       describe file("#{tmpdir}/testrepo/.git/HEAD") do
@@ -97,7 +97,7 @@ hosts.each do |host|
 
     context 'using git protocol' do
       before(:all) do
-        on(host,apply_manifest("file {'#{tmpdir}/testrepo': ensure => directory, purge => true, recurse => true, recurselimit => 1, force => true; }"))
+        apply_manifest_on(host, "file {'#{tmpdir}/testrepo': ensure => directory, purge => true, recurse => true, recurselimit => 1, force => true; }")
         host.execute("nohup git daemon  --detach --base-path=/#{tmpdir}")
       end
 
@@ -111,8 +111,8 @@ hosts.each do |host|
         EOS
 
         # Run it twice and test for idempotency
-        apply_manifest(pp, :catch_failures => true)
-        apply_manifest(pp, :catch_changes => true)
+        apply_manifest_on(host, pp, :catch_failures => true)
+        apply_manifest_on(host, pp, :catch_changes => true)
       end
       describe file("#{tmpdir}/testrepo/.git/HEAD") do
         it { should contain 'ref: refs/heads/master' }
@@ -125,7 +125,7 @@ hosts.each do |host|
 
     context 'using http protocol' do
       before(:all) do
-        on(host,apply_manifest("file {'#{tmpdir}/testrepo': ensure => directory, purge => true, recurse => true, recurselimit => 1, force => true; }"))
+        apply_manifest_on(host, "file {'#{tmpdir}/testrepo': ensure => directory, purge => true, recurse => true, recurselimit => 1, force => true; }")
         daemon =<<-EOF
         require 'webrick'
         server = WEBrick::HTTPServer.new(:Port => 8000, :DocumentRoot => "#{tmpdir}")
@@ -146,8 +146,8 @@ hosts.each do |host|
         EOS
 
         # Run it twice and test for idempotency
-        apply_manifest(pp, :catch_failures => true)
-        apply_manifest(pp, :catch_changes => true)
+        apply_manifest_on(host, pp, :catch_failures => true)
+        apply_manifest_on(host, pp, :catch_changes => true)
       end
       describe file("#{tmpdir}/testrepo/.git/HEAD") do
         it { should contain 'ref: refs/heads/master' }
@@ -160,7 +160,7 @@ hosts.each do |host|
 
     context 'using https protocol' do
       before(:all) do
-        on(host,apply_manifest("file {'#{tmpdir}/testrepo': ensure => directory, purge => true, recurse => true, recurselimit => 1, force => true; }"))
+        apply_manifest_on(host, "file {'#{tmpdir}/testrepo': ensure => directory, purge => true, recurse => true, recurselimit => 1, force => true; }")
         daemon =<<-EOF
         require 'webrick'
         require 'webrick/https'
@@ -190,8 +190,8 @@ hosts.each do |host|
         EOS
 
         # Run it twice and test for idempotency
-        apply_manifest(pp, :catch_failures => true)
-        apply_manifest(pp, :catch_changes => true)
+        apply_manifest_on(host, pp, :catch_failures => true)
+        apply_manifest_on(host, pp, :catch_changes => true)
       end
 
       describe file("#{tmpdir}/testrepo/.git/HEAD") do
@@ -205,7 +205,7 @@ hosts.each do |host|
 
     context 'using ssh protocol' do
       before(:all) do
-        on(host,apply_manifest("file {'#{tmpdir}/testrepo': ensure => directory, purge => true, recurse => true, recurselimit => 1, force => true; }"))
+        apply_manifest_on(host, "file {'#{tmpdir}/testrepo': ensure => directory, purge => true, recurse => true, recurselimit => 1, force => true; }")
       end
       it 'should have HEAD pointing to master' do
         pp = <<-EOS
@@ -217,8 +217,8 @@ hosts.each do |host|
         EOS
 
         # Run it twice and test for idempotency
-        apply_manifest(pp, :catch_failures => true)
-        apply_manifest(pp, :catch_changes => true)
+        apply_manifest_on(host, pp, :catch_failures => true)
+        apply_manifest_on(host, pp, :catch_changes => true)
       end
 
       describe file("#{tmpdir}/testrepo/.git/HEAD") do
