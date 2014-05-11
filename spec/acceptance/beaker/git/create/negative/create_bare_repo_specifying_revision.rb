@@ -22,12 +22,12 @@ hosts.each do |host|
     }
     EOS
 
-    apply_manifest_on(host, pp, :acceptable_exit_codes => [1])
+    apply_manifest_on(host, pp)
   end
 
-  step 'verify repo was NOT created' do
-    on(host, "ls -al #{tmpdir}") do |res|
-      fail_test "found #{repo_name}" if res.stdout.include? "#{repo_name}"
+  step 'verify repo does not contain .git directory' do
+    on(host, "ls -al #{tmpdir}/#{repo_name}") do |res|
+      fail_test "found .git for #{repo_name}" if res.stdout.include? ".git"
     end
   end
 
