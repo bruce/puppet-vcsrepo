@@ -36,7 +36,7 @@ hosts.each do |host|
     apply_manifest_on(host, pp)
   end
 
-  stop "verify repo is checked out to revision #{sha}" do
+  step "verify repo is checked out to revision #{@sha}" do
     on(host, "ls #{tmpdir}/#{repo_name}/.git/") do |res|
       fail_test('checkout not found') unless res.stdout.include? "HEAD"
     end
