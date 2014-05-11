@@ -42,13 +42,9 @@ hosts.each do |host|
     apply_manifest_on(host, pp)
   end
 
-  step 'verify checkout is shallow and of the correct depth' do
-    on(host, "ls #{tmpdir}/#{repo_name}/.git/") do |res|
-      fail_test('shallow not found') unless res.stdout.include? "shallow"
-    end
-
-    on(host, "wc -l #{tmpdir}/#{repo_name}/.git/shallow") do |res|
-      fail_test('shallow not found') unless res.stdout.include? "2 #{tmpdir}/#{repo_name}/.git/shallow"
+  step 'git does not support shallow clone via HTTP: verify checkout is NOT created' do
+    on(host, "ls #{tmpdir}") do |res|
+      fail_test('checkout found') if res.stdout.include? "#{repo_name}"
     end
   end
 
