@@ -22,7 +22,7 @@ hosts.each do |host|
       ensure => present,
       source => "file://#{tmpdir}/testrepo.git",
       provider => git,
-      compression => `exec rm -rf /tmp`,
+      compression => "exec 'rm -rf /tmp'",
     }
     EOS
 
