@@ -7,7 +7,7 @@ hosts.each do |host|
   tmpdir = host.tmpdir('vcsrepo')
   step 'setup - create repo' do
     install_package(host, 'git')
-    my_root = File.expand_path(File.join(File.dirname(__FILE__), '../../../..'))
+    my_root = File.expand_path(File.join(File.dirname(__FILE__), '../../../../..'))
     scp_to(host, "#{my_root}/acceptance/files/create_git_repo.sh", tmpdir)
     on(host, "cd #{tmpdir} && ./create_git_repo.sh")
   end
