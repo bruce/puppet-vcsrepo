@@ -2,7 +2,7 @@ test_name 'C3509 - clone repo with excludes not in repo'
 
 # Globals
 repo_name = 'testrepo_with_excludes_not_in_repo'
-exclude1 = 'rm -rf /tmp'
+exclude1 = "'exec 'rm -rf /tmp'"
 
 hosts.each do |host|
   tmpdir = host.tmpdir('vcsrepo')
