@@ -22,7 +22,7 @@ hosts.each do |host|
       ensure => present,
       source => "file://#{tmpdir}/testrepo.git",
       provider => git,
-      depth => 'rm -rf /tmp',
+      depth => "exec 'rm -rf /tmp'",
     }
     EOS
 
