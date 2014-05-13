@@ -140,7 +140,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
     if @resource.value(:remote) != 'origin'
       args.push('--origin', @resource.value(:remote))
     end
-    if !File.exist?(File.join(@resource.value(:path), '.git'))
+    if !working_copy_exists?
       args.push(source, path)
       Dir.chdir("/") do
         git_with_identity(*args)
@@ -271,6 +271,9 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
   end
 
   def get_revision(rev)
+    if @resource.value(:force) && working_copy_exists?
+      create
+    end
     if !working_copy_exists?
       create
     end

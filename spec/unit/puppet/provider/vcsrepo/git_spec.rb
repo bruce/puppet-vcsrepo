@@ -9,6 +9,7 @@ describe Puppet::Type.type(:vcsrepo).provider(:git_provider) do
     :revision => '2634',
     :source   => 'git@repo',
     :path     => '/tmp/test',
+    :force    => false
   })}
 
   let(:provider) { resource.provider }
@@ -151,12 +152,26 @@ describe Puppet::Type.type(:vcsrepo).provider(:git_provider) do
         provider.expects(:convert_working_copy_to_bare)
         provider.create
       end
+      it "should clone overtop it using force" do
+        resource[:force] = true
+        Dir.expects(:chdir).with('/').at_least_once.yields
+        Dir.expects(:chdir).with('/tmp/test').at_least_once.yields
+        provider.expects(:path_exists?).returns(true)
+        provider.expects(:path_empty?).returns(false)
+        provider.destroy
+        provider.expects(:git).with('clone',resource.value(:source), resource.value(:path))
+        provider.expects(:update_submodules)
+        provider.expects(:git).with('branch', '-a').returns(resource.value(:revision))
+        provider.expects(:git).with('checkout', '--force', resource.value(:revision))
+        provider.create
+      end
     end
 
     context "when the path is not empty and not a repository" do
       it "should raise an exception" do
-        expects_directory?(true)
+        provider.expects(:path_exists?).returns(true)
         provider.expects(:path_empty?).returns(false)
+        provider.expects(:working_copy_exists?).returns(false)
         proc { provider.create }.should raise_error(Puppet::Error)
       end
     end
@@ -390,7 +405,7 @@ describe Puppet::Type.type(:vcsrepo).provider(:git_provider) do
     end
   end
 
-  describe 'convert_bare_to_working_copy' do
+    describe 'convert_bare_to_working_copy' do
     it do
       FileUtils.expects(:mv).returns(true)
       FileUtils.expects(:mkdir).returns(true)
