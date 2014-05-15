@@ -7,6 +7,7 @@ password  = 'bar'
 http_server_script = 'basic_auth_https_daemon.rb'
 
 hosts.each do |host|
+  ruby = '/opt/puppet/bin/ruby' if host.is_pe? || 'ruby'
   tmpdir = host.tmpdir('vcsrepo')
   step 'setup - create repo' do
     install_package(host, 'git')
@@ -39,12 +40,12 @@ hosts.each do |host|
     server.start
     EOF
     create_remote_file(host, "#{tmpdir}/#{http_server_script}", script)
-    on(host, "ruby #{tmpdir}/#{http_server_script}")
+    on(host, "#{ruby} #{tmpdir}/#{http_server_script}")
   end
 
   teardown do
     on(host, "rm -fr #{tmpdir}")
-    on(host, "ps ax | grep 'ruby #{tmpdir}/#{http_server_script}' | grep -v grep | awk '{print \"kill -9 \" $1}' | sh")
+    on(host, "ps ax | grep '#{ruby} #{tmpdir}/#{http_server_script}' | grep -v grep | awk '{print \"kill -9 \" $1}' | sh")
   end
 
   step 'checkout with puppet using basic auth' do
