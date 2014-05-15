@@ -79,12 +79,18 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
 
   def revision=(desired)
     checkout(desired)
-    if local_branch_revision?(desired)
+    if local_branch_revision?
       # reset instead of pull to avoid merge conflicts. assuming remote is
       # authoritative.
       # might be worthwhile to have an allow_local_changes param to decide
       # whether to reset or pull when we're ensuring latest.
-      at_path { git_with_identity('reset', '--hard', "#{@resource.value(:remote)}/#{desired}") }
+      at_path {
+        git_with_identity('reset', '--hard', "#{@resource.value(:remote)}/#{@resource.value(:revision)}")
+        if detached?
+          git_with_identity('checkout', "#{@resource.value(:revision)}")
+          git_with_identity('pull')
+        end
+      }
     end
     if @resource.value(:ensure) != :bare
       update_submodules
@@ -259,7 +265,16 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
   end
 
   def on_branch?
-    at_path { git_with_identity('rev-parse', '--abbrev-ref', 'HEAD').chomp }
+    at_path {
+      matches = git_with_identity('branch', '--list').match /\*\s+(.*)/
+      matches[1] unless matches[1].match /detached/
+    }
+  end
+
+  def detached?
+    at_path {
+      git_with_identity('branch', '--list').match /\*\s+\(detached from.*\)/
+    }
   end
 
   def tags
