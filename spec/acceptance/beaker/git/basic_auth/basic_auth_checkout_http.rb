@@ -8,6 +8,7 @@ http_server_script = 'basic_auth_http_daemon.rb'
 
 hosts.each do |host|
   ruby = '/opt/puppet/bin/ruby' if host.is_pe? || 'ruby'
+  gem = '/opt/puppet/bin/gem' if host.is_pe? || 'gem'
   tmpdir = host.tmpdir('vcsrepo')
   step 'setup - create repo' do
     install_package(host, 'git')
@@ -18,23 +19,19 @@ hosts.each do |host|
 
   step 'setup - start http server' do
     script =<<-EOF
-    require 'webrick'
+    require 'sinatra'
 
-    authenticate = Proc.new do |req, res|
-      WEBrick::HTTPAuth.basic_auth(req, res, '') do |user, password|
-        user == '#{user}' && password == '#{password}'
-      end
+    set :bind, '0.0.0.0'
+    set :static, true
+    set :public_folder, '#{tmpdir}'
+
+
+    use Rack::Auth::Basic do |username, password|
+        username == '#{user}' && password == '#{password}'
     end
-
-    server = WEBrick::HTTPServer.new(
-    :Port               => 8000,
-    :DocumentRoot       => "#{tmpdir}",
-    :DocumentRootOptions=> {:HandlerCallback => authenticate},
-    )
-    WEBrick::Daemon.start
-    server.start
     EOF
     create_remote_file(host, "#{tmpdir}/#{http_server_script}", script)
+    on(host, "#{gem} install sinatra")
     on(host, "#{ruby} #{tmpdir}/#{http_server_script} &")
   end
 
@@ -47,7 +44,7 @@ hosts.each do |host|
     pp = <<-EOS
     vcsrepo { "#{tmpdir}/#{repo_name}":
       ensure => present,
-      source => "http://#{host}:8000/testrepo.git",
+      source => "http://#{host}:4567/testrepo.git",
       provider => git,
       basic_auth_username => '#{user}',
       basic_auth_password => '#{password}',
