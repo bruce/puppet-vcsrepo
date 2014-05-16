@@ -1,4 +1,5 @@
 test_name 'C3493 - checkout with basic auth (https protocol)'
+skip_test 'waiting for CA trust solution'
 
 # Globals
 repo_name = 'testrepo_checkout'

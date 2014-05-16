@@ -1,4 +1,5 @@
 test_name 'C3480 - shallow clone repo minimal depth = 1 (https protocol)'
+skip_test 'Not currently supported. See FM-1286'
 
 # Globals
 repo_name = 'testrepo_shallow_clone'

@@ -1,4 +1,5 @@
 test_name 'C3475 - shallow clone repo minimal depth = 1 (file path protocol)'
+skip_test 'Not currently supported. See FM-1285'
 
 # Globals
 repo_name = 'testrepo_shallow_clone'
