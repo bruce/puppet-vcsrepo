@@ -4,7 +4,7 @@ test_name 'C3455 - checkout a revision (http protocol)'
 repo_name = 'testrepo_revision_checkout'
 
 hosts.each do |host|
-  ruby = '/opt/puppet/bin/ruby' if host.is_pe? || 'ruby'
+  ruby = (host.is_pe? && '/opt/puppet/bin/ruby') || 'ruby'
   tmpdir = host.tmpdir('vcsrepo')
   step 'setup - create repo' do
     install_package(host, 'git')
@@ -26,7 +26,7 @@ hosts.each do |host|
 
   teardown do
     on(host, "rm -fr #{tmpdir}")
-    on(host, 'ps ax | grep "#{ruby} /tmp/http_daemon.rb" | grep -v grep | awk \'{print "kill -9 " $1}\' | sh')
+    on(host, "ps ax | grep '#{ruby} /tmp/http_daemon.rb' | grep -v grep | awk '{print \"kill -9 \" $1}' | sh")
   end
 
   step 'get revision sha from repo' do

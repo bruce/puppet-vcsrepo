@@ -4,7 +4,7 @@ test_name 'C3479 - shallow clone repo minimal depth = 1 (http protocol)'
 repo_name = 'testrepo_shallow_clone'
 
 hosts.each do |host|
-  ruby = '/opt/puppet/bin/ruby' if host.is_pe? || 'ruby'
+  ruby = (host.is_pe? && '/opt/puppet/bin/ruby') || 'ruby'
   tmpdir = host.tmpdir('vcsrepo')
   step 'setup - create repo' do
     install_package(host, 'git')

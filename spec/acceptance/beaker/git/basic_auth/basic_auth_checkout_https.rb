@@ -7,7 +7,7 @@ password  = 'bar'
 http_server_script = 'basic_auth_https_daemon.rb'
 
 hosts.each do |host|
-  ruby = '/opt/puppet/bin/ruby' if host.is_pe? || 'ruby'
+  ruby = (host.is_pe? && '/opt/puppet/bin/ruby') || 'ruby'
   tmpdir = host.tmpdir('vcsrepo')
   step 'setup - create repo' do
     install_package(host, 'git')
