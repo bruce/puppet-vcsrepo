@@ -85,7 +85,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
       # might be worthwhile to have an allow_local_changes param to decide
       # whether to reset or pull when we're ensuring latest.
       at_path {
-        git_with_identity('reset', '--hard', "#{@resource.value(:remote)}/#{@resource.value(:revision)}")
+        git_with_identity('reset', '--hard', "#{@resource.value(:remote)}/#{desired}")
         if detached?
           git_with_identity('checkout', "#{@resource.value(:revision)}")
           git_with_identity('pull')
@@ -266,14 +266,14 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
 
   def on_branch?
     at_path {
-      matches = git_with_identity('branch', '--list').match /\*\s+(.*)/
+      matches = git_with_identity('branch', '-a').match /\*\s+(.*)/
       matches[1] unless matches[1].match /detached/
     }
   end
 
   def detached?
     at_path {
-      git_with_identity('branch', '--list').match /\*\s+\(detached from.*\)/
+      git_with_identity('branch', '-a').match /\*\s+\(detached from.*\)/
     }
   end
 
