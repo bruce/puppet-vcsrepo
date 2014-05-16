@@ -261,10 +261,8 @@ describe Puppet::Type.type(:vcsrepo).provider(:git_provider) do
       it "should use 'git fetch' and 'git reset'" do
         resource[:revision] = 'feature/foo'
         provider.expects(:update_submodules)
-        provider.expects(:git).with('branch','--list').returns("* master")
-        provider.expects(:git).with('branch', '-a').returns(resource.value(:revision))
+        provider.expects(:git).with('branch', '-a').at_least_once.returns(resource.value(:revision))
         provider.expects(:git).with('checkout', '--force', resource.value(:revision))
-        provider.expects(:git).with('branch', '-a').returns(resource.value(:revision))
         provider.expects(:git).with('reset', '--hard', "origin/#{resource.value(:revision)}")
         provider.revision = resource.value(:revision)
       end
@@ -273,10 +271,8 @@ describe Puppet::Type.type(:vcsrepo).provider(:git_provider) do
       it "should use 'git fetch' and 'git reset'" do
         resource[:revision] = 'only/remote'
         provider.expects(:update_submodules)
-        provider.expects(:git).with('branch','--list').returns("* master")
-        provider.expects(:git).with('branch', '-a').returns(resource.value(:revision))
+        provider.expects(:git).with('branch', '-a').at_least_once.returns(resource.value(:revision))
         provider.expects(:git).with('checkout', '--force', resource.value(:revision))
-        provider.expects(:git).with('branch', '-a').returns(resource.value(:revision))
         provider.expects(:git).with('reset', '--hard', "origin/#{resource.value(:revision)}")
         provider.revision = resource.value(:revision)
       end
@@ -343,7 +339,7 @@ describe Puppet::Type.type(:vcsrepo).provider(:git_provider) do
   context "retrieving the current revision" do
     before do
       expects_chdir
-      provider.expects(:git).with('branch','--list').returns("* foo")
+      provider.expects(:git).with('branch','-a').returns("* foo")
     end
 
     it "will strip trailing newlines" do
@@ -379,20 +375,20 @@ describe Puppet::Type.type(:vcsrepo).provider(:git_provider) do
     end
     context 'on master' do
       it do
-        provider.expects(:git).with('branch','--list').returns("* master")
+        provider.expects(:git).with('branch','-a').returns("* master")
         provider.latest.should == 'master'
       end
     end
     context 'no branch' do
       it do
-        provider.expects(:git).with('branch','--list').returns("* master")
+        provider.expects(:git).with('branch','-a').returns("* master")
 
         provider.latest.should == 'master'
       end
     end
     context 'feature/bar' do
       it do
-        provider.expects(:git).with('branch','--list').returns("* master")
+        provider.expects(:git).with('branch','-a').returns("* master")
         provider.latest.should == 'master'
       end
     end
