@@ -121,14 +121,36 @@ describe 'clones a remote repo' do
     end
   end
 
-  context 'ensure latest' do
+  context 'ensure latest with branch specified' do
     it 'clones a repo' do
       pp = <<-EOS
       vcsrepo { "#{tmpdir}/testrepo_latest":
         ensure => latest,
         provider => git,
         source => "file://#{tmpdir}/testrepo.git",
-        revision => 'master',
+        revision => 'a_branch',
+      }
+      EOS
+
+      # Run it twice and test for idempotency
+      apply_manifest(pp, :catch_failures => true)
+      apply_manifest(pp, :catch_changes => true)
+    end
+
+    it 'verifies the HEAD commit SHA on remote and local match' do
+      remote_commit = shell("git ls-remote file://#{tmpdir}/testrepo_latest HEAD | head -1").stdout
+      local_commit = shell("git --git-dir=#{tmpdir}/testrepo_latest/.git rev-parse HEAD").stdout.chomp
+      expect(remote_commit).to include(local_commit)
+    end
+  end
+
+  context 'ensure latest with branch unspecified' do
+    it 'clones a repo' do
+      pp = <<-EOS
+      vcsrepo { "#{tmpdir}/testrepo_latest":
+        ensure => latest,
+        provider => git,
+        source => "file://#{tmpdir}/testrepo.git",
       }
       EOS
 
