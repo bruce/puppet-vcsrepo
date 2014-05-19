@@ -2,3 +2,9 @@ coverage
 .DS_Store
 .#*
 \#*
+Gemfile.lock
+log
+
+#Intellij
+.idea
+*.iml
