@@ -1,4 +1,5 @@
 test_name 'C3509 - clone repo with excludes not in repo'
+skip_test 'expectations not defined'
 
 # Globals
 repo_name = 'testrepo_with_excludes_not_in_repo'
