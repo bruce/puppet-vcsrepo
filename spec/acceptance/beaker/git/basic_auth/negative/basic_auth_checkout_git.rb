@@ -17,7 +17,7 @@ hosts.each do |host|
 
   step 'setup - start git daemon' do
     install_package(host, 'git-daemon')
-    on(host, "nohup git daemon  --detach --base-path=/#{tmpdir}")
+    on(host, "git daemon --base-path=#{tmpdir}  --export-all --reuseaddr --verbose --detach")
   end
 
   teardown do
