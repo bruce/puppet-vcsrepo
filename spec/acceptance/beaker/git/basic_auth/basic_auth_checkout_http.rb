@@ -1,4 +1,5 @@
 test_name 'C3492 - checkout with basic auth (http protocol)'
+skip_test 'HTTP not supported yet for basic auth using git. See FM-1331'
 
 # Globals
 repo_name = 'testrepo_checkout'
