@@ -33,7 +33,7 @@ hosts.each do |host|
 
   teardown do
     on(host, "rm -fr #{tmpdir}")
-    on(host, "ps ax | grep '#{ruby} /tmp/https_daemon.rb' | grep -v grep | awk '{print \"kill -9 \" $1}' | sh")
+    on(host, "ps ax | grep '#{ruby} /tmp/https_daemon.rb' | grep -v grep | awk '{print \"kill -9 \" $1}' | sh ; sleep 1")
   end
 
   step 'get revision sha from repo' do
@@ -53,8 +53,8 @@ hosts.each do |host|
     }
     EOS
 
-    apply_manifest_on(host, pp)
-    apply_manifest_on(host, pp)
+    apply_manifest_on(host, pp, :catch_failures => true)
+    apply_manifest_on(host, pp, :catch_changes  => true)
   end
 
   step "verify checkout is set to revision #{@sha}" do

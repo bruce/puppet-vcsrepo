@@ -14,12 +14,12 @@ hosts.each do |host|
   end
 
   step 'setup - create group' do
-    apply_manifest_on(host, "group { '#{group}': ensure => present, }")
+    apply_manifest_on(host, "group { '#{group}': ensure => present, }", :catch_failures => true)
   end
 
   teardown do
     on(host, "rm -fr #{tmpdir}")
-    apply_manifest_on(host, "group { '#{group}': ensure => absent, }")
+    apply_manifest_on(host, "group { '#{group}': ensure => absent, }", :catch_failures => true)
   end
 
   step 'checkout a group with puppet' do
@@ -32,8 +32,8 @@ hosts.each do |host|
     }
     EOS
 
-    apply_manifest_on(host, pp)
-    apply_manifest_on(host, pp)
+    apply_manifest_on(host, pp, :catch_failures => true)
+    apply_manifest_on(host, pp, :catch_changes  => true)
   end
 
   step "verify git checkout is own by group #{group}" do

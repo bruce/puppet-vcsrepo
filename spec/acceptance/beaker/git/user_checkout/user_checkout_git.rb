@@ -18,13 +18,13 @@ hosts.each do |host|
   end
 
   step 'setup - create user' do
-    apply_manifest_on(host, "user { '#{user}': ensure => present, }")
+    apply_manifest_on(host, "user { '#{user}': ensure => present, }", :catch_failures => true)
   end
 
   teardown do
     on(host, "rm -fr #{tmpdir}")
-    on(host, 'pkill -9 git-daemon')
-    apply_manifest_on(host, "user { '#{user}': ensure => absent, }")
+    on(host, 'pkill -9 git-daemon ; sleep 1')
+    apply_manifest_on(host, "user { '#{user}': ensure => absent, }", :catch_failures => true)
   end
 
   step 'checkout a user with puppet' do
@@ -37,8 +37,8 @@ hosts.each do |host|
     }
     EOS
 
-    apply_manifest_on(host, pp)
-    apply_manifest_on(host, pp)
+    apply_manifest_on(host, pp, :catch_failures => true)
+    apply_manifest_on(host, pp, :catch_changes  => true)
   end
 
   step "verify git checkout is owned by user #{user}" do

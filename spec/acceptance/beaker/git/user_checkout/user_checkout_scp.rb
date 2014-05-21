@@ -14,22 +14,23 @@ hosts.each do |host|
   end
   step 'setup - establish ssh keys' do
     # create ssh keys
-    on(host, 'ssh-keygen -q -t rsa -f /root/.ssh/id_rsa -N ""')
+    on(host, 'yes | ssh-keygen -q -t rsa -f /root/.ssh/id_rsa -N ""')
 
     # copy public key to authorized_keys
+    on(host, 'cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys')
     on(host, 'echo -e "Host *\n\tStrictHostKeyChecking no\n" >> /root/.ssh/config')
     on(host, 'chown -R root:root /root/.ssh')
   end
 
   step 'setup - create user' do
-    apply_manifest_on(host, "user { '#{user}': ensure => present, }")
+    apply_manifest_on(host, "user { '#{user}': ensure => present, }", :catch_failures => true)
   end
 
   teardown do
     on(host, "rm -fr #{tmpdir}")
-    apply_manifest_on(host, "file{'/root/.ssh/id_rsa': ensure => absent, force => true }")
-    apply_manifest_on(host, "file{'/root/.ssh/id_rsa.pub': ensure => absent, force => true }")
-    apply_manifest_on(host, "user { '#{user}': ensure => absent, }")
+    apply_manifest_on(host, "file{'/root/.ssh/id_rsa': ensure => absent, force => true }", :catch_failures => true)
+    apply_manifest_on(host, "file{'/root/.ssh/id_rsa.pub': ensure => absent, force => true }", :catch_failures => true)
+    apply_manifest_on(host, "user { '#{user}': ensure => absent, }", :catch_failures => true)
   end
 
   step 'checkout as a user with puppet (scp syntax)' do
@@ -42,8 +43,8 @@ hosts.each do |host|
     }
     EOS
 
-    apply_manifest_on(host, pp)
-    apply_manifest_on(host, pp)
+    apply_manifest_on(host, pp, :catch_failures => true)
+    apply_manifest_on(host, pp, :catch_changes  => true)
   end
 
   step "verify git checkout is owned by user #{user}" do

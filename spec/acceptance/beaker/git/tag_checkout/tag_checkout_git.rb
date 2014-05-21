@@ -19,7 +19,7 @@ hosts.each do |host|
 
   teardown do
     on(host, "rm -fr #{tmpdir}")
-    on(host, 'pkill -9 git-daemon')
+    on(host, 'pkill -9 git-daemon ; sleep 1')
   end
 
   step 'get tag sha from repo' do
@@ -38,8 +38,8 @@ hosts.each do |host|
     }
     EOS
 
-    apply_manifest_on(host, pp)
-    apply_manifest_on(host, pp)
+    apply_manifest_on(host, pp, :catch_failures => true)
+    apply_manifest_on(host, pp, :catch_changes  => true)
   end
 
   step "verify checkout out tag is #{tag}" do

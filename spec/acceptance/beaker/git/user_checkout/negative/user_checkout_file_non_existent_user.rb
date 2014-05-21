@@ -14,7 +14,7 @@ hosts.each do |host|
   end
 
   step 'setup - delete user' do
-    apply_manifest_on(host, "user { '#{user}': ensure => absent, }")
+    apply_manifest_on(host, "user { '#{user}': ensure => absent, }", :catch_failures => true)
   end
 
   teardown do
@@ -31,8 +31,7 @@ hosts.each do |host|
     }
     EOS
 
-    apply_manifest_on(host, pp)
-    apply_manifest_on(host, pp)
+    apply_manifest_on(host, pp, :expect_failures => true)
   end
 
   step "verify git checkout is NOT owned by user #{user}" do
