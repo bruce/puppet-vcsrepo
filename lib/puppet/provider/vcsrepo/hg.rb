@@ -3,8 +3,9 @@ require File.join(File.dirname(__FILE__), '..', 'vcsrepo')
 Puppet::Type.type(:vcsrepo).provide(:hg, :parent => Puppet::Provider::Vcsrepo) do
   desc "Supports Mercurial repositories"
 
-  optional_commands :hg => 'hg',
-                    :su => 'su'
+  commands :hg => 'hg'
+  optional_commands :su => 'su'
+
   has_features :reference_tracking, :ssh_identity, :user
 
   def create
