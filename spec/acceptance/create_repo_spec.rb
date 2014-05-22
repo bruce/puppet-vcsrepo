@@ -54,7 +54,7 @@ describe 'create a repo' do
   end
 
   context 'bare repo with a revision' do
-    it 'creates a bare repo' do
+    it 'does not create a bare repo when a revision is defined' do
       pp = <<-EOS
       vcsrepo { "#{tmpdir}/testrepo_bare_repo_rev":
         ensure => bare,
@@ -63,14 +63,10 @@ describe 'create a repo' do
       }
       EOS
 
-      apply_manifest(pp, :catch_failures => true)
+      apply_manifest(pp, :expect_failures => true)
     end
 
-    describe file("#{tmpdir}/testrepo_bare_repo_rev/config") do
-      it { should contain 'bare = true' }
-    end
-
-    describe file("#{tmpdir}/testrepo_bare_repo_rev/.git") do
+    describe file("#{tmpdir}/testrepo_bare_repo_rev") do
       it { should_not be_directory }
     end
   end
