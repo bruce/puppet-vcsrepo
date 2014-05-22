@@ -26,8 +26,7 @@ hosts.each do |host|
     }
     EOS
 
-    apply_manifest_on(host, pp)
-    apply_manifest_on(host, pp)
+    apply_manifest_on(host, pp, :expect_failures => true)
   end
 
   step 'verify that master revision is checked out' do

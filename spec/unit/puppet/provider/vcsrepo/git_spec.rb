@@ -90,10 +90,9 @@ branches
 
     context "with an ensure of bare" do
       context "with revision" do
-        it "should just execute 'git clone --bare'" do
+        it "should raise an error" do
           resource[:ensure] = :bare
-          provider.expects(:git).with('clone', '--bare', resource.value(:source), resource.value(:path))
-          provider.create
+          expect { provider.create }.to raise_error Puppet::Error, /cannot set a revision.+bare/i
         end
       end
       context "without revision" do
@@ -144,6 +143,7 @@ branches
       it "should execute 'git init --bare'" do
         resource[:ensure] = :bare
         resource.delete(:source)
+        resource.delete(:revision)
         expects_chdir
         expects_mkdir
         expects_directory?(false)
@@ -157,6 +157,7 @@ branches
       it "should convert it to a bare repository" do
         resource[:ensure] = :bare
         resource.delete(:source)
+        resource.delete(:revision)
         provider.expects(:working_copy_exists?).returns(true)
         provider.expects(:convert_working_copy_to_bare)
         provider.create

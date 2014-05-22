@@ -10,16 +10,15 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
   has_features :bare_repositories, :reference_tracking, :ssh_identity, :multiple_remotes, :user, :depth
 
   def create
+    if @resource.value(:revision) and @resource.value(:ensure) == :bare
+      fail("Cannot set a revision (#{@resource.value(:revision)}) on a bare repository")
+    end
     if !@resource.value(:source)
       init_repository(@resource.value(:path))
     else
       clone_repository(@resource.value(:source), @resource.value(:path))
       if @resource.value(:revision)
-        if @resource.value(:ensure) == :bare
-          notice "Ignoring revision for bare repository"
-        else
-          checkout
-        end
+        checkout
       end
       if @resource.value(:ensure) != :bare
         update_submodules
