@@ -1,18 +1,18 @@
 require 'puppetlabs_spec_helper/rake_tasks'
 require 'rake'
 
-task 'beaker:test',[:host,:type] => :set_beaker_variables do |t,args|
+desc "Run beaker-rspec and beaker tests"
+task 'beaker:test:all',[:host,:type] => ["rake:beaker:rspec:test", "rake:beaker:test"] do |t,args|
+end
 
+desc "Run beaker-rspec tests"
+task 'beaker:rspec:test',[:host,:type] => [:set_beaker_variables] do |t,args|
   Rake::Task['beaker-rspec:test'].invoke(args)
+end
 
-  if File.exists?('./acceptance')
-    Dir.chdir('./acceptance')
-    exec(build_beaker_command args)
-    Dir.chdir('../')
-  else
-    puts "No acceptance directory found, not running beaker tests"
-  end
-
+desc "Run beaker tests"
+task 'beaker:test',[:host,:type] => [:set_beaker_variables] do |t,args|
+  sh(build_beaker_command args)
 end
 
 desc "Run beaker rspec tasks against pe"
@@ -40,6 +40,9 @@ task :set_beaker_variables do |t,args|
     puts "Host to test #{ENV['BEAKER_set']}"
   end
   ENV['BEAKER_IS_PE'] = args[:type] == 'pe'? "true": "false"
+  if ENV['BEAKER_setfile']
+    @hosts_config = ENV['BEAKER_setfile']
+  end
 end
 
 def build_beaker_command(args)
@@ -48,11 +51,14 @@ def build_beaker_command(args)
   if File.exists?("./.beaker-#{args[:type]}.cfg")
     cmd << "--options-file ./.beaker-#{args[:type]}.cfg"
   end
-  if File.exists?("config/#{args[:host]}.cfg")
-    cmd << "--hosts config/#{args[:host]}.cfg"
+  if File.exists?(@hosts_config)
+    cmd << "--hosts #{@hosts_config}"
   end
-  if File.exists?("./tests")
-    cmd << "--tests ./tests"
+  if File.exists?('./spec/acceptance/beaker_helper.rb')
+    cmd << "--pre-suite ./spec/acceptance/beaker_helper.rb"
+  end
+  if File.exists?("./spec/acceptance/beaker")
+    cmd << "--tests ./spec/acceptance/beaker"
   end
   cmd.join(" ")
 end
