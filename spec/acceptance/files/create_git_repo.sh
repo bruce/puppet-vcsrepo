@@ -6,12 +6,12 @@ touch file1.txt file2.txt file3.txt
 git init
 echo 'change 1' > file1.txt
 git add file1.txt
-git tag 0.0.1
 git commit -m 'add file1'
+git tag 0.0.1
 echo 'change 2' > file2.txt
 git add file2.txt
-git tag 0.0.2
 git commit -m 'add file2'
+git tag 0.0.2
 echo 'change 3' > file3.txt
 git add file3.txt
 git commit -m 'add file3'

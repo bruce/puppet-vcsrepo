@@ -34,6 +34,8 @@ RSpec.configure do |c|
           exit
         end
       end
+      shell('git config --global user.email "root@localhost"')
+      shell('git config --global user.name "root"')
     end
   end
 end
