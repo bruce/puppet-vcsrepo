@@ -43,6 +43,9 @@ task :set_beaker_variables do |t,args|
   if ENV['BEAKER_setfile']
     @hosts_config = ENV['BEAKER_setfile']
   end
+  if File.exists?(check_args_for_keyfile(args.extras))
+    ENV['BEAKER_keyfile'] = check_args_for_keyfile(args.extras)
+  end
 end
 
 def build_beaker_command(args)
@@ -60,5 +63,16 @@ def build_beaker_command(args)
   if File.exists?("./spec/acceptance/beaker")
     cmd << "--tests ./spec/acceptance/beaker"
   end
+  if File.exists?(check_args_for_keyfile(args.extras))
+    cmd << "--keyfile #{check_args_for_keyfile(args.extras)}"
+  end
   cmd.join(" ")
+end
+
+def check_args_for_keyfile(extra_args)
+  keyfile = ''
+  extra_args.each do |a|
+    keyfile = a if (`file -b #{a}`.gsub(/\n/,"").match(/ key/))
+  end
+  return keyfile
 end
