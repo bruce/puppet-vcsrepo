@@ -72,7 +72,7 @@ end
 def check_args_for_keyfile(extra_args)
   keyfile = ''
   extra_args.each do |a|
-    keyfile = a if (`file -b #{a}`.gsub(/\n/,"").match(/ key/))
+    keyfile = a unless (`ssh-keygen -l -f #{a}`.gsub(/\n/,"").match(/is not a .*key file/))
   end
   return keyfile
 end
