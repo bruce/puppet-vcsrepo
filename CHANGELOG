@@ -1,3 +1,29 @@
+2014-06-04 - Version 1.0.0
+
+Summary:
+
+This release focuses on a number of bugfixes, and also has some
+new features for Bzr and Git.
+
+Features:
+- Bzr:
+ - Call set_ownership
+- Git:
+ - Add ability for shallow clones
+ - Use -a and desired for HARD resets
+ - Use rev-parse to get tag canonical revision
+
+Fixes:
+- HG:
+ - Only add ssh options when it's talking to the network
+- Git:
+ - Fix for issue with detached HEAD
+ - force => true will now destroy and recreate repo
+ - Actually use the remote parameter
+ - Use origin/master instead of origin/HEAD when on master
+- SVN:
+ - Fix svnlook behavior with plain directories
+
 2013-11-13 - Version 0.2.0
 
 Summary:
