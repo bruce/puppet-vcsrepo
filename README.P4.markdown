@@ -71,9 +71,18 @@ You can set `p4port` to specify a Perforce server:
         p4port   => 'ssl:perforce.com:1666'
     }
 
-If `p4port`, `p4user`, `p4charset` or `p4client` are specified they will override the
-environment variabels P4PORT, P4USER, etc... If a P4CONFIG file is defined, the config
-file settings will take precedence.
+You can set `p4passwd` for authentication :
+
+    vcsrepo { "/path/to/repo":
+        ensure   => present,
+        provider => p4,
+        source   => '//depot/branch/...',
+        p4port   => 'ssl:perforce.com:1666'
+    }
+
+If `p4port`, `p4user`, `p4charset`, `p4passwd` or `p4client` are specified they will 
+override the environment variabels P4PORT, P4USER, etc... If a P4CONFIG file is 
+defined, the config file settings will take precedence.
 
 
 More Examples

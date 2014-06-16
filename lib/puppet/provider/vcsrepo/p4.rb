@@ -162,12 +162,14 @@ Puppet::Type.type(:vcsrepo).provide(:p4, :parent => Puppet::Provider::Vcsrepo) d
 		p4port = @resource.value(:p4port)
 		p4user = @resource.value(:p4user)
 		p4charset = @resource.value(:p4charset)
+		p4passwd = @resource.value(:p4passwd)
 		p4client = @resource.value(:p4client) || client_name
 	
 		cfg = Hash.new	
 		cfg.store 'P4USER', p4user if p4user
 		cfg.store 'P4PORT', p4port if p4port
 		cfg.store 'P4CHARSET', p4charset if p4charset
+		cfg.store 'P4PASSWD', p4passwd if p4passwd
 		cfg.store 'P4CLIENT', p4client if p4client
 		
 		return cfg	

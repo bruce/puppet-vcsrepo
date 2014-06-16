@@ -227,6 +227,10 @@ Puppet::Type.newtype(:vcsrepo) do
   newparam :p4charset, :required_features => [:p4_config] do
     desc "The Perforce P4CHARSET environment."
   end
+  
+  newparam :p4passwd, :required_features => [:p4_config] do
+    desc "The Perforce P4PASSWD environment."
+  end
     
   autorequire(:package) do
     ['git', 'git-core']
