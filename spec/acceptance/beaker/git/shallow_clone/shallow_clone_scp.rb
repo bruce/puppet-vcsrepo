@@ -47,7 +47,7 @@ hosts.each do |host|
     end
 
     on(host, "wc -l #{tmpdir}/#{repo_name}/.git/shallow") do |res|
-      fail_test('shallow not found') unless res.stdout.include? "2 #{tmpdir}/#{repo_name}/.git/shallow"
+      fail_test('shallow not found') unless res.stdout.include? "1 #{tmpdir}/#{repo_name}/.git/shallow"
     end
   end
 
