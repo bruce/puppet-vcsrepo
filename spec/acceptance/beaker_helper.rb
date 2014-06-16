@@ -6,7 +6,7 @@ test_name "Installing Puppet and vcsrepo module" do
         install_pe
       else
         install_puppet
-        on hosts, "mkdir -p #{host['distmoduledir']}"
+        on hosts, "mkdir -p #{hosts.first['distmoduledir']}"
       end
     end
   end

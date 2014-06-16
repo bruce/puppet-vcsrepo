@@ -7,7 +7,7 @@ unless ENV['RS_PROVISION'] == 'no'
       install_pe
     else
       install_puppet
-      on hosts, "mkdir -p #{host['distmoduledir']}"
+      on hosts, "mkdir -p #{hosts.first['distmoduledir']}"
     end
   end
 end
