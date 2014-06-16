@@ -19,6 +19,6 @@ test_name "Installing Puppet and vcsrepo module" do
 	email = root@localhost
 	name = root
 EOS
-    create_remote_file(host, "/root/.gitconfig", script)
+    create_remote_file(hosts.first, "/root/.gitconfig", script)
   end
 end
