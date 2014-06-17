@@ -25,7 +25,7 @@
 
 ##Overview
 
-The vcsrepo module allows you to use Puppet to easily deploy code from your version control system (VCS).
+The vcsrepo module allows you to use Puppet to easily deploy content from your version control system (VCS).
 
 ##Module Description
 
@@ -246,7 +246,7 @@ For SSH keys associated with a user, enter the username in the `user` parameter.
 
 #####Further Examples
 
-For for more examples using Git, see `examples/git/`.
+For more examples using Git, see `examples/git/`.
 
 ###Mercurial
 
@@ -415,7 +415,7 @@ The vcsrepo module is slightly unusual in that it is simply a type and providers
 * `module` - Specifies the repository module to manage. (Requires the `modules` feature.)
 * `owner` - Specifies the user/uid that owns the repository files.
 *  `path` - Specifies the absolute path to the repository. If omitted, the value defaults to the resource's title.
-* `provider` - The specific backend to use for this vcsrepo resource. Puppet will usually discover the appropriate provider for your platform.
+* `provider` - Specifies the backend to use for this vcsrepo resource. 
 * `remote` - Specifies the remote repository to track. (Requires the `multiple_remotes` feature.)
 * `revision` - Sets the revision of the repository. Values can match /^\S+$/.
 * `source` - Specifies the source URI for the repository.
