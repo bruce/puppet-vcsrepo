@@ -9,6 +9,12 @@ unless ENV['RS_PROVISION'] == 'no'
       install_puppet
       on hosts, "mkdir -p #{hosts.first['distmoduledir']}"
     end
+
+    # We ask the host to interpolate it's distmoduledir because we don't
+    # actually know it on Windows until we've let it redirect us (depending
+    # on whether we're running as a 32/64 bit process on 32/64 bit Windows
+    moduledir = on(host, "echo #{host['distmoduledir']}").stdout.chomp
+    on host, "mkdir -p #{moduledir}"
   end
 end
 
@@ -21,10 +27,12 @@ RSpec.configure do |c|
 
   # Configure all nodes in nodeset
   c.before :suite do
-    # Install module and dependencies
+    # Install module and dependencies on all hosts
     puppet_module_install(:source => proj_root, :module_name => 'vcsrepo')
+
+    # ensure test dependencies are available on all hosts
     hosts.each do |host|
-      case fact('osfamily')
+      case fact_on(host, 'osfamily')
       when 'RedHat'
         install_package(host, 'git')
       when 'Debian'
@@ -35,8 +43,8 @@ RSpec.configure do |c|
           exit
         end
       end
-      shell('git config --global user.email "root@localhost"')
-      shell('git config --global user.name "root"')
+      on host, 'git config --global user.email "root@localhost"'
+      on host, 'git config --global user.name "root"'
     end
   end
 end
