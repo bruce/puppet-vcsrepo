@@ -3,6 +3,8 @@ test_name 'C3606 - shallow clone repo depth overflow 64bit integer'
 # Globals
 repo_name = 'testrepo_shallow_clone'
 
+pending_test("The overflow can't be handled on some git versions")
+
 hosts.each do |host|
   tmpdir = host.tmpdir('vcsrepo')
   step 'setup - create repo' do
