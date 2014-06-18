@@ -6,6 +6,7 @@ test_name "Installing Puppet and vcsrepo module" do
         install_pe
       else
         install_puppet
+        on hosts, "mkdir -p #{hosts.first['distmoduledir']}"
       end
     end
   end
@@ -19,6 +20,6 @@ test_name "Installing Puppet and vcsrepo module" do
 	email = root@localhost
 	name = root
 EOS
-    create_remote_file(host, "/root/.gitconfig", script)
+    create_remote_file(hosts.first, "/root/.gitconfig", gitconfig)
   end
 end
