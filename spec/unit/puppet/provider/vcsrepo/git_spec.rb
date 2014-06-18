@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Puppet::Type.type(:vcsrepo).provider(:git_provider) do
-  def branch_a_list(include_branch)
+  def branch_a_list(include_branch = nil?)
     <<branches
 end
 #{"*  master" unless  include_branch.nil?}
@@ -222,51 +222,41 @@ branches
       expects_chdir('/tmp/test')
       resource[:revision] = 'currentsha'
       resource.delete(:source)
-      provider.expects(:git).with('rev-parse', 'HEAD').returns('currentsha')
+      provider.stubs(:git).with('config', 'remote.origin.url').returns('')
+      provider.stubs(:git).with('fetch', 'origin') # FIXME
+      provider.stubs(:git).with('fetch', '--tags', 'origin')
+      provider.stubs(:git).with('rev-parse', 'HEAD').returns('currentsha')
+      provider.stubs(:git).with('branch', '-a').returns(branch_a_list(resource.value(:revision)))
+      provider.stubs(:git).with('tag', '-l').returns("Hello")
     end
 
     context "when its SHA is not different than the current SHA" do
       it "should return the ref" do
-        provider.expects(:git).with('config', 'remote.origin.url').returns('')
-        provider.expects(:git).with('fetch', 'origin') # FIXME
-        provider.expects(:git).with('fetch', '--tags', 'origin')
-        provider.expects(:git).with('rev-parse', '--revs-only', resource.value(:revision)).returns('currentsha')
-        provider.expects(:git).with('tag', '-l').returns("Hello")
+        provider.expects(:git).with('rev-parse', resource.value(:revision)).returns('currentsha')
         provider.revision.should == resource.value(:revision)
       end
     end
 
     context "when its SHA is different than the current SHA" do
       it "should return the current SHA" do
-        provider.expects(:git).with('config', 'remote.origin.url').returns('')
-        provider.expects(:git).with('fetch', 'origin') # FIXME
-        provider.expects(:git).with('fetch', '--tags', 'origin')
-        provider.expects(:git).with('rev-parse', '--revs-only', resource.value(:revision)).returns('othersha')
-        provider.expects(:git).with('tag', '-l').returns("Hello")
-        provider.revision.should == 'currentsha'
+        provider.expects(:git).with('rev-parse', resource.value(:revision)).returns('othersha')
+        provider.revision.should == resource.value(:revision)
       end
     end
 
     context "when its a ref to a remote head" do
       it "should return the revision" do
-        provider.expects(:git).with('config', 'remote.origin.url').returns('')
-        provider.expects(:git).with('fetch', 'origin') # FIXME
-        provider.expects(:git).with('fetch', '--tags', 'origin')
-        provider.expects(:git).with('tag', '-l').returns("Hello")
-        provider.expects(:git).with('rev-parse', '--revs-only', resource.value(:revision)).returns('')
-        provider.expects(:git).with('ls-remote', '--heads', '--tags', 'origin', resource.value(:revision)).returns("newsha refs/heads/#{resource.value(:revision)}")
-        provider.revision.should == 'currentsha'
+        provider.stubs(:git).with('branch', '-a').returns("  remotes/origin/#{resource.value(:revision)}")
+        provider.expects(:git).with('rev-parse', "origin/#{resource.value(:revision)}").returns("newsha")
+        provider.revision.should == resource.value(:revision)
       end
     end
 
     context "when its a ref to non existant remote head" do
       it "should fail" do
-        provider.expects(:git).with('config', 'remote.origin.url').returns('')
-        provider.expects(:git).with('fetch', 'origin') # FIXME
-        provider.expects(:git).with('fetch', '--tags', 'origin')
-        provider.expects(:git).with('tag', '-l').returns("Hello")
+        provider.expects(:git).with('branch', '-a').returns(branch_a_list)
         provider.expects(:git).with('rev-parse', '--revs-only', resource.value(:revision)).returns('')
-        provider.expects(:git).with('ls-remote', '--heads', '--tags', 'origin', resource.value(:revision)).returns('')
+
         expect { provider.revision }.to raise_error(Puppet::Error, /not a local or remote ref$/)
       end
     end
@@ -276,10 +266,7 @@ branches
         resource[:source] = 'git://git@foo.com/bar.git'
         provider.expects(:git).with('config', 'remote.origin.url').returns('old')
         provider.expects(:git).with('config', 'remote.origin.url', 'git://git@foo.com/bar.git')
-        provider.expects(:git).with('fetch', 'origin') # FIXME
-        provider.expects(:git).with('fetch', '--tags', 'origin')
-        provider.expects(:git).with('rev-parse', '--revs-only', resource.value(:revision)).returns('currentsha')
-        provider.expects(:git).with('tag', '-l').returns("Hello")
+        provider.expects(:git).with('rev-parse', resource.value(:revision)).returns('currentsha')
         provider.revision.should == resource.value(:revision)
       end
     end
@@ -295,7 +282,7 @@ branches
         provider.expects(:update_submodules)
         provider.expects(:git).with('branch', '-a').at_least_once.returns(branch_a_list(resource.value(:revision)))
         provider.expects(:git).with('checkout', '--force', resource.value(:revision))
-        provider.expects(:git).with('reset', '--hard', "origin/#{resource.value(:revision)}")
+        provider.expects(:git).with('reset', '--hard',  "origin/#{resource.value(:revision)}")
         provider.revision = resource.value(:revision)
       end
     end
@@ -305,7 +292,7 @@ branches
         provider.expects(:update_submodules)
         provider.expects(:git).with('branch', '-a').at_least_once.returns(resource.value(:revision))
         provider.expects(:git).with('checkout', '--force', resource.value(:revision))
-        provider.expects(:git).with('reset', '--hard', "origin/#{resource.value(:revision)}")
+        provider.expects(:git).with('reset', '--hard',  "origin/#{resource.value(:revision)}")
         provider.revision = resource.value(:revision)
       end
     end
@@ -368,60 +355,19 @@ branches
     end
   end
 
-  context "retrieving the current revision" do
-    before do
-      expects_chdir
-      provider.expects(:git).with('branch','-a').returns("* foo")
-    end
-
-    it "will strip trailing newlines" do
-      provider.expects(:get_revision).with('origin/foo')
-      provider.latest
-    end
-  end
-
   describe 'latest?' do
-    before do
-      expects_chdir('/tmp/test')
-    end
     context 'when true' do
       it do
         provider.expects(:revision).returns('testrev')
-        provider.expects(:latest).returns('testrev')
+        provider.expects(:latest_revision).returns('testrev')
         provider.latest?.should be_true
       end
     end
     context 'when false' do
       it do
         provider.expects(:revision).returns('master')
-        provider.expects(:latest).returns('testrev')
+        provider.expects(:latest_revision).returns('testrev')
         provider.latest?.should be_false
-      end
-    end
-  end
-
-  describe 'latest' do
-    before do
-      provider.expects(:get_revision).returns('master')
-      expects_chdir
-    end
-    context 'on master' do
-      it do
-        provider.expects(:git).with('branch','-a').returns("* master")
-        provider.latest.should == 'master'
-      end
-    end
-    context 'no branch' do
-      it do
-        provider.expects(:git).with('branch','-a').returns("* master")
-
-        provider.latest.should == 'master'
-      end
-    end
-    context 'feature/bar' do
-      it do
-        provider.expects(:git).with('branch','-a').returns("* master")
-        provider.latest.should == 'master'
       end
     end
   end
