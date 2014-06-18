@@ -1,3 +1,17 @@
+2014-06-17 - Supported Release 1.0.1
+
+Summary:
+This release is the first supported release of vcsrepo. The readme has been
+greatly improved.
+
+Features:
+- Updated and expanded readme to follow readme template
+
+Fixes:
+- Remove SLES from compatability metadata
+- Unpin rspec development dependencies
+- Update acceptance level testing
+
 2014-06-04 - Version 1.0.0
 
 Summary:
