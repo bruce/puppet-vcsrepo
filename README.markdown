@@ -13,6 +13,7 @@
     * [CVS](#cvs)
     * [Git](#git)
     * [Mercurial](#mercurial)
+    * [Perforce](#perforce)
     * [Subversion](#subversion)  
 5. [Reference - An under-the-hood peek at what the module is doing and how](#reference)
     * [Type: vcsrepo](#type-vcsrepo)
@@ -57,6 +58,7 @@ The vcsrepo module works with the following VCSs:
 * [CVS (cvs)](#cvs)
 * [Git (git)](#git)
 * [Mercurial (hg)](#mercurial)
+* [Perforce (p4)](#perforce)
 * [Subversion (svn)](#subversion)
 
 ###Bazaar
@@ -313,6 +315,96 @@ When your source uses SSH, such as 'ssh://...', you can manage your SSH keys wit
 #####Further Examples
 
 For more examples using Mercurial, see `examples/hg/`.
+
+###Perforce
+
+#####To create an empty Workspace
+
+To create an empty Workspace, define a `vcsrepo` without a `source` or `revision`.  The 
+Environment variables P4PORT, P4USER, etc... are used to define the Perforce server
+connection settings.
+
+    vcsrepo { "/path/to/repo":
+      ensure     => present,
+      provider   => p4
+    }
+
+If no `p4client` name is provided a workspace generated name is calculated based on the 
+Digest of path.  For example:
+
+    puppet-91bc00640c4e5a17787286acbe2c021c
+
+Providing a `p4client` name will create/update the client workspace in Perforce.  The
+value replaces the P4CLIENT environment variable.
+ 
+    vcsrepo { "/path/to/repo":
+      ensure     => present,
+      provider   => p4
+      p4client   => "my_client_ws"
+    }
+
+#####To create/update and sync a Perforce workspace
+
+To sync a depot path to head (latest):
+
+    vcsrepo { "/path/to/repo":
+        ensure   => present,
+        provider => p4,
+        source   => '//depot/branch/...'
+    }
+
+For a specific changelist, use `revision`:
+
+    vcsrepo { "/path/to/repo":
+        ensure   => present,
+        provider => p4,
+        source   => '//depot/branch/...',
+        revision => '2341'
+    }
+
+You can also set `revision` to a label:
+
+    vcsrepo { "/path/to/repo":
+        ensure   => present,
+        provider => p4,
+        source   => '//depot/branch/...',
+        revision => 'my_label'
+    }
+
+Check out as a user by setting `p4user`:
+
+    vcsrepo { "/path/to/repo":
+        ensure   => present,
+        provider => p4,
+        source   => '//depot/branch/...',
+        p4user   => 'user'
+    }
+
+You can set `p4port` to specify a Perforce server:
+
+    vcsrepo { "/path/to/repo":
+        ensure   => present,
+        provider => p4,
+        source   => '//depot/branch/...',
+        p4port   => 'ssl:perforce.com:1666'
+    }
+
+You can set `p4passwd` for authentication :
+
+    vcsrepo { "/path/to/repo":
+        ensure   => present,
+        provider => p4,
+        source   => '//depot/branch/...',
+        p4port   => 'ssl:perforce.com:1666'
+    }
+
+If `p4port`, `p4user`, `p4charset`, `p4passwd` or `p4client` are specified they will 
+override the environment variabels P4PORT, P4USER, etc... If a P4CONFIG file is defined,
+the config file settings will take precedence.
+
+#####Further Examples
+
+For examples you can run, see `examples/p4/`
 
 ###Subversion
 
