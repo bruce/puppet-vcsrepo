@@ -1,219 +1,219 @@
 require File.join(File.dirname(__FILE__), '..', 'vcsrepo')
 
 Puppet::Type.type(:vcsrepo).provide(:p4, :parent => Puppet::Provider::Vcsrepo) do
-	desc "Supports Perforce depots"
+  desc "Supports Perforce depots"
 
-	has_features :filesystem_types, :reference_tracking, :p4_config
-	
-	def create
-		# create or update client 
-		create_client(client_name, @resource.value(:path))
-		
-		# if source provided, sync client
-		source = @resource.value(:source)
-		if source
-			revision = @resource.value(:revision)
-			sync_client(source, revision)
-		end
+  has_features :filesystem_types, :reference_tracking, :p4_config
+  
+  def create
+    # create or update client 
+    create_client(client_name, @resource.value(:path))
+    
+    # if source provided, sync client
+    source = @resource.value(:source)
+    if source
+      revision = @resource.value(:revision)
+      sync_client(source, revision)
+    end
 
-		update_owner
-	end
+    update_owner
+  end
 
-	def working_copy_exists?
-		# Check if the server is there, or raise error
-		p4(['info'], {:marshal => false})
-	
-		# Check if workspace is setup
-		args = ['where']
-		args.push(@resource.value(:path) + "...")
-		hash = p4(args, {:raise => false})
-		
-		return (hash['code'] != "error")
-	end
+  def working_copy_exists?
+    # Check if the server is there, or raise error
+    p4(['info'], {:marshal => false})
+  
+    # Check if workspace is setup
+    args = ['where']
+    args.push(@resource.value(:path) + "...")
+    hash = p4(args, {:raise => false})
+    
+    return (hash['code'] != "error")
+  end
 
-	def exists?
-		working_copy_exists?
-	end
+  def exists?
+    working_copy_exists?
+  end
 
-	def destroy
-		args = ['client']
-		args.push('-d', '-f')
-		args.push(client_name)
-		p4(args)
-		FileUtils.rm_rf(@resource.value(:path))
-	end
+  def destroy
+    args = ['client']
+    args.push('-d', '-f')
+    args.push(client_name)
+    p4(args)
+    FileUtils.rm_rf(@resource.value(:path))
+  end
 
-	def latest?
-		rev = self.revision
-		if rev
-			(rev >= self.latest)
-		else
-			true
-		end		
-	end
+  def latest?
+    rev = self.revision
+    if rev
+      (rev >= self.latest)
+    else
+      true
+    end   
+  end
 
-	def latest
-		args = ['changes']
-		args.push('-m1', @resource.value(:source))
-		hash = p4(args)
-		
-		return hash['change'].to_i
-	end
+  def latest
+    args = ['changes']
+    args.push('-m1', @resource.value(:source))
+    hash = p4(args)
+    
+    return hash['change'].to_i
+  end
 
-	def revision
-		args = ['cstat']
-		args.push(@resource.value(:source))
-		hash = p4(args)
-		
-		if hash['status'] == "have"
-			return hash['change'].to_i
-		else
-			return 0
-		end
-	end
+  def revision
+    args = ['cstat']
+    args.push(@resource.value(:source))
+    hash = p4(args)
+    
+    if hash['status'] == "have"
+      return hash['change'].to_i
+    else
+      return 0
+    end
+  end
 
-	def revision=(desired)
-		sync_client(@resource.value(:source), desired)
-		update_owner
-	end
+  def revision=(desired)
+    sync_client(@resource.value(:source), desired)
+    update_owner
+  end
 
-	private
+  private
 
-	def update_owner
-		if @resource.value(:owner) or @resource.value(:group)
-			set_ownership
-		end
-	end
-	
-	# Sync the client workspace files to head or specified revision.
-	# Params:
+  def update_owner
+    if @resource.value(:owner) or @resource.value(:group)
+      set_ownership
+    end
+  end
+  
+  # Sync the client workspace files to head or specified revision.
+  # Params:
   # +source+:: Depot path to sync
   # +revision+:: Perforce change list to sync to (optional)
-	def sync_client(source, revision)
-		notice "Syncing: #{source}"
-		args = ['sync']
-		if revision
-			args.push(source + "@" + revision)
-		else
-			args.push(source)
-		end
-		p4(args)
-	end
-	
-	# Returns the name of the Perforce client workspace 
-	def client_name
-		path = @resource.value(:path)
-		client = @resource.value(:p4client)
-		if not client
-			client = "puppet-" + Digest::MD5.hexdigest(path)
-		end
-		return client
-	end
-	
-	# Create (or update) a client workspace spec.
-	# If a client name is not provided then a hash based on the path is used.
-	# Params:
-	# +client+:: Name of client workspace
+  def sync_client(source, revision)
+    notice "Syncing: #{source}"
+    args = ['sync']
+    if revision
+      args.push(source + "@" + revision)
+    else
+      args.push(source)
+    end
+    p4(args)
+  end
+  
+  # Returns the name of the Perforce client workspace 
+  def client_name
+    path = @resource.value(:path)
+    client = @resource.value(:p4client)
+    if not client
+      client = "puppet-" + Digest::MD5.hexdigest(path)
+    end
+    return client
+  end
+  
+  # Create (or update) a client workspace spec.
+  # If a client name is not provided then a hash based on the path is used.
+  # Params:
+  # +client+:: Name of client workspace
   # +path+:: The Root location of the Perforce client workspace
-	def create_client(client, path)
-		notice "Creating client: #{client}"
-		hash = parse_client(client)
-		hash['Root'] = path
-		hash['Description'] = "Generated by Puppet VCSrepo"
-		save_client(hash)
-	end
+  def create_client(client, path)
+    notice "Creating client: #{client}"
+    hash = parse_client(client)
+    hash['Root'] = path
+    hash['Description'] = "Generated by Puppet VCSrepo"
+    save_client(hash)
+  end
 
 
-	# Fetches a client workspace spec from Perforce and returns a hash map representation.
+  # Fetches a client workspace spec from Perforce and returns a hash map representation.
   # Params:
   # +client+:: name of the client workspace
-	def parse_client(client)
-		args = ['client']
-		args.push('-o', client)
-		hash = p4(args)
+  def parse_client(client)
+    args = ['client']
+    args.push('-o', client)
+    hash = p4(args)
 
- 		return hash
-	end
-	
-	
-	# Saves the client workspace spec from the given hash 
+    return hash
+  end
+  
+  
+  # Saves the client workspace spec from the given hash 
   # Params:
   # +hash+:: hash map of client spec
-	def save_client(hash)
-		spec = String.new
-		view = "\nView:\n"
-	
-		hash.each do |k,v|
-			next if( k == "code" )
- 			if(k.to_s =~ /View/ )
- 				view += "\t#{v}\n"
- 			else
-				spec += "#{k.to_s}: #{v.to_s}\n"
- 			end
-		end	
-		spec += view
-		
-		args = ['client']
-		args.push('-i')
-		p4(args, {:input => spec, :marshal => false})
-	end	
-	
-	def config
-		p4port = @resource.value(:p4port)
-		p4user = @resource.value(:p4user)
-		p4charset = @resource.value(:p4charset)
-		p4passwd = @resource.value(:p4passwd)
-		p4client = @resource.value(:p4client) || client_name
-	
-		cfg = Hash.new	
-		cfg.store 'P4USER', p4user if p4user
-		cfg.store 'P4PORT', p4port if p4port
-		cfg.store 'P4CHARSET', p4charset if p4charset
-		cfg.store 'P4PASSWD', p4passwd if p4passwd
-		cfg.store 'P4CLIENT', p4client if p4client
-		
-		return cfg	
-	end
-	
-	def p4(args, options = {})
-		# Merge custom options with defaults
-		opts = { 
-			:raise 		=> true,		# Raise errors
-			:marshal	=> true,		# Marshal output
-		}.merge(options)
-		
-		cmd = ['p4']
-		cmd.push '-R' if opts[:marshal]
-		cmd.push args
-		cmd_str = cmd.respond_to?(:join) ? cmd.join(' ') : cmd
-		
-		notice "environment: #{config}"
-		notice "command: #{cmd_str}"
-		
-		hash = Hash.new
-		Open3.popen3(config, cmd_str) do |i, o, e, t|
-			# Send input stream if provided
-			if(opts[:input])
-				notice "input:\n" + opts[:input]
-				i.write opts[:input]
-				i.close
-			end
-			
-			if(opts[:marshal])
-				hash = Marshal.load(o)
-			else
-				hash['data'] = o.read				
-			end
-			
-			# Raise errors, Perforce or Exec
-			if(opts[:raise])
-				p4_err = "P4: " + hash['data'] if(hash['code'] == 'error') 
-				raise Puppet::DevError, "#{p4_err}\n#{e.read}\nExit: #{t.value}" if(t.value != 0)
-			end
- 		end
- 		
- 		notice "hash: #{hash}\n"
- 		return hash
-	end
-	
+  def save_client(hash)
+    spec = String.new
+    view = "\nView:\n"
+  
+    hash.each do |k,v|
+      next if( k == "code" )
+      if(k.to_s =~ /View/ )
+        view += "\t#{v}\n"
+      else
+        spec += "#{k.to_s}: #{v.to_s}\n"
+      end
+    end 
+    spec += view
+    
+    args = ['client']
+    args.push('-i')
+    p4(args, {:input => spec, :marshal => false})
+  end 
+  
+  def config
+    p4port = @resource.value(:p4port)
+    p4user = @resource.value(:p4user)
+    p4charset = @resource.value(:p4charset)
+    p4passwd = @resource.value(:p4passwd)
+    p4client = @resource.value(:p4client) || client_name
+  
+    cfg = Hash.new  
+    cfg.store 'P4USER', p4user if p4user
+    cfg.store 'P4PORT', p4port if p4port
+    cfg.store 'P4CHARSET', p4charset if p4charset
+    cfg.store 'P4PASSWD', p4passwd if p4passwd
+    cfg.store 'P4CLIENT', p4client if p4client
+    
+    return cfg  
+  end
+  
+  def p4(args, options = {})
+    # Merge custom options with defaults
+    opts = { 
+      :raise    => true,    # Raise errors
+      :marshal  => true,    # Marshal output
+    }.merge(options)
+    
+    cmd = ['p4']
+    cmd.push '-R' if opts[:marshal]
+    cmd.push args
+    cmd_str = cmd.respond_to?(:join) ? cmd.join(' ') : cmd
+    
+    notice "environment: #{config}"
+    notice "command: #{cmd_str}"
+    
+    hash = Hash.new
+    Open3.popen3(config, cmd_str) do |i, o, e, t|
+      # Send input stream if provided
+      if(opts[:input])
+        notice "input:\n" + opts[:input]
+        i.write opts[:input]
+        i.close
+      end
+      
+      if(opts[:marshal])
+        hash = Marshal.load(o)
+      else
+        hash['data'] = o.read       
+      end
+      
+      # Raise errors, Perforce or Exec
+      if(opts[:raise])
+        p4_err = "P4: " + hash['data'] if(hash['code'] == 'error') 
+        raise Puppet::DevError, "#{p4_err}\n#{e.read}\nExit: #{t.value}" if(t.value != 0)
+      end
+    end
+    
+    notice "hash: #{hash}\n"
+    return hash
+  end
+  
 end

@@ -1,7 +1,7 @@
 vcsrepo { "/tmp/vcstest-p4-create_client":
-    ensure    => present,
-    provider  => p4, 
-    p4client  => "puppet-test001",
-    source    => "//depot/..."
-    revision  => "30"
+  ensure    => present,
+  provider  => p4, 
+  p4client  => "puppet-test001",
+  source    => "//depot/..."
+  revision  => "30"
 }
