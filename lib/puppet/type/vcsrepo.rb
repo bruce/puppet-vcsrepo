@@ -98,9 +98,8 @@ Puppet::Type.newtype(:vcsrepo) do
       if prov
         if prov.working_copy_exists?
           if @resource.value(:force)
-            if noop?
-              notice "Noop Mode - Would have deleted repository"
-              notice "Noop Mode - Would have created repository from latest"
+            if noop
+              notice "Noop Mode - Would have deleted repository and re-created from latest"
             else
               notice "Deleting current repository before recloning"
               prov.destroy
@@ -212,13 +211,4 @@ Puppet::Type.newtype(:vcsrepo) do
   autorequire(:package) do
     ['git', 'git-core']
   end
-
-  def noop?
-    if defined?(@noop)
-      @noop
-    else
-      Puppet[:noop]
-    end
-  end
-
 end

@@ -175,6 +175,28 @@ branches
         provider.expects(:git).with('checkout', '--force', resource.value(:revision))
         provider.create
       end
+      it "should warn about destroying it using force and noop attribute" do
+        resource[:force] = true
+        resource[:noop] = true
+        resource.delete(:revision)
+        provider.expects(:working_copy_exists?).returns(true)
+
+        provider.expects(:destroy).never
+        provider.expects(:create).never
+        Puppet::Type::Vcsrepo::Ensure.any_instance.expects(:send_log).with(:notice, "Noop Mode - Would have deleted repository and re-created from latest")
+        provider.resource.retrieve
+      end
+      it "should warn about destroying it using force and global noop" do
+        resource[:force] = true
+        Puppet[:noop] = true
+        resource.delete(:revision)
+        provider.expects(:working_copy_exists?).returns(true)
+
+        provider.expects(:destroy).never
+        provider.expects(:create).never
+        Puppet::Type::Vcsrepo::Ensure.any_instance.expects(:send_log).with(:notice, "Noop Mode - Would have deleted repository and re-created from latest")
+        provider.resource.retrieve
+      end
     end
 
     context "when the path is not empty and not a repository" do
