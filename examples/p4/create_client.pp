@@ -1,5 +1,4 @@
-vcsrepo { "/tmp/vcstest-p4-create_client":
+vcsrepo { "/tmp/vcstest/p4_client_root":
   ensure    => present,
-  provider  => p4, 
-  p4client  => "puppet-test001"
+  provider  => p4
 }

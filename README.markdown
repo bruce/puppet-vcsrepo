@@ -329,18 +329,19 @@ connection settings.
       provider   => p4
     }
 
-If no `p4client` name is provided a workspace generated name is calculated based on the 
-Digest of path.  For example:
+If no `P4CLIENT` environment name is provided a workspace generated name is calculated
+based on the Digest of path.  For example:
 
     puppet-91bc00640c4e5a17787286acbe2c021c
 
-Providing a `p4client` name will create/update the client workspace in Perforce.  The
-value replaces the P4CLIENT environment variable.
+A Perforce configuration file can be used by setting the `P4CONFIG` environment or
+defining `p4config`.  If a configuration is defined, then the environment variable for 
+`P4CLIENT` is replaced.
  
     vcsrepo { "/path/to/repo":
       ensure     => present,
-      provider   => p4
-      p4client   => "my_client_ws"
+      provider   => p4,
+      p4config   => '.p4config'
     }
 
 #####To create/update and sync a Perforce workspace
@@ -371,36 +372,10 @@ You can also set `revision` to a label:
         revision => 'my_label'
     }
 
-Check out as a user by setting `p4user`:
+#####To authenticate against the Perforce server
 
-    vcsrepo { "/path/to/repo":
-        ensure   => present,
-        provider => p4,
-        source   => '//depot/branch/...',
-        p4user   => 'user'
-    }
-
-You can set `p4port` to specify a Perforce server:
-
-    vcsrepo { "/path/to/repo":
-        ensure   => present,
-        provider => p4,
-        source   => '//depot/branch/...',
-        p4port   => 'ssl:perforce.com:1666'
-    }
-
-You can set `p4passwd` for authentication :
-
-    vcsrepo { "/path/to/repo":
-        ensure   => present,
-        provider => p4,
-        source   => '//depot/branch/...',
-        p4port   => 'ssl:perforce.com:1666'
-    }
-
-If `p4port`, `p4user`, `p4charset`, `p4passwd` or `p4client` are specified they will 
-override the environment variabels P4PORT, P4USER, etc... If a P4CONFIG file is defined,
-the config file settings will take precedence.
+Either set the environment variables `P4USER` and `P4PASSWD` or use a configuration file.
+For secure servers set the `P4PASSWD` with a valid ticket generated using `p4 login -p`.
 
 #####Further Examples
 

@@ -40,7 +40,7 @@ Puppet::Type.newtype(:vcsrepo) do
   feature :depth,
           "The provider can do shallow clones"
 
-  feature :p4_config,
+  feature :p4config,
           "The provider understands Perforce Configuration"
 
   ensurable do
@@ -212,26 +212,10 @@ Puppet::Type.newtype(:vcsrepo) do
     desc "The value to be used to do a shallow clone."
   end
 
-  newparam :p4port, :required_features => [:p4_config] do
-    desc "The Perforce P4PORT environment."
-  end
-  
-  newparam :p4user, :required_features => [:p4_config] do
-    desc "The Perforce P4USER environment."
-  end
-  
-  newparam :p4client, :required_features => [:p4_config] do
-    desc "The Perforce P4CLIENT environment."
+  newparam :p4config, :required_features => [:p4config] do
+    desc "The Perforce P4CONFIG environment."
   end
 
-  newparam :p4charset, :required_features => [:p4_config] do
-    desc "The Perforce P4CHARSET environment."
-  end
-  
-  newparam :p4passwd, :required_features => [:p4_config] do
-    desc "The Perforce P4PASSWD environment."
-  end
-    
   autorequire(:package) do
     ['git', 'git-core']
   end
