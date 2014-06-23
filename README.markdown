@@ -330,7 +330,7 @@ connection settings.
     }
 
 If no `P4CLIENT` environment name is provided a workspace generated name is calculated
-based on the Digest of path.  For example:
+based on the Digest of path and hostname.  For example:
 
     puppet-91bc00640c4e5a17787286acbe2c021c
 

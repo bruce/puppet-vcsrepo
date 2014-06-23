@@ -106,7 +106,8 @@ Puppet::Type.type(:vcsrepo).provide(:p4, :parent => Puppet::Provider::Vcsrepo) d
     
     # default (generated) client name
     path = @resource.value(:path)
-    default = "puppet-" + Digest::MD5.hexdigest(path)
+    host = Facter.value('hostname')
+    default = "puppet-" + Digest::MD5.hexdigest(path + host)
     
     # check config for client name
     set_client = nil
