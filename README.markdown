@@ -306,6 +306,16 @@ To specify an SSH identity key,
       identity => "/home/user/.ssh/id_dsa,
     }
 
+To specify a username and password for HTTP Basic authentication,
+
+    vcsrepo { "/path/to/repo":
+      ensure   => latest,
+      provider => hg,
+      source   => 'http://hg.example.com/myrepo',
+      basic_auth_username => 'hgusername',
+      basic_auth_password => 'hgpassword',
+    }
+
 #####Sources that use SSH 
 
 When your source uses SSH, such as 'ssh://...', you can manage your SSH keys with Puppet using the [require](http://docs.puppetlabs.com/references/stable/metaparameter.html#require) metaparameter in `vcsrepo` to ensure they are present.
