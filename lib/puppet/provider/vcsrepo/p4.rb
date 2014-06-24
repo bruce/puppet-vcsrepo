@@ -179,7 +179,8 @@ Puppet::Type.type(:vcsrepo).provide(:p4, :parent => Puppet::Provider::Vcsrepo) d
     spec = String.new
     view = "\nView:\n"
   
-    hash.each do |k,v|
+    hash.keys.sort.each do |k|
+    	v = hash[k]
       next if( k == "code" )
       if(k.to_s =~ /View/ )
         view += "\t#{v}\n"
