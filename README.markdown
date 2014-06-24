@@ -346,15 +346,15 @@ defining `p4config`.  If a configuration is defined, then the environment variab
 
 #####To create/update and sync a Perforce workspace
 
-To sync a depot path to head (latest):
+To sync a depot path to head, ensure `latest`:
 
     vcsrepo { "/path/to/repo":
-        ensure   => present,
+        ensure   => latest,
         provider => p4,
         source   => '//depot/branch/...'
     }
 
-For a specific changelist, use `revision`:
+For a specific changelist, ensure `present` and specify a `revision`:
 
     vcsrepo { "/path/to/repo":
         ensure   => present,
