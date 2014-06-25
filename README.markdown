@@ -53,11 +53,103 @@ To get started with the vcsrepo module, you must simply define the type `vcsrepo
 
 The vcsrepo module works with the following VCSs:
 
+* [Git (git)](#git)*
 * [Bazaar (bzr)](#bazaar)
 * [CVS (cvs)](#cvs)
-* [Git (git)](#git)
 * [Mercurial (hg)](#mercurial)
 * [Subversion (svn)](#subversion)
+
+**Note:* Git is the only VCS provider officially [supported](https://forge.puppetlabs.com/supported) by Puppet Labs.
+
+
+###Git
+
+#####To create a blank repository
+
+To create a blank repository suitable for use as a central repository,
+define `vcsrepo` without `source` or `revision`.
+
+    vcsrepo { "/path/to/repo":
+      ensure   => present,
+      provider => git,
+    }
+
+If you're defining `vcsrepo` for a central or official repository, you may want to make it a bare repository.  You do this by setting `ensure` to 'bare' rather than 'present'.
+
+    vcsrepo { "/path/to/repo":
+      ensure   => bare,
+      provider => git,
+    }
+
+#####To clone/pull a repository
+
+To get the current HEAD on the master branch,
+
+    vcsrepo { "/path/to/repo":
+      ensure   => present,
+      provider => git,
+      source   => "git://example.com/repo.git",
+    }
+
+To get a specific revision or branch (can be a commit SHA, tag, or branch name),
+
+ **SHA**
+
+    vcsrepo { "/path/to/repo":
+      ensure   => present,
+      provider => git,
+      source   => 'git://example.com/repo.git',
+      revision => '0c466b8a5a45f6cd7de82c08df2fb4ce1e920a31',
+    }
+
+**Tag**
+
+    vcsrepo { "/path/to/repo":
+      ensure   => present,
+      provider => git,
+      source   => 'git://example.com/repo.git',
+      revision => '1.1.2rc1',
+    }
+
+**Branch name**
+
+    vcsrepo { "/path/to/repo":
+      ensure   => present,
+      provider => git,
+      source   => 'git://example.com/repo.git',
+      revision => 'development',
+    }
+
+To check out a branch as a specific user,
+
+    vcsrepo { "/path/to/repo":
+      ensure   => present,
+      provider => git,
+      source   => 'git://example.com/repo.git',
+      revision => '0c466b8a5a45f6cd7de82c08df2fb4ce1e920a31',
+      user     => 'someUser',
+    }
+
+To keep the repository at the latest revision (**WARNING:** this will always overwrite local changes to the repository),
+
+    vcsrepo { "/path/to/repo":
+      ensure   => latest,
+      provider => git,
+      source   => 'git://example.com/repo.git',
+      revision => 'master',
+    }
+
+#####Sources that use SSH
+
+When your source uses SSH, such as 'username@server:…', you can manage your SSH keys with Puppet using the [require](http://docs.puppetlabs.com/references/stable/metaparameter.html#require) metaparameter in `vcsrepo` to ensure they are present.
+
+For SSH keys associated with a user, enter the username in the `user` parameter. Doing so will use that user's keys.
+
+    user => 'toto'  # will use toto's $HOME/.ssh setup
+
+#####Further Examples
+
+For more examples using Git, see `examples/git/`.
 
 ###Bazaar
 
@@ -158,95 +250,6 @@ When your source uses SSH, you can manage your SSH keys with Puppet using the [r
 #####Further examples
 
 For for more examples using CVS, see `examples/cvs/`.
-
-###Git
-
-#####To create a blank repository
-
-To create a blank repository suitable for use as a central repository,
-define `vcsrepo` without `source` or `revision`.
-
-    vcsrepo { "/path/to/repo":
-      ensure   => present,
-      provider => git,
-    }
-
-If you're defining `vcsrepo` for a central or official repository, you may want to make it a bare repository.  You do this by setting `ensure` to 'bare' rather than 'present'.
-
-    vcsrepo { "/path/to/repo":
-      ensure   => bare,
-      provider => git,
-    }
-
-#####To clone/pull a repository
-
-To get the current HEAD on the master branch,
-
-    vcsrepo { "/path/to/repo":
-      ensure   => present,
-      provider => git,
-      source   => "git://example.com/repo.git",
-    }
-
-To get a specific revision or branch (can be a commit SHA, tag, or branch name),
-
- **SHA**
-
-    vcsrepo { "/path/to/repo":
-      ensure   => present,
-      provider => git,
-      source   => 'git://example.com/repo.git',
-      revision => '0c466b8a5a45f6cd7de82c08df2fb4ce1e920a31',
-    }
-
-**Tag**
-
-    vcsrepo { "/path/to/repo":
-      ensure   => present,
-      provider => git,
-      source   => 'git://example.com/repo.git',
-      revision => '1.1.2rc1',
-    }
-
-**Branch name**
-
-    vcsrepo { "/path/to/repo":
-      ensure   => present,
-      provider => git,
-      source   => 'git://example.com/repo.git',
-      revision => 'development',
-    }
-
-To check out a branch as a specific user,
-
-    vcsrepo { "/path/to/repo":
-      ensure   => present,
-      provider => git,
-      source   => 'git://example.com/repo.git',
-      revision => '0c466b8a5a45f6cd7de82c08df2fb4ce1e920a31',
-      user     => 'someUser',
-    }
-
-To keep the repository at the latest revision (**WARNING:** this will always overwrite local changes to the repository),
-
-    vcsrepo { "/path/to/repo":
-      ensure   => latest,
-      provider => git,
-      source   => 'git://example.com/repo.git',
-      revision => 'master',
-    }
-
-#####Sources that use SSH
-
-When your source uses SSH, such as 'username@server:…', you can manage your SSH keys with Puppet using the [require](http://docs.puppetlabs.com/references/stable/metaparameter.html#require) metaparameter in `vcsrepo` to ensure they are present.
-
-For SSH keys associated with a user, enter the username in the `user` parameter. Doing so will use that user's keys.
-
-    user => 'toto'  # will use toto's $HOME/.ssh setup
-
-#####Further Examples
-
-For more examples using Git, see `examples/git/`.
 
 ###Mercurial
 
@@ -374,10 +377,10 @@ The vcsrepo module is slightly unusual in that it is simply a type and providers
 
 **Note**: Not all features are available with all providers.
 
+* `git`   - Supports the Git VCS. (Contains features: `bare_repositories`, `depth`, `multiple_remotes`, `reference_tracking`, `ssh_identity`, `user`.)
 * `bar`   - Supports the Bazaar VCS. (Contains features: `reference_tracking`.)
 * `cvs`   - Supports the CVS VCS. (Contains features: `cvs_rsh`, `gzip_compression`, `modules`,`reference_tracking`.)
 * `dummy` - 
-* `git`   - Supports the Git VCS. (Contains features: `bare_repositories`, `depth`, `multiple_remotes`, `reference_tracking`, `ssh_identity`, `user`.)
 * `hg`    - Supports the Mercurial VCS. (Contains features: `reference_tracking`, `ssh_identity`, `user`.)
 * `svn`   - Supports the Subversion VCS. (Contains features: `basic_auth`, `configuration`, `filesystem_types`, `reference_tracking`.)
 
@@ -423,6 +426,11 @@ The vcsrepo module is slightly unusual in that it is simply a type and providers
 
 ####Features and Parameters by Provider
 
+#####`git`
+**Features**: `bare_repositories`, `depth`, `multiple_remotes`, `reference_tracking`, `ssh_identity`, `user`
+
+**Parameters**: `depth`, `ensure`, `excludes`, `force`, `group`, `identity`, `owner`, `path`, `provider`, `remote`, `revision`, `source`, `user`
+
 #####`bzr`
 **Features**: `reference_tracking`
 
@@ -432,11 +440,6 @@ The vcsrepo module is slightly unusual in that it is simply a type and providers
 **Features**: `cvs_rsh`, `gzip_compression`, `modules`, `reference_tracking`, `revision`
 
 **Parameters**: `compression`, `cvs_rsh`, `ensure`, `excludes`, `force`, `group`, `module`, `owner`, `path`, `provider`, `revision`, `source`, `user`
-
-#####`git`
-**Features**: `bare_repositories`, `depth`, `multiple_remotes`, `reference_tracking`, `ssh_identity`, `user`
-
-**Parameters**: `depth`, `ensure`, `excludes`, `force`, `group`, `identity`, `owner`, `path`, `provider`, `remote`, `revision`, `source`, `user`
 
 #####`hg`
 **Features**: `reference_tracking`, `ssh_identity`, `user`
@@ -449,6 +452,8 @@ The vcsrepo module is slightly unusual in that it is simply a type and providers
 **Parameters**: `basic_auth_password`, `basic_auth_username`, `configuration`, `ensure`, `excludes`, `force`, `fstype`, `group`, `owner`, `path`, `provider`, `revision`, `source`, `user`
         
 ##Limitations
+
+Git is the only VCS provider officially [supported](https://forge.puppetlabs.com/supported) by Puppet Labs.
 
 This module has been built on and tested against Puppet 2.7 and higher.
 
