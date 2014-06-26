@@ -1,11 +1,7 @@
-coverage
-.DS_Store
-.#*
-\#*
+pkg/
 Gemfile.lock
-log
-.vagrant
-
-#Intellij
-.idea
-*.iml
+vendor/
+spec/fixtures/
+.vagrant/
+.bundle/
+coverage/
