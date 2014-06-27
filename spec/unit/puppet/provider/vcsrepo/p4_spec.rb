@@ -50,7 +50,11 @@ describe Puppet::Type.type(:vcsrepo).provider(:p4) do
       it "should execute 'p4 client'" do
         ENV['P4CLIENT'] = nil
         
-        provider.expects(:p4).with(['client', '-o', "puppet-1c5e7a8e4f702e5091dfba173bc0e7c0"]).returns({})
+        path = resource.value(:path)
+    	host = Facter.value('hostname')
+        default = "puppet-" + Digest::MD5.hexdigest(path + host)
+    
+        provider.expects(:p4).with(['client', '-o', default]).returns({})
         provider.expects(:p4).with(['client', '-i'], spec)
         provider.create
       end
