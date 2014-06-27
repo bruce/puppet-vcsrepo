@@ -40,6 +40,12 @@
         ]
       },
       {
+        "operatingsystem": "SLES",
+        "operatingsystemrelease": [
+          "11 SP1"
+        ]
+      },
+      {
         "operatingsystem": "Debian",
         "operatingsystemrelease": [
           "6",
