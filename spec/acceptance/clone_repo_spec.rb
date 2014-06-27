@@ -318,6 +318,36 @@ describe 'clones a remote repo' do
     describe file("#{tmpdir}/testrepo_force/.git") do
       it { should be_directory }
     end
+
+    context 'and noop' do
+      let(:repo_name) do
+        'testrepo_already_exists'
+      end
+      before(:all) do
+        shell("mkdir #{tmpdir}/#{repo_name}")
+        shell("cd #{tmpdir}/#{repo_name} && git init")
+        shell("cd #{tmpdir}/#{repo_name} && touch a && git add a && git commit -m 'a'")
+      end
+      after(:all) do
+        shell("rm -rf #{tmpdir}/#{repo_name}")
+      end
+
+      it 'applies the manifest' do
+        pp = <<-EOS
+        vcsrepo { "#{tmpdir}/#{repo_name}":
+          ensure   => present,
+          source   => "file://#{tmpdir}/testrepo.git",
+          provider => git,
+          force    => true,
+          noop     => true,
+        }
+        EOS
+
+        apply_manifest_on(host, pp, :catch_changes => true) do |r|
+          expect(r.stdout).to match(/Noop Mode/)
+        end
+      end
+    end
   end
 
   context 'as a user' do
@@ -473,16 +503,6 @@ describe 'clones a remote repo' do
       # Run it twice and test for idempotency
       apply_manifest(pp, :catch_failures => true)
       apply_manifest(pp, :catch_changes => true)
-    end
-
-    after(:all) do
-      pp = <<-EOS
-      user { 'testuser-ssh':
-        ensure => absent,
-        managehome => true,
-      }
-      EOS
-      apply_manifest(pp, :catch_failures => true)
     end
   end
 end
