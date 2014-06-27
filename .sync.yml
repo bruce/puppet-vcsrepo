@@ -1,4 +1,6 @@
 ---
+.travis.yml:
+  script: "\"bundle exec rake spec SPEC_OPTS='--format documentation'\""
 Rakefile:
   unmanaged: true
 spec/spec_helper.rb:
