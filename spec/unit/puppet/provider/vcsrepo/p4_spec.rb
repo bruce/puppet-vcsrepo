@@ -48,6 +48,8 @@ describe Puppet::Type.type(:vcsrepo).provider(:p4) do
 
     context "when a client and source are not given" do
       it "should execute 'p4 client'" do
+        ENV['P4CLIENT'] = nil
+        
         provider.expects(:p4).with(['client', '-o', "puppet-1c5e7a8e4f702e5091dfba173bc0e7c0"]).returns({})
         provider.expects(:p4).with(['client', '-i'], spec)
         provider.create
