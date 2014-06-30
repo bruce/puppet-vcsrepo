@@ -1,21 +1,6 @@
 ---
 .travis.yml:
-  env_matrix:
-  - PUPPET_GEM_VERSION="~> 2.7.0"
-  - PUPPET_GEM_VERSION="~> 3.3.0"
-  additional:
-  -
-    configs:
-      after_success:
-      - git clone -q git://github.com/puppetlabs/ghpublisher.git .forge-release
-      - .forge-release/publish
-  -
-    configs:
-      before_install:
-      - gem update --system 2.1.11
-      - gem --version
-      comments:
-      - Temporary workaround for broken Rubygems on Travis
+  script: "\"bundle exec rake spec SPEC_OPTS='--format documentation'\""
 Rakefile:
   unmanaged: true
 spec/spec_helper.rb:
