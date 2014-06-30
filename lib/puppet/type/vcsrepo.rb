@@ -40,6 +40,9 @@ Puppet::Type.newtype(:vcsrepo) do
   feature :depth,
           "The provider can do shallow clones"
 
+  feature :p4config,
+          "The provider understands Perforce Configuration"
+
   ensurable do
     attr_accessor :latest
 
@@ -206,6 +209,10 @@ Puppet::Type.newtype(:vcsrepo) do
 
   newparam :depth, :required_features => [:depth] do
     desc "The value to be used to do a shallow clone."
+  end
+
+  newparam :p4config, :required_features => [:p4config] do
+    desc "The Perforce P4CONFIG environment."
   end
 
   autorequire(:package) do

@@ -13,6 +13,7 @@
     * [CVS](#cvs)
     * [Git](#git)
     * [Mercurial](#mercurial)
+    * [Perforce](#perforce)
     * [Subversion](#subversion)  
 5. [Reference - An under-the-hood peek at what the module is doing and how](#reference)
     * [Type: vcsrepo](#type-vcsrepo)
@@ -57,6 +58,7 @@ The vcsrepo module works with the following VCSs:
 * [Bazaar (bzr)](#bazaar)
 * [CVS (cvs)](#cvs)
 * [Mercurial (hg)](#mercurial)
+* [Perforce (p4)](#perforce)
 * [Subversion (svn)](#subversion)
 
 **Note:* Git is the only VCS provider officially [supported](https://forge.puppetlabs.com/supported) by Puppet Labs.
@@ -326,6 +328,71 @@ When your source uses SSH, such as 'ssh://...', you can manage your SSH keys wit
 #####Further Examples
 
 For more examples using Mercurial, see `examples/hg/`.
+
+###Perforce
+
+#####To create an empty Workspace
+
+To create an empty Workspace, define a `vcsrepo` without a `source` or `revision`.  The 
+Environment variables P4PORT, P4USER, etc... are used to define the Perforce server
+connection settings.
+
+    vcsrepo { "/path/to/repo":
+      ensure     => present,
+      provider   => p4
+    }
+
+If no `P4CLIENT` environment name is provided a workspace generated name is calculated
+based on the Digest of path and hostname.  For example:
+
+    puppet-91bc00640c4e5a17787286acbe2c021c
+
+A Perforce configuration file can be used by setting the `P4CONFIG` environment or
+defining `p4config`.  If a configuration is defined, then the environment variable for 
+`P4CLIENT` is replaced.
+ 
+    vcsrepo { "/path/to/repo":
+      ensure     => present,
+      provider   => p4,
+      p4config   => '.p4config'
+    }
+
+#####To create/update and sync a Perforce workspace
+
+To sync a depot path to head, ensure `latest`:
+
+    vcsrepo { "/path/to/repo":
+        ensure   => latest,
+        provider => p4,
+        source   => '//depot/branch/...'
+    }
+
+For a specific changelist, ensure `present` and specify a `revision`:
+
+    vcsrepo { "/path/to/repo":
+        ensure   => present,
+        provider => p4,
+        source   => '//depot/branch/...',
+        revision => '2341'
+    }
+
+You can also set `revision` to a label:
+
+    vcsrepo { "/path/to/repo":
+        ensure   => present,
+        provider => p4,
+        source   => '//depot/branch/...',
+        revision => 'my_label'
+    }
+
+#####To authenticate against the Perforce server
+
+Either set the environment variables `P4USER` and `P4PASSWD` or use a configuration file.
+For secure servers set the `P4PASSWD` with a valid ticket generated using `p4 login -p`.
+
+#####Further Examples
+
+For examples you can run, see `examples/p4/`
 
 ###Subversion
 
