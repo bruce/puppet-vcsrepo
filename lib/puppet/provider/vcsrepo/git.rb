@@ -52,7 +52,9 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
     return current unless @resource.value(:revision)
 
     if tag_revision?(@resource.value(:revision))
-      canonical = at_path { git_with_identity('rev-parse', @resource.value(:revision)).chomp }
+      # git-rev-parse will give you the hash of the tag object itself rather than the commit it points to by default.
+      # Using tag^0 will return the actual commit.
+      canonical = at_path { git_with_identity('rev-parse', "#{@resource.value(:revision)}^0").chomp }
     else
       # if it's not a tag, look for it as a local ref
       canonical = at_path { git_with_identity('rev-parse', '--revs-only', @resource.value(:revision)).chomp }
