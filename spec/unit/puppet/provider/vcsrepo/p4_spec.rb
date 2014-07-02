@@ -51,7 +51,7 @@ describe Puppet::Type.type(:vcsrepo).provider(:p4) do
         ENV['P4CLIENT'] = nil
         
         path = resource.value(:path)
-    	host = Facter.value('hostname')
+      host = Facter.value('hostname')
         default = "puppet-" + Digest::MD5.hexdigest(path + host)
     
         provider.expects(:p4).with(['client', '-o', default]).returns({})
