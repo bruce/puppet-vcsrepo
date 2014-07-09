@@ -61,7 +61,7 @@ The vcsrepo module works with the following VCSs:
 * [Perforce (p4)](#perforce)
 * [Subversion (svn)](#subversion)
 
-**Note:* Git is the only VCS provider officially [supported](https://forge.puppetlabs.com/supported) by Puppet Labs.
+**Note:** Git is the only VCS provider officially [supported](https://forge.puppetlabs.com/supported) by Puppet Labs.
 
 
 ###Git
