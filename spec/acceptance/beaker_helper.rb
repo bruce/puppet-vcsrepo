@@ -25,8 +25,8 @@ test_name "Installing Puppet and vcsrepo module" do
     hosts.each do |host|
       proj_root = File.expand_path(File.join(File.dirname(__FILE__),'..','..'))
 
-      # This require beaker 1.12.2 I believe
-      puppet_module_install(:source => proj_root, :module_name => 'vcsrepo')
+      # This require beaker 1.15
+      copy_module_to(host, :source => proj_root, :module_name => 'vcsrepo')
 
       case fact_on(host, 'osfamily')
       when 'RedHat'
