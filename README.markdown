@@ -459,6 +459,7 @@ The vcsrepo module is slightly unusual in that it is simply a type and providers
 * `cvs`   - Supports the CVS VCS. (Contains features: `cvs_rsh`, `gzip_compression`, `modules`,`reference_tracking`.)
 * `dummy` - 
 * `hg`    - Supports the Mercurial VCS. (Contains features: `reference_tracking`, `ssh_identity`, `user`.)
+* `p4`    - Supports the Perforce VCS. (Contains features: `reference_tracking`, `filesystem_types`, `p4config`.)
 * `svn`   - Supports the Subversion VCS. (Contains features: `basic_auth`, `configuration`, `filesystem_types`, `reference_tracking`.)
 
 ####Features
@@ -477,6 +478,7 @@ The vcsrepo module is slightly unusual in that it is simply a type and providers
 * `reference_tracking` - The provider supports tracking revision references that can change over time (e.g. some VCS tags and branch names). (Available with `bar`, `cvs`, `git`, `hg`, `svn`.)
 * `ssh_identity` - The provider supports a configurable SSH identity file. (Available with `git` and `hg`.)
 * `user` - The provider can run as a different user. (Available with `git` and `hg`.)
+* `p4config` - The provider support setting the P4CONFIG environment. (Available with `p4`.)
 
 ####Parameters
 
@@ -494,12 +496,13 @@ The vcsrepo module is slightly unusual in that it is simply a type and providers
 * `identity` - Specifies the SSH identity file. (Requires the `ssh_identity` feature.)
 * `module` - Specifies the repository module to manage. (Requires the `modules` feature.)
 * `owner` - Specifies the user/uid that owns the repository files.
-*  `path` - Specifies the absolute path to the repository. If omitted, the value defaults to the resource's title.
+* `path` - Specifies the absolute path to the repository. If omitted, the value defaults to the resource's title.
 * `provider` - Specifies the backend to use for this vcsrepo resource. 
 * `remote` - Specifies the remote repository to track. (Requires the `multiple_remotes` feature.)
 * `revision` - Sets the revision of the repository. Values can match /^\S+$/.
 * `source` - Specifies the source URI for the repository.
 * `user` - Specifies the user to run as for repository operations.
+* `p4config` - Specifies the P4CONFIG environment used for Perforce connection configuration.
 
 ####Features and Parameters by Provider
 
@@ -522,6 +525,11 @@ The vcsrepo module is slightly unusual in that it is simply a type and providers
 **Features**: `reference_tracking`, `ssh_identity`, `user`
 
 **Parameters**: `ensure`, `excludes`, `force`, `group`, `identity`, `owner`, `path`, `provider`, `revision`, `source`, `user`
+
+#####`p4`
+**Features**: `reference_tracking`, `filesystem_types`, `p4config`
+
+**Parameters**: `ensure`, `group`, `owner`, `path`, `provider`, `revision`, `source`, `p4config`
 
 #####`svn`
 **Features**: `basic_auth`, `configuration`, `filesystem_types`, `reference_tracking`
