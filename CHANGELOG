@@ -1,3 +1,16 @@
+2014-07-14 - Supported Release 1.1.0
+Summary:
+This release adds a Perforce provider* and corrects the git provider behavior
+when using `ensure => latest`.
+
+*(Only git provider is currently supported.)
+
+Features:
+- New Perforce provider
+
+Bugfixes:
+- (MODULES-660) Fix behavior with `ensure => latest` and detached HEAD
+- Spec test fixes
 2014-06-30 - Supported Release 1.0.2
 Summary:
 This supported release adds SLES 11 to the list of compatible OSs and
