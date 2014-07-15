@@ -68,12 +68,12 @@ Puppet::Type.type(:vcsrepo).provide(:p4, :parent => Puppet::Provider::Vcsrepo) d
     
     revision = 0
     if hash && hash['code'] != 'error'
-    	hash['data'].each do |c|
-    	  if c['status'] == 'have'
-    	  	change = c['change'].to_i
-    	  	revision = change if change > revision
-    	  end
-    	end
+      hash['data'].each do |c|
+        if c['status'] == 'have'
+          change = c['change'].to_i
+          revision = change if change > revision
+        end
+      end
     end
     return revision
   end
@@ -180,7 +180,7 @@ Puppet::Type.type(:vcsrepo).provide(:p4, :parent => Puppet::Provider::Vcsrepo) d
     view = "\nView:\n"
   
     hash.keys.sort.each do |k|
-    	v = hash[k]
+      v = hash[k]
       next if( k == "code" )
       if(k.to_s =~ /View/ )
         view += "\t#{v}\n"
@@ -251,28 +251,28 @@ Puppet::Type.type(:vcsrepo).provide(:p4, :parent => Puppet::Provider::Vcsrepo) d
   
   # helper method as cstat does not Marshal
   def marshal_cstat(hash)
-  	data = hash['data']
-  	code = 'error'
-  	
-  	list = Array.new
-  	change = Hash.new
-  	data.each_line do |l|
-  		p = /^\.\.\. (.*) (.*)$/
-  		m = p.match(l)
-  		if m 
+    data = hash['data']
+    code = 'error'
+    
+    list = Array.new
+    change = Hash.new
+    data.each_line do |l|
+      p = /^\.\.\. (.*) (.*)$/
+      m = p.match(l)
+      if m 
         change[m[1]] = m[2]
-  		  if m[1] == 'status'
-  		  	code = 'stat'
-  		  	list.push change
-  		  	change = Hash.new
-  		  end
-  		end
-  	end
-  	
-  	hash = Hash.new
-  	hash.store 'code', code
-  	hash.store 'data', list
-  	return hash
+        if m[1] == 'status'
+          code = 'stat'
+          list.push change
+          change = Hash.new
+        end
+      end
+    end
+    
+    hash = Hash.new
+    hash.store 'code', code
+    hash.store 'data', list
+    return hash
   end
   
 end
