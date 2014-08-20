@@ -4,7 +4,6 @@ Puppet::Type.type(:vcsrepo).provide(:hg, :parent => Puppet::Provider::Vcsrepo) d
   desc "Supports Mercurial repositories"
 
   commands :hg => 'hg'
-  optional_commands :su => 'su'
 
   has_features :reference_tracking, :ssh_identity, :user, :basic_auth
 
@@ -123,7 +122,7 @@ Puppet::Type.type(:vcsrepo).provide(:hg, :parent => Puppet::Provider::Vcsrepo) d
     end
     if @resource.value(:user) and @resource.value(:user) != Facter['id'].value
       args.map! { |a| if a =~ /\s/ then "'#{a}'" else a end }  # Adds quotes to arguments with whitespaces.
-      su(@resource.value(:user), '-c', "hg #{args.join(' ')}")
+      Puppet::Util::Execution.execute("hg #{args.join(' ')}", :uid => @resource.value(:user), :failonfail => true)
     else
       hg(*args)
     end
