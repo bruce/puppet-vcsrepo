@@ -26,7 +26,7 @@ describe Puppet::Type.type(:vcsrepo).provider(:p4) do
         resource[:source] = 'something'
         resource[:revision] = '1'
         ENV['P4CLIENT'] = 'client_ws1'
-          
+
         provider.expects(:p4).with(['client', '-o', 'client_ws1']).returns({})
         provider.expects(:p4).with(['client', '-i'], spec)
         provider.expects(:p4).with(['sync', resource.value(:source) + "@" + resource.value(:revision)])
@@ -38,7 +38,7 @@ describe Puppet::Type.type(:vcsrepo).provider(:p4) do
       it "should just execute 'p4 sync' without a revision" do
         resource[:source] = 'something'
         ENV['P4CLIENT'] = 'client_ws2'
-        
+
         provider.expects(:p4).with(['client', '-o', 'client_ws2']).returns({})
         provider.expects(:p4).with(['client', '-i'], spec)
         provider.expects(:p4).with(['sync', resource.value(:source)])
@@ -49,11 +49,11 @@ describe Puppet::Type.type(:vcsrepo).provider(:p4) do
     context "when a client and source are not given" do
       it "should execute 'p4 client'" do
         ENV['P4CLIENT'] = nil
-        
+
         path = resource.value(:path)
       host = Facter.value('hostname')
         default = "puppet-" + Digest::MD5.hexdigest(path + host)
-    
+
         provider.expects(:p4).with(['client', '-o', default]).returns({})
         provider.expects(:p4).with(['client', '-i'], spec)
         provider.create
@@ -64,7 +64,7 @@ describe Puppet::Type.type(:vcsrepo).provider(:p4) do
   describe 'destroying' do
     it "it should remove the directory" do
       ENV['P4CLIENT'] = 'test_client'
-      
+
       provider.expects(:p4).with(['client', '-d', '-f', 'test_client'])
       expects_rm_rf
       provider.destroy
