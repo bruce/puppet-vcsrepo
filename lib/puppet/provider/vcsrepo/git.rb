@@ -281,7 +281,16 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
 
   # @!visibility private
   def set_excludes
-    at_path { open('.git/info/exclude', 'w') { |f| @resource.value(:excludes).each { |ex| f.write(ex + "\n") }}}
+    # Excludes may be an Array or a String.
+    at_path do
+      open('.git/info/exclude', 'w') do |f|
+        if @resource.value(:excludes).respond_to?(:each)
+          @resource.value(:excludes).each { |ex| f.puts ex }
+        else
+          f.puts @resource.value(:excludes)
+        end
+      end
+    end
   end
 
   # Finds the latest revision or sha of the current branch if on a branch, or
