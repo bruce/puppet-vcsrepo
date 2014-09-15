@@ -29,11 +29,10 @@ RSpec.configure do |c|
 
   # Configure all nodes in nodeset
   c.before :suite do
-    # Install module and dependencies on all hosts
-    puppet_module_install(:source => proj_root, :module_name => 'vcsrepo')
 
     # ensure test dependencies are available on all hosts
     hosts.each do |host|
+      copy_module_to(host, :source => proj_root, :module_name => 'vcsrepo')
       case fact_on(host, 'osfamily')
       when 'RedHat'
         install_package(host, 'git')
