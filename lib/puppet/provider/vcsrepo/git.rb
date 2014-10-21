@@ -3,9 +3,7 @@ require File.join(File.dirname(__FILE__), '..', 'vcsrepo')
 Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) do
   desc "Supports Git repositories"
 
-  ##TODO modify the commands below so that the su - is included
   commands :git => 'git'
-  optional_commands :su  => 'su'
 
   has_features :bare_repositories, :reference_tracking, :ssh_identity, :multiple_remotes, :user, :depth
 
@@ -374,7 +372,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
         return ret
       end
     elsif @resource.value(:user) and @resource.value(:user) != Facter['id'].value
-      su(@resource.value(:user), '-c', "git #{args.join(' ')}" )
+      Puppet::Util::Execution.execute("git #{args.join(' ')}", :uid => @resource.value(:user), :failonfail => true)
     else
       git(*args)
     end
