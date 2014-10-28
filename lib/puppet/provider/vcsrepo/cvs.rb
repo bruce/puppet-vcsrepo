@@ -4,7 +4,7 @@ Puppet::Type.type(:vcsrepo).provide(:cvs, :parent => Puppet::Provider::Vcsrepo) 
   desc "Supports CVS repositories/workspaces"
 
   commands :cvs => 'cvs'
-  has_features :gzip_compression, :reference_tracking, :modules, :cvs_rsh
+  has_features :gzip_compression, :reference_tracking, :modules, :cvs_rsh, :user
 
   def create
     if !@resource.value(:source)
@@ -125,13 +125,11 @@ Puppet::Type.type(:vcsrepo).provide(:cvs, :parent => Puppet::Provider::Vcsrepo) 
       e = {}
     end
 
-    # The location of withenv changed from Puppet 2.x to 3.x
-    withenv = Puppet::Util.method(:withenv) if Puppet::Util.respond_to?(:withenv)
-    withenv = Puppet::Util::Execution.method(:withenv) if Puppet::Util::Execution.respond_to?(:withenv)
-    fail("Cannot set custom environment #{e}") if e && !withenv
-
-    withenv.call e do
-      Puppet.debug cvs *args
+    if @resource.value(:user) and @resource.value(:user) != Facter['id'].value
+      debug "Running as user " + @resource.value(:user)
+      Puppet.debug Puppet::Util::Execution.execute("cvs #{args.join(' ')}", :uid => @resource.value(:user), :custom_environment => e)
+    else
+      Puppet.debug Puppet::Util::Execution.execute("cvs #{args.join(' ')}", :custom_environment => e)
     end
   end
 end
