@@ -23,14 +23,14 @@ describe Puppet::Type.type(:vcsrepo).provider(:cvs_provider) do
         resource[:source] = ':ext:source@example.com:/foo/bar'
         resource[:revision] = 'an-unimportant-value'
         expects_chdir('/tmp')
-        provider.expects(:cvs).with('-d', resource.value(:source), 'checkout', '-r', 'an-unimportant-value', '-d', 'test', 'bar')
+        Puppet::Util::Execution.expects(:execute).with([:cvs, '-d', resource.value(:source), 'checkout', '-r', 'an-unimportant-value', '-d', 'test', 'bar'], :custom_environment => {})
         provider.create
       end
 
       it "should just execute 'cvs checkout' without a revision" do
         resource[:source] = ':ext:source@example.com:/foo/bar'
         resource.delete(:revision)
-        provider.expects(:cvs).with('-d', resource.value(:source), 'checkout', '-d', File.basename(resource.value(:path)), File.basename(resource.value(:source)))
+        Puppet::Util::Execution.expects(:execute).with([:cvs, '-d', resource.value(:source), 'checkout', '-d', File.basename(resource.value(:path)), File.basename(resource.value(:source))], :custom_environment => {})
         provider.create
       end
 
@@ -39,7 +39,7 @@ describe Puppet::Type.type(:vcsrepo).provider(:cvs_provider) do
           resource[:source] = ':ext:source@example.com:/foo/bar'
           resource[:compression] = '3'
           resource.delete(:revision)
-          provider.expects(:cvs).with('-d', resource.value(:source), '-z', '3', 'checkout', '-d', File.basename(resource.value(:path)), File.basename(resource.value(:source)))
+          Puppet::Util::Execution.expects(:execute).with([:cvs, '-d', resource.value(:source), '-z', '3', 'checkout', '-d', File.basename(resource.value(:path)), File.basename(resource.value(:source))], :custom_environment => {})
           provider.create
         end
       end
@@ -48,7 +48,7 @@ describe Puppet::Type.type(:vcsrepo).provider(:cvs_provider) do
     context "when a source is not given" do
       it "should execute 'cvs init'" do
         resource.delete(:source)
-        provider.expects(:cvs).with('-d', resource.value(:path), 'init')
+        Puppet::Util::Execution.expects(:execute).with([:cvs, '-d', resource.value(:path), 'init'], :custom_environment => {})
         provider.create
       end
     end
@@ -107,7 +107,7 @@ describe Puppet::Type.type(:vcsrepo).provider(:cvs_provider) do
 
     it "should use 'cvs update -dr'" do
       expects_chdir
-      provider.expects(:cvs).with('update', '-dr', @tag, '.')
+      Puppet::Util::Execution.expects(:execute).with([:cvs, 'update', '-dr', @tag, '.'], :custom_environment => {})
       provider.revision = @tag
     end
   end
