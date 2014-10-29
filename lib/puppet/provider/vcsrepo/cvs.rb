@@ -33,13 +33,13 @@ Puppet::Type.type(:vcsrepo).provide(:cvs, :parent => Puppet::Provider::Vcsrepo) 
   end
 
   def latest?
-    debug "Checking for updates because 'ensure => latest'"
+    Puppet.debug "Checking for updates because 'ensure => latest'"
     at_path do
       # We cannot use -P to prune empty dirs, otherwise
       # CVS would report those as "missing", regardless
       # if they have contents or updates.
       is_current = (runcvs('-nq', 'update', '-d').strip == "")
-      if (!is_current) then debug "There are updates available on the checkout's current branch/tag." end
+      if (!is_current) then Puppet.debug "There are updates available on the checkout's current branch/tag." end
       return is_current
     end
   end
@@ -62,7 +62,7 @@ Puppet::Type.type(:vcsrepo).provide(:cvs, :parent => Puppet::Provider::Vcsrepo) 
       else
         @rev = 'HEAD'
       end
-      debug "Checkout is on branch/tag '#{@rev}'"
+      Puppet.debug "Checkout is on branch/tag '#{@rev}'"
     end
     return @rev
   end
@@ -119,17 +119,17 @@ Puppet::Type.type(:vcsrepo).provide(:cvs, :parent => Puppet::Provider::Vcsrepo) 
 
   def runcvs(*args)
     if @resource.value(:cvs_rsh)
-      debug "Using CVS_RSH = " + @resource.value(:cvs_rsh)
+      Puppet.debug "Using CVS_RSH = " + @resource.value(:cvs_rsh)
       e = { :CVS_RSH => @resource.value(:cvs_rsh) }
     else
       e = {}
     end
 
     if @resource.value(:user) and @resource.value(:user) != Facter['id'].value
-      debug "Running as user " + @resource.value(:user)
-      Puppet.debug Puppet::Util::Execution.execute("cvs #{args.join(' ')}", :uid => @resource.value(:user), :custom_environment => e)
+      Puppet.debug "Running as user " + @resource.value(:user)
+      Puppet::Util::Execution.execute([:cvs, *args], :uid => @resource.value(:user), :custom_environment => e)
     else
-      Puppet.debug Puppet::Util::Execution.execute("cvs #{args.join(' ')}", :custom_environment => e)
+      Puppet::Util::Execution.execute([:cvs, *args], :custom_environment => e)
     end
   end
 end
