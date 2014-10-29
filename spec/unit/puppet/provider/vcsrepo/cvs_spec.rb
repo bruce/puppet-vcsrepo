@@ -27,6 +27,15 @@ describe Puppet::Type.type(:vcsrepo).provider(:cvs_provider) do
         provider.create
       end
 
+      it "should execute 'cvs checkout' as user 'muppet'" do
+        resource[:source] = ':ext:source@example.com:/foo/bar'
+        resource[:revision] = 'an-unimportant-value'
+        resource[:user] = 'muppet'
+        expects_chdir('/tmp')
+        Puppet::Util::Execution.expects(:execute).with([:cvs, '-d', resource.value(:source), 'checkout', '-r', 'an-unimportant-value', '-d', 'test', 'bar'], :uid => 'muppet', :custom_environment => {})
+        provider.create
+      end
+
       it "should just execute 'cvs checkout' without a revision" do
         resource[:source] = ':ext:source@example.com:/foo/bar'
         resource.delete(:revision)
