@@ -489,7 +489,7 @@ The vcsrepo module is slightly unusual in that it is simply a type and providers
 * `cvs_rsh` -  The value to be used for the CVS_RSH environment variable. (Requires the `cvs_rsh` feature.)
 * `depth` - The value to be used to do a shallow clone. (Requires the `depth` feature.)
 * `ensure` - Determines the state of the repository. Valid values are 'present', 'bare', 'absent', 'latest'.
-* `excludes` - Lists any files to be excluded from the repository.
+* `excludes` - Lists any files to be excluded from the repository. Can be an array or string.
 * `force` - Forces repository creation. Valid values are 'true' and 'false'. **WARNING** Forcing will destroy any files in the path.
 * `fstype` - Sets the filesystem type. (Requires the `filesystem_types` feature.)
 * `group` - Determines the group/gid that owns the repository files.
