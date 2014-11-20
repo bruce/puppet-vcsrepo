@@ -41,6 +41,10 @@ This module provides a single type with providers for each VCS, which can be use
 
 ##Setup
 
+Before you begin using vcsrepo, it's worth keeping in mind that this module will not install VCS software for you. If you are going to use this module, you must have already installed your preferred VCS.
+
+Also, this module, like Puppet generally, will not create parent directories for you. You will need to have your parent directories in place before you begin.
+
 ###Beginning with vcsrepo	
 
 To get started with the vcsrepo module, you must simply define the type `vcsrepo` with a path to your repository and the [type of VCS](#Usage) you're using in `provider` (in the below example, Git). 
