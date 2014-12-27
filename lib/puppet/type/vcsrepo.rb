@@ -100,16 +100,6 @@ Puppet::Type.newtype(:vcsrepo) do
       prov = @resource.provider
       if prov
         if prov.working_copy_exists?
-          if @resource.value(:force)
-            if noop
-              notice "Noop Mode - Would have deleted repository and re-created from latest"
-            else
-              notice "Deleting current repository before recloning"
-              prov.destroy
-              notice "Create repository from latest"
-              prov.create
-            end
-          end
           (@should.include?(:latest) && prov.latest?) ? :latest : :present
         elsif prov.class.feature?(:bare_repositories) and prov.bare_exists?
           :bare

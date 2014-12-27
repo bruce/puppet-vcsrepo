@@ -35,8 +35,7 @@ hosts.each do |host|
     }
     EOS
 
-    apply_manifest_on(host, pp, :catch_failures => true)
-    apply_manifest_on(host, pp, :catch_changes  => true)
+    apply_manifest_on(host, pp, :expect_failures => true)
   end
 
   step 'verify original repo was not replaced' do

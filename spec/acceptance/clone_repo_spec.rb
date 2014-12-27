@@ -350,9 +350,7 @@ describe 'clones a remote repo' do
         }
         EOS
 
-        apply_manifest(pp, :catch_changes => true) do |r|
-          expect(r.stdout).to match(/Noop Mode/)
-        end
+        apply_manifest(pp, :catch_changes => true)
       end
     end
   end
