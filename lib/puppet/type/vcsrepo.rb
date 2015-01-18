@@ -43,6 +43,9 @@ Puppet::Type.newtype(:vcsrepo) do
   feature :p4config,
           "The provider understands Perforce Configuration"
 
+  feature :submodules,
+          "The repository contains submodules which can be optionally initialized"
+
   ensurable do
     attr_accessor :latest
 
@@ -213,6 +216,12 @@ Puppet::Type.newtype(:vcsrepo) do
 
   newparam :p4config, :required_features => [:p4config] do
     desc "The Perforce P4CONFIG environment."
+  end
+
+  newparam :submodules, :required_features => [:submodules] do
+    desc "Initialize and update each submodule in the repository."
+    newvalues(:true, :false)
+    defaultto true
   end
 
   autorequire(:package) do

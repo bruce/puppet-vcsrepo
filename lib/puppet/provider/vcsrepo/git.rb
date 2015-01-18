@@ -5,7 +5,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
 
   commands :git => 'git'
 
-  has_features :bare_repositories, :reference_tracking, :ssh_identity, :multiple_remotes, :user, :depth
+  has_features :bare_repositories, :reference_tracking, :ssh_identity, :multiple_remotes, :user, :depth, :submodules
 
   def create
     if @resource.value(:revision) and @resource.value(:ensure) == :bare
@@ -18,7 +18,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
       if @resource.value(:revision)
         checkout
       end
-      if @resource.value(:ensure) != :bare
+      if @resource.value(:ensure) != :bare && @resource.value(:submodules) == :true
         update_submodules
       end
     end

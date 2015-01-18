@@ -141,6 +141,15 @@ To keep the repository at the latest revision (**WARNING:** this will always ove
       revision => 'master',
     }
 
+To clone the repository but skip initialiazing submodules,
+
+    vcsrepo { "/path/to/repo":
+      ensure     => latest,
+      provider   => git,
+      source     => 'git://example.com/repo.git',
+      submodules => false,
+    }
+
 #####Sources that use SSH
 
 When your source uses SSH, such as 'username@server:…', you can manage your SSH keys with Puppet using the [require](http://docs.puppetlabs.com/references/stable/metaparameter.html#require) metaparameter in `vcsrepo` to ensure they are present.
@@ -479,6 +488,7 @@ The vcsrepo module is slightly unusual in that it is simply a type and providers
 * `ssh_identity` - The provider supports a configurable SSH identity file. (Available with `git` and `hg`.)
 * `user` - The provider can run as a different user. (Available with `git`, `hg` and `cvs`.)
 * `p4config` - The provider support setting the P4CONFIG environment. (Available with `p4`.)
+* `submodules` - The provider supports repository submodules which can be optionally initialized. (Available with `git`.)
 
 ####Parameters
 
@@ -507,9 +517,9 @@ The vcsrepo module is slightly unusual in that it is simply a type and providers
 ####Features and Parameters by Provider
 
 #####`git`
-**Features**: `bare_repositories`, `depth`, `multiple_remotes`, `reference_tracking`, `ssh_identity`, `user`
+**Features**: `bare_repositories`, `depth`, `multiple_remotes`, `reference_tracking`, `ssh_identity`, `user`, `submodules`
 
-**Parameters**: `depth`, `ensure`, `excludes`, `force`, `group`, `identity`, `owner`, `path`, `provider`, `remote`, `revision`, `source`, `user`
+**Parameters**: `depth`, `ensure`, `excludes`, `force`, `group`, `identity`, `owner`, `path`, `provider`, `remote`, `revision`, `source`, `user`, `submodules`
 
 #####`bzr`
 **Features**: `reference_tracking`
