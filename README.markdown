@@ -154,6 +154,20 @@ To clone the repository but skip initialiazing submodules,
       submodules => false,
     }
 
+##### Using multiple remotes with a repository
+Instead of specifying a single string in the 'source' property, you can specify a hash with multiple name => URL mappings,
+
+    vcsrepo { "/path/to/repo":
+      ensure   => present,
+      provider => git,
+      source   => {
+        "origin"       => "https://github.com/puppetlabs/puppetlabs-vcsrepo.git", 
+        "other_remote" => "https://github.com/other_user/puppetlabs-vcsrepo.git"
+      },
+    }
+
+It is important to note that you must specify a mapping for the remote that is specified in the 'remote' property - this is set to 'origin' by default.
+
 #####Sources that use SSH
 
 When your source uses SSH, such as 'username@server:…', you can manage your SSH keys with Puppet using the [require](http://docs.puppetlabs.com/references/stable/metaparameter.html#require) metaparameter in `vcsrepo` to ensure they are present.
