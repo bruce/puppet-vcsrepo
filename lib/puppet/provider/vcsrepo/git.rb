@@ -20,7 +20,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
       if @resource.value(:revision)
         checkout
       end
-      if @resource.value(:ensure) != :bare && @resource.value(:submodules) == :true && @resource.value(:submodules) == :true
+      if @resource.value(:ensure) != :bare && @resource.value(:submodules) == :true
         update_submodules
       end
 
