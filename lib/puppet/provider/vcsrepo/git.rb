@@ -20,7 +20,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
       if @resource.value(:revision)
         checkout
       end
-      if @resource.value(:ensure) != :bare && @resource.value(:submodules) == :true
+      if @resource.value(:ensure) != :bare && @resource.value(:submodules) == :true && @resource.value(:submodules) == :true
         update_submodules
       end
 
@@ -75,7 +75,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
       at_path { git_with_identity('reset', '--hard', "#{@resource.value(:remote)}/#{desired}") }
     end
     #TODO Would this ever reach here if it is bare?
-    if @resource.value(:ensure) != :bare
+    if @resource.value(:ensure) != :bare && @resource.value(:submodules) == :true
       update_submodules
     end
     update_owner_and_excludes
