@@ -45,7 +45,11 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
   #
   # @return [String] Returns the target sha/tag/branch
   def latest
-    @resource.value(:revision)
+    if not @resource.value(:revision) and branch = on_branch?
+      return branch
+    else
+      return @resource.value(:revision)
+    end
   end
 
   # Get the current revision of the repo (tag/branch/sha)
@@ -281,7 +285,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
   # handle upstream branch changes
   # @!visibility private
   def checkout(revision = @resource.value(:revision))
-    if !local_branch_revision? && remote_branch_revision?
+    if !local_branch_revision?(revision) && remote_branch_revision?(revision)
       #non-locally existant branches (perhaps switching to a branch that has never been checked out)
       at_path { git_with_identity('checkout', '--force', '-b', revision, '--track', "#{@resource.value(:remote)}/#{revision}") }
     else
