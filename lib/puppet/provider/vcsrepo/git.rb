@@ -76,7 +76,11 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
       #updated and authoritative.
       #TODO might be worthwhile to have an allow_local_changes param to decide
       #whether to reset or pull when we're ensuring latest.
-      at_path { git_with_identity('reset', '--hard', "#{@resource.value(:remote)}/#{desired}") }
+      if @resource.value(:source)
+        at_path { git_with_identity('reset', '--hard', "#{@resource.value(:remote)}/#{desired}") }
+      else
+        at_path { git_with_identity('reset', '--hard', "#{desired}") }
+      end
     end
     #TODO Would this ever reach here if it is bare?
     if @resource.value(:ensure) != :bare && @resource.value(:submodules) == :true
@@ -392,7 +396,17 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
   # @return [String] Returns the tag/branch of the current repo if it's up to
   #                  date; otherwise returns the sha of the requested revision.
   def get_revision(rev = 'HEAD')
-    update_references
+    if @resource.value(:source)
+      update_references
+    else
+      status = at_path { git_with_identity('status')}
+      is_it_new = status =~ /Initial commit/
+      if is_it_new
+        status =~ /On branch (.*)/
+        branch = $1
+        return branch
+      end
+    end
     current = at_path { git_with_identity('rev-parse', rev).strip }
     if @resource.value(:revision)
       if tag_revision?
