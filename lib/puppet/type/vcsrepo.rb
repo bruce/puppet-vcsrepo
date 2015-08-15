@@ -229,6 +229,6 @@ Puppet::Type.newtype(:vcsrepo) do
   end
 
   autorequire(:package) do
-    ['git', 'git-core']
+    ['git', 'git-core', 'mercurial']
   end
 end
