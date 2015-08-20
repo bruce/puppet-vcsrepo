@@ -32,7 +32,7 @@ describe 'clones with special characters' do
 
       # create ssh keys
       shell('mkdir -p /home/testuser-ssh/.ssh')
-      shell('ssh-keygen -q -t rsa -f /home/testuser-ssh/.ssh/id_rsa -N ""')
+      shell('echo -e \'y\n\'|ssh-keygen -q -t rsa -f /home/testuser-ssh/.ssh/id_rsa -N ""')
 
       # copy public key to authorized_keys
       shell('cat /home/testuser-ssh/.ssh/id_rsa.pub > /home/testuser-ssh/.ssh/authorized_keys')
