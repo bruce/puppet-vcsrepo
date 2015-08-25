@@ -202,6 +202,10 @@ Puppet::Type.newtype(:vcsrepo) do
     desc "The configuration directory to use"
   end
 
+  newparam :mirror do
+    desc "Specify if this repository should be treated as a mirror."
+  end
+
   newparam :cvs_rsh, :required_features => [:cvs_rsh] do
     desc "The value to be used for the CVS_RSH environment variable."
   end
