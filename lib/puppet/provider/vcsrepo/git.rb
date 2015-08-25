@@ -200,6 +200,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
         args << '--bare --mirror'
       else
         args << '--bare'
+      end
     end
     if @resource.value(:remote) != 'origin'
       args.push('--origin', @resource.value(:remote))
