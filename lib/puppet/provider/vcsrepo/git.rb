@@ -3,7 +3,9 @@ require File.join(File.dirname(__FILE__), '..', 'vcsrepo')
 Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) do
   desc "Supports Git repositories"
 
-  commands :git => 'git'
+  has_command(:git, 'git') do
+    environment({ 'HOME' => ENV['HOME'] })
+  end
 
   has_features :bare_repositories, :reference_tracking, :ssh_identity, :multiple_remotes, :user, :depth, :branch, :submodules
 
@@ -457,7 +459,8 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
         return ret
       end
     elsif @resource.value(:user) and @resource.value(:user) != Facter['id'].value
-      Puppet::Util::Execution.execute("git #{args.join(' ')}", :uid => @resource.value(:user), :failonfail => true)
+      env = Etc.getpwnam(@resource.value(:user))
+      Puppet::Util::Execution.execute("git #{args.join(' ')}", :uid => @resource.value(:user), :failonfail => true, :custom_environment => {'HOME' => env['dir']})
     else
       git(*args)
     end
