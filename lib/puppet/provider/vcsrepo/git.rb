@@ -7,7 +7,8 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
     environment({ 'HOME' => ENV['HOME'] })
   end
 
-  has_features :bare_repositories, :reference_tracking, :ssh_identity, :multiple_remotes, :user, :depth, :branch, :submodules
+  has_features :bare_repositories, :reference_tracking, :ssh_identity, :multiple_remotes,
+    :user, :depth, :branch, :submodules
 
   def create
     check_force

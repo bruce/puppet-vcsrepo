@@ -29,13 +29,19 @@ RSpec.configure do |c|
         end
 
         install_package(host, 'git')
+        install_package(host, 'subversion')
 
       when 'Debian'
         install_package(host, 'git-core')
+        install_package(host, 'subversion')
 
       else
         if !check_for_package(host, 'git')
           puts "Git package is required for this module"
+          exit
+        end
+        if !check_for_package(host, 'subversion')
+          puts "Subversion package is required for this module"
           exit
         end
       end

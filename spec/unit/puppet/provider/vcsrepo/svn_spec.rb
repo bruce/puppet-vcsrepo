@@ -11,11 +11,13 @@ describe Puppet::Type.type(:vcsrepo).provider(:svn) do
 
   let(:provider) { resource.provider }
 
+  let(:test_paths) { ['path1/file1', 'path2/nested/deep/file2'] }
+
   before :each do
     Puppet::Util.stubs(:which).with('svn').returns('/usr/bin/svn')
   end
 
-  describe 'creating' do
+  describe 'creation/checkout' do
     context 'with source and revision' do
       it "should execute 'svn checkout' with a revision" do
         resource[:source] = 'exists'
@@ -82,10 +84,80 @@ describe Puppet::Type.type(:vcsrepo).provider(:svn) do
         provider.create
       end
     end
+
+    context "with specific include paths" do
+
+      it "should raise an error when trying to make a repo" do
+        resource[:includes] = test_paths
+        expect { provider.create }.to raise_error(Puppet::Error, /Specifying include paths on a nonexistent repo./)
+      end
+
+      it "should perform a sparse checkout" do
+        resource[:source] = 'exists'
+        resource[:includes] = test_paths
+        Dir.expects(:chdir).with('/tmp/vcsrepo').at_least_once.yields
+        provider.expects(:svn).with('--non-interactive', 'checkout', '--depth', 'empty',
+          resource.value(:source),
+          resource.value(:path))
+        provider.expects(:svn).with('--non-interactive', 'update', '--parents',
+          *resource[:includes])
+        provider.create
+      end
+      it "should perform a sparse checkout at a specific revision" do
+        resource[:source] = 'exists'
+        resource[:revision] = 1
+        resource[:includes] = test_paths
+        Dir.expects(:chdir).with('/tmp/vcsrepo').at_least_once.yields
+        provider.expects(:svn).with('--non-interactive', 'checkout', '-r',
+          resource.value(:revision),
+          '--depth', 'empty',
+          resource.value(:source),
+          resource.value(:path))
+        provider.expects(:svn).with('--non-interactive', 'update', '-r',
+          resource.value(:revision),
+          '--parents',
+          *resource[:includes])
+        provider.create
+      end
+      it "should perform a sparse checkout with a specific depth" do
+        resource[:source] = 'exists'
+        resource[:depth] = 'files'
+        resource[:includes] = test_paths
+        Dir.expects(:chdir).with('/tmp/vcsrepo').at_least_once.yields
+        provider.expects(:svn).with('--non-interactive', 'checkout', '--depth', 'empty',
+          resource.value(:source),
+          resource.value(:path))
+        provider.expects(:svn).with('--non-interactive', 'update',
+          '--depth', resource.value(:depth),
+          '--parents',
+          *resource[:includes])
+        provider.create
+      end
+      it "should perform a sparse checkout at a specific depth and revision" do
+        resource[:source] = 'exists'
+        resource[:revision] = 1
+        resource[:depth] = 'files'
+        resource[:includes] = test_paths
+        Dir.expects(:chdir).with('/tmp/vcsrepo').at_least_once.yields
+        provider.expects(:svn).with('--non-interactive', 'checkout', '-r',
+          resource.value(:revision),
+          '--depth', 'empty',
+          resource.value(:source),
+          resource.value(:path))
+        provider.expects(:svn).with('--non-interactive', 'update',
+          '-r', resource.value(:revision),
+          '--depth', resource.value(:depth),
+          '--parents',
+          *resource[:includes])
+        provider.create
+      end
+
+    end
+
   end
 
   describe 'destroying' do
-    it "it should remove the directory" do
+    it "should remove the directory" do
       expects_rm_rf
       provider.destroy
     end
