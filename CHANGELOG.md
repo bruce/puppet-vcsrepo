@@ -1,10 +1,10 @@
-##Supported Release 1.3.2
+# Change Log
+All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
+
+## [1.3.2] - Supported Release
 ###Summary
 
 Small release for support of newer PE versions. This increments the version of PE in the metadata.json file.
-
-# Change Log
-All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [1.3.1] - 2015-07-28 Supported Release
 ###Summary
