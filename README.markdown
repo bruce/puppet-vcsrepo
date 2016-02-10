@@ -94,6 +94,16 @@ vcsrepo { '/path/to/repo':
 }
 ~~~
 
+If you want to clone your repository as bare or mirror, you can set `ensure` to 'bare' or 'mirror':
+
+~~~
+vcsrepo { '/path/to/repo':
+  ensure   => mirror,
+  provider => git,
+  source   => 'git://example.com/repo.git',
+}
+~~~
+
 By default, `vcsrepo` will use the HEAD of the source repository's master branch. To use another branch or a specific commit, set `revision` to either a branch name or a commit SHA or tag.
 
 Branch name:

@@ -10,7 +10,7 @@ end
    remote/origin/foo
 
 branches
-    end
+  end
   let(:resource) { Puppet::Type.type(:vcsrepo).new({
     :name     => 'test',
     :ensure   => :present,
@@ -111,6 +111,24 @@ branches
       end
     end
 
+    context "with an ensure of mirror" do
+      context "with revision" do
+        it "should raise an error" do
+          resource[:ensure] = :mirror
+          expect { provider.create }.to raise_error Puppet::Error, /cannot set a revision.+bare/i
+        end
+      end
+      context "without revision" do
+        it "should just execute 'git clone --mirror'" do
+          resource[:ensure] = :mirror
+          resource.delete(:revision)
+          provider.expects(:git).with('clone', '--mirror', resource.value(:source), resource.value(:path))
+          provider.expects(:update_remotes)
+          provider.create
+        end
+      end
+    end
+
     context "when a source is not given" do
       context "when the path does not exist" do
         it "should execute 'git init'" do
@@ -156,6 +174,14 @@ branches
         provider.expects(:working_copy_exists?).returns(false)
         provider.expects(:git).with('init', '--bare')
         provider.create
+      end
+
+      it "should raise an exeption" do
+        resource[:ensure] = :mirror
+        resource.delete(:source)
+        resource.delete(:revision)
+
+        expect { provider.create }.to raise_error Puppet::Error, /cannot init repository with mirror.+try bare/i
       end
     end
 

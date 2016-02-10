@@ -69,6 +69,8 @@ Puppet::Type.newtype(:vcsrepo) do
         end
       when :bare
         return is == :bare
+      when :mirror
+        return is == :mirror
       end
     end
 
@@ -78,6 +80,12 @@ Puppet::Type.newtype(:vcsrepo) do
     end
 
     newvalue :bare, :required_features => [:bare_repositories] do
+      if !provider.exists?
+        provider.create
+      end
+    end
+
+    newvalue :mirror, :required_features => [:bare_repositories] do
       if !provider.exists?
         provider.create
       end
@@ -227,7 +235,7 @@ Puppet::Type.newtype(:vcsrepo) do
   newparam :conflict do
     desc "The action to take if conflicts exist between repository and working copy"
   end
-  
+
   newparam :trust_server_cert do
     desc "Trust server certificate"
     newvalues(:true, :false)
