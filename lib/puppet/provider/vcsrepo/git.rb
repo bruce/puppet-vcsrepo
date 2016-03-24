@@ -472,7 +472,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
       end
     elsif @resource.value(:user) and @resource.value(:user) != Facter['id'].value
       env = Etc.getpwnam(@resource.value(:user))
-      Puppet::Util::Execution.execute("git #{args.join(' ')}", :uid => @resource.value(:user), :failonfail => true, :custom_environment => {'HOME' => env['dir']})
+      Puppet::Util::Execution.execute("git #{args.join(' ')}", :uid => @resource.value(:user), :failonfail => true, :custom_environment => {'HOME' => env['dir']}, :combine => true)
     else
       git(*args)
     end
