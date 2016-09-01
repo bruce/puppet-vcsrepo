@@ -71,6 +71,8 @@ Puppet::Type.newtype(:vcsrepo) do
         return is == :bare
       when :mirror
         return is == :mirror
+      when :absent
+        return is == :absent
       end
     end
 
