@@ -1,6 +1,15 @@
 # Change Log
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.4.0] - Supported Release
+### Summary
+Small release for a new feature and added compatibility.
+
+### Features
+- Now clone your git repository as a mirror or bare repo!
+- STDERR has been added to Puppet's output
+- Added Debian 8 and Ubuntu 16.04 compatibility
+
 ## [1.3.2] - Supported Release
 ###Summary
 
