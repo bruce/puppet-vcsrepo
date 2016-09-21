@@ -74,8 +74,27 @@ describe Puppet::Type.type(:vcsrepo).provider(:p4) do
   describe "checking existence" do
     it "should check for the directory" do
       provider.expects(:p4).with(['info'], {:marshal => false}).returns({})
-      provider.expects(:p4).with(['where', resource.value(:path) + "..."], {:raise => false}).returns({})
+      provider.expects(:p4).with(['where', resource.value(:path) + "/..."], {:raise => false}).returns({})
       provider.exists?
+    end
+  end
+
+  describe "checking the source property" do
+    it "should run 'p4 where'" do
+      resource[:source] = '//public/something'
+      provider.expects(:p4).with(['where', resource.value(:path) + '/...'],
+                                 {:raise => false}).returns({
+                                   'depotFile' => '//public/something'
+                                 })
+      expect(provider.source).to eq(resource.value(:source))
+    end
+  end
+
+  describe "setting the source property" do
+    it "should call 'create'" do
+      resource[:source] = '//public/something'
+      provider.expects(:create)
+      provider.source = resource.value(:source)
     end
   end
 

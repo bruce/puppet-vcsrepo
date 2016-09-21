@@ -33,7 +33,7 @@ describe Puppet::Type.type(:vcsrepo) do
     resource.property(:ensure)
   end
 
-  properties = [ :ensure ]
+  properties = [ :ensure, :source ]
 
   properties.each do |property|
     it "should have a #{property} property" do
@@ -46,6 +46,13 @@ describe Puppet::Type.type(:vcsrepo) do
   parameters.each do |parameter|
     it "should have a #{parameter} parameter" do
       expect(described_class.attrclass(parameter).ancestors).to be_include(Puppet::Parameter)
+    end
+  end
+
+  describe "munging of 'source' property" do
+    it "should remove trailing /" do
+      resource[:source] = ':pserver:anonymous@cvs.sv.gnu.org:/sources/cvs/'
+      expect(resource[:source]).to eq(':pserver:anonymous@cvs.sv.gnu.org:/sources/cvs')
     end
   end
 

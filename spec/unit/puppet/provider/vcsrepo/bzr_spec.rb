@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Puppet::Type.type(:vcsrepo).provider(:bzr_provider) do
+describe Puppet::Type.type(:vcsrepo).provider(:bzr) do
 
   let(:resource) { Puppet::Type.type(:vcsrepo).new({
     :name     => 'test',
@@ -49,8 +49,9 @@ describe Puppet::Type.type(:vcsrepo).provider(:bzr_provider) do
   end
 
   describe "checking existence" do
-    it "should check for the directory" do
-      File.expects(:directory?).with(File.join(resource.value(:path), '.bzr')).returns(true)
+    it "should execute bzr status on the path" do
+      File.expects(:directory?).with(resource.value(:path)).returns(true)
+      provider.expects(:bzr).with('status', resource[:path])
       provider.exists?
     end
   end
@@ -106,4 +107,19 @@ describe Puppet::Type.type(:vcsrepo).provider(:bzr_provider) do
     end
   end
 
+  describe "checking the source property" do
+    it "should use 'bzr info'" do
+      expects_chdir
+      resource[:source] = 'http://bazaar.launchpad.net/~bzr-pqm/bzr/bzr.dev/'
+      provider.expects(:bzr).with('info').returns(' parent branch: http://bazaar.launchpad.net/~bzr-pqm/bzr/bzr.dev/')
+      expect(provider.source).to eq(resource.value(:source))
+    end
+  end
+  describe "setting the source property" do
+    it "should call 'create'" do
+      resource[:source] = 'http://bazaar.launchpad.net/~bzr-pqm/bzr/bzr.dev/'
+      provider.expects(:create)
+      provider.source = resource.value(:source)
+    end
+  end
 end

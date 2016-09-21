@@ -12,7 +12,7 @@ describe Puppet::Type.type(:vcsrepo).provider(:svn) do
   let(:provider) { resource.provider }
 
   before :each do
-    Puppet::Util.stubs(:which).with('git').returns('/usr/bin/git')
+    Puppet::Util.stubs(:which).with('svn').returns('/usr/bin/svn')
   end
 
   describe 'creating' do
@@ -92,9 +92,15 @@ describe Puppet::Type.type(:vcsrepo).provider(:svn) do
   end
 
   describe "checking existence" do
-    it "should check for the directory" do
+    it "should run `svn status` on the path when there's a source" do
+      resource[:source] = 'dummy'
       expects_directory?(true, resource.value(:path))
-      expects_directory?(true, File.join(resource.value(:path), '.svn'))
+      provider.expects(:svn).with('status', resource[:path])
+      provider.exists?
+    end
+    it "should run `svnlook uuid` on the path when there's no source" do
+      expects_directory?(true, resource.value(:path))
+      provider.expects(:svnlook).with('uuid', resource[:path])
       provider.exists?
     end
   end
@@ -153,6 +159,53 @@ describe Puppet::Type.type(:vcsrepo).provider(:svn) do
         expects_chdir
         provider.expects(:svn).with('--non-interactive', 'switch', '-r', @revision, 'an-unimportant-value')
         provider.revision = @revision
+      end
+      it "should use 'svn switch'" do
+        resource[:source] = 'an-unimportant-value'
+        resource[:revision] = '30'
+        expects_chdir
+        provider.expects(:svn).with('--non-interactive', 'switch', '-r', resource.value(:revision), 'an-unimportant-value')
+        provider.source = resource.value(:source)
+      end
+      it "should use 'svn switch'" do
+        resource[:source] = 'an-unimportant-value'
+        resource[:revision] = '30'
+        expects_chdir
+        provider.expects(:svn).with('--non-interactive', 'switch', '-r', resource.value(:revision), 'an-unimportant-value')
+        provider.source = resource.value(:source)
+      end
+    end
+  end
+
+  describe "checking the source property" do
+    before do
+      provider.expects(:svn).with('--non-interactive', 'info').returns(fixture(:svn_info))
+    end
+    it "should use 'svn info'" do
+      expects_chdir
+      expect(provider.source).to eq('http://example.com/svn/trunk') # From URL
+    end
+  end
+
+  describe "setting the source property" do
+    context 'with conflict' do
+      it "should use 'svn switch'" do
+        resource[:source] = 'http://example.com/svn/tags/1.0'
+        resource[:conflict] = 'theirs-full'
+        expects_chdir
+        provider.expects(:svn).with('--non-interactive', 'switch', '--accept',
+                                    resource.value(:conflict),
+                                    resource.value(:source))
+        provider.source = resource.value(:source)
+      end
+    end
+    context 'without conflict' do
+      it "should use 'svn switch'" do
+        resource[:source] = 'http://example.com/svn/tags/1.0'
+        expects_chdir
+        provider.expects(:svn).with('--non-interactive', 'switch',
+                                    resource.value(:source))
+        provider.source = resource.value(:source)
       end
     end
   end
