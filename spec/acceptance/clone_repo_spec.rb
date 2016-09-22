@@ -531,4 +531,58 @@ describe 'clones a remote repo' do
       apply_manifest(pp, :catch_changes => true)
     end
   end
+
+  context 'bare repo' do
+    it 'creates a bare repo' do
+      pp = <<-EOS
+      vcsrepo { "#{tmpdir}/testrepo_bare_repo":
+        ensure => bare,
+        provider => git,
+        source => "file://#{tmpdir}/testrepo.git",
+      }
+      EOS
+
+      # Run it twice and test for idempotency
+      apply_manifest(pp, :catch_failures => true)
+      apply_manifest(pp, :catch_changes => true)
+    end
+
+    describe file("#{tmpdir}/testrepo_bare_repo/config") do
+      it { is_expected.to contain 'bare = true' }
+    end
+    describe file("#{tmpdir}/testrepo_bare_repo/.git") do
+      it { is_expected.not_to be_directory }
+    end
+    describe file("#{tmpdir}/testrepo_bare_repo/HEAD") do
+      it { is_expected.to contain 'ref: refs/heads/master' }
+    end
+  end
+
+  context 'mirror repo' do
+    it 'creates a mirror repo' do
+      pp = <<-EOS
+      vcsrepo { "#{tmpdir}/testrepo_mirror_repo":
+        ensure => mirror,
+        provider => git,
+        source => "file://#{tmpdir}/testrepo.git",
+      }
+      EOS
+
+      # Run it twice and test for idempotency
+      apply_manifest(pp, :catch_failures => true)
+      apply_manifest(pp, :catch_changes => true)
+    end
+
+    describe file("#{tmpdir}/testrepo_mirror_repo/config") do
+      it { is_expected.to contain 'bare = true' }
+      it { is_expected.to contain 'mirror = true' }
+    end
+    describe file("#{tmpdir}/testrepo_mirror_repo/.git") do
+      it { is_expected.not_to be_directory }
+    end
+    describe file("#{tmpdir}/testrepo_mirror_repo/HEAD") do
+      it { is_expected.to contain 'ref: refs/heads/master' }
+    end
+  end
+
 end
