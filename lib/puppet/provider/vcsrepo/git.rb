@@ -23,6 +23,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
     else
       clone_repository(default_url, @resource.value(:path))
       update_remotes(@resource.value(:source))
+      set_mirror if @resource.value(:ensure) == :mirror and @resource.value(:source).is_a?(Hash)
 
       if @resource.value(:revision)
         checkout
@@ -242,6 +243,96 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
     end
   end
 
+  # Convert working copy to bare
+  #
+  # Moves:
+  #   <path>/.git
+  # to:
+  #   <path>/
+  # and sets core.bare=true, and calls `set_mirror` if appropriate
+  def convert_working_copy_to_bare
+    return unless working_copy_exists? and not bare_exists?
+    notice "Converting working copy repository to bare repository"
+    FileUtils.mv(File.join(@resource.value(:path), '.git'), tempdir)
+    FileUtils.rm_rf(@resource.value(:path))
+    FileUtils.mv(tempdir, @resource.value(:path))
+    at_path do
+      git('config', '--local', '--bool', 'core.bare', 'true')
+      if @resource.value(:ensure) == :mirror
+        if !@resource.value(:source)
+          fail('Cannot have empty repository that is also a mirror.')
+        else
+          set_mirror
+        end
+      end
+    end
+  end
+
+  # Convert bare to working copy
+  #
+  # Moves:
+  #   <path>/
+  # to:
+  #   <path>/.git
+  # and sets core.bare=false, and calls `set_no_mirror` if appropriate
+  def convert_bare_to_working_copy
+    notice "Converting bare repository to working copy repository"
+    FileUtils.mv(@resource.value(:path), tempdir)
+    FileUtils.mkdir(@resource.value(:path))
+    FileUtils.mv(tempdir, File.join(@resource.value(:path), '.git'))
+    if has_commits?
+      at_path do
+        git('config', '--local', '--bool', 'core.bare', 'false')
+        reset('HEAD')
+        git_with_identity('checkout', '--force')
+        update_owner_and_excludes
+      end
+    end
+    set_no_mirror if mirror?
+  end
+
+  def mirror?
+    at_path do
+      begin
+        git('config', '--get-regexp', 'remote\..*\.mirror')
+        return true
+      rescue Puppet::ExecutionFailure
+        return false
+      end
+    end
+  end
+
+  def set_mirror
+    at_path do
+      if @resource.value(:source).is_a?(String)
+        git('config', "remote.#{@resource.value(:remote)}.mirror", 'true')
+      else
+        @resource.value(:source).keys.each { |remote|
+          git('config', "remote.#{remote}.mirror", 'true')
+        }
+      end
+    end
+  end
+
+  def set_no_mirror
+    at_path do
+      if @resource.value(:source).is_a?(String)
+        begin
+          git('config', '--unset', "remote.#{@resource.value(:remote)}.mirror")
+        rescue Puppet::ExecutionFailure
+        end
+      else
+        @resource.value(:source).keys.each { |remote|
+          begin
+          git('config', '--unset', "remote.#{remote}.mirror")
+          rescue Puppet::ExecutionFailure
+          end
+        }
+      end
+    end
+  end
+
+
   private
 
   # @!visibility private
@@ -303,39 +394,6 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
       at_path do
         git_with_identity(*args)
       end
-    end
-  end
-
-  # Convert working copy to bare
-  #
-  # Moves:
-  #   <path>/.git
-  # to:
-  #   <path>/
-  # @!visibility private
-  def convert_working_copy_to_bare
-    notice "Converting working copy repository to bare repository"
-    FileUtils.mv(File.join(@resource.value(:path), '.git'), tempdir)
-    FileUtils.rm_rf(@resource.value(:path))
-    FileUtils.mv(tempdir, @resource.value(:path))
-  end
-
-  # Convert bare to working copy
-  #
-  # Moves:
-  #   <path>/
-  # to:
-  #   <path>/.git
-  # @!visibility private
-  def convert_bare_to_working_copy
-    notice "Converting bare repository to working copy repository"
-    FileUtils.mv(@resource.value(:path), tempdir)
-    FileUtils.mkdir(@resource.value(:path))
-    FileUtils.mv(tempdir, File.join(@resource.value(:path), '.git'))
-    if has_commits?
-      reset('HEAD')
-      git_with_identity('checkout', '--force')
-      update_owner_and_excludes
     end
   end
 

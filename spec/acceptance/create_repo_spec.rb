@@ -86,4 +86,22 @@ describe 'create a repo' do
       it { is_expected.not_to be_directory }
     end
   end
+
+  context 'mirror repo' do
+    it 'does not create a mirror repo' do
+      pp = <<-EOS
+      vcsrepo { "#{tmpdir}/testrepo_mirror_repo":
+        ensure => mirror,
+        provider => git,
+      }
+      EOS
+
+      apply_manifest(pp, :expect_failures => true)
+    end
+
+    describe file("#{tmpdir}/testrepo_mirror_repo") do
+      it { is_expected.not_to be_directory }
+    end
+  end
+
 end

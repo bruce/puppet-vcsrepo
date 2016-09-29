@@ -77,19 +77,30 @@ Puppet::Type.newtype(:vcsrepo) do
     end
 
     newvalue :present do
-      notice "Creating repository from present"
-      provider.create
+      if !provider.exists?
+        provider.create
+      elsif provider.class.feature?(:bare_repositories) and provider.bare_exists?
+        provider.convert_bare_to_working_copy
+      end
     end
 
     newvalue :bare, :required_features => [:bare_repositories] do
       if !provider.exists?
         provider.create
+      elsif provider.working_copy_exists?
+        provider.convert_working_copy_to_bare
+      elsif provider.mirror?
+        provider.set_no_mirror
       end
     end
 
     newvalue :mirror, :required_features => [:bare_repositories] do
       if !provider.exists?
         provider.create
+      elsif provider.working_copy_exists?
+        provider.convert_working_copy_to_bare
+      elsif !provider.mirror?
+        provider.set_mirror
       end
     end
 
@@ -99,6 +110,9 @@ Puppet::Type.newtype(:vcsrepo) do
 
     newvalue :latest, :required_features => [:reference_tracking] do
       if provider.exists? && !@resource.value(:force)
+        if provider.class.feature?(:bare_repositories) and provider.bare_exists?
+          provider.convert_bare_to_working_copy
+        end
         if provider.respond_to?(:update_references)
           provider.update_references
         end
@@ -121,7 +135,11 @@ Puppet::Type.newtype(:vcsrepo) do
         if prov.working_copy_exists?
           (@should.include?(:latest) && prov.latest?) ? :latest : :present
         elsif prov.class.feature?(:bare_repositories) and prov.bare_exists?
-          :bare
+          if prov.mirror?
+            :mirror
+          else
+            :bare
+          end
         else
           :absent
         end

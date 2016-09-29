@@ -182,6 +182,25 @@ branches
     end
 
 
+    context "with an ensure of mirror" do
+
+      context "with multiple remotes" do
+        it "should execute 'git clone --mirror' and set all remotes to mirror" do
+          resource[:ensure] = :mirror
+          resource[:source] = {"origin" => "git://git@foo.com/bar.git", "other" => "git://git@foo.com/baz.git"}
+          resource.delete(:revision)
+          Dir.expects(:chdir).with('/').at_least_once.yields
+          provider.expects(:git).with('clone', '--mirror', resource.value(:source)['origin'], resource.value(:path))
+          provider.expects(:update_remotes)
+          expects_chdir
+          provider.expects(:git).with('config', 'remote.origin.mirror', 'true')
+          provider.expects(:git).with('config', 'remote.other.mirror', 'true')
+          provider.create
+        end
+      end
+
+    end
+
     context "when the path is a working copy repository" do
       it "should clone overtop it using force" do
         resource[:force] = true
@@ -207,6 +226,75 @@ branches
         expect { provider.create }.to raise_error(Puppet::Error)
       end
     end
+  end
+
+  context "converting repo type" do
+
+    context "from working copy to bare" do
+      it "should convert the repo" do
+        resource[:ensure] = :bare
+        provider.expects(:working_copy_exists?).returns(true)
+        provider.expects(:bare_exists?).returns(false)
+        FileUtils.expects(:mv).returns(true)
+        FileUtils.expects(:rm_rf).returns(true)
+        FileUtils.expects(:mv).returns(true)
+        expects_chdir
+        provider.expects(:git).with('config', '--local', '--bool', 'core.bare', 'true')
+        provider.instance_eval { convert_working_copy_to_bare }
+      end
+    end
+
+    context "from working copy to mirror" do
+      it "should convert the repo" do
+        resource[:ensure] = :mirror
+        provider.expects(:working_copy_exists?).returns(true)
+        provider.expects(:bare_exists?).returns(false)
+        FileUtils.expects(:mv).returns(true)
+        FileUtils.expects(:rm_rf).returns(true)
+        FileUtils.expects(:mv).returns(true)
+        expects_chdir
+        provider.expects(:git).with('config', '--local', '--bool', 'core.bare', 'true')
+        provider.expects(:git).with('config', 'remote.origin.mirror', 'true')
+        provider.instance_eval { convert_working_copy_to_bare }
+      end
+    end
+
+    context "from bare copy to working copy" do
+      it "should convert the repo" do
+        FileUtils.expects(:mv).returns(true)
+        FileUtils.expects(:mkdir).returns(true)
+        FileUtils.expects(:mv).returns(true)
+        expects_chdir
+        provider.expects(:has_commits?).returns(true)
+        # If you forget to stub these out you lose 3 hours of rspec work.
+        provider.expects(:git).
+          with('config', '--local', '--bool', 'core.bare', 'false').returns(true)
+        provider.expects(:reset).with('HEAD').returns(true)
+        provider.expects(:git_with_identity).with('checkout', '--force').returns(true)
+        provider.expects(:update_owner_and_excludes).returns(true)
+        provider.expects(:mirror?).returns(false)
+        provider.instance_eval { convert_bare_to_working_copy }
+      end
+    end
+
+    context "from mirror to working copy" do
+      it "should convert the repo" do
+        FileUtils.expects(:mv).returns(true)
+        FileUtils.expects(:mkdir).returns(true)
+        FileUtils.expects(:mv).returns(true)
+        expects_chdir
+        provider.expects(:has_commits?).returns(true)
+        provider.expects(:git).
+          with('config', '--local', '--bool', 'core.bare', 'false').returns(true)
+        provider.expects(:reset).with('HEAD').returns(true)
+        provider.expects(:git_with_identity).with('checkout', '--force').returns(true)
+        provider.expects(:update_owner_and_excludes).returns(true)
+        provider.expects(:git).with('config', '--unset', 'remote.origin.mirror')
+        provider.expects(:mirror?).returns(true)
+        provider.instance_eval { convert_bare_to_working_copy }
+      end
+    end
+
   end
 
   context 'destroying' do
@@ -424,31 +512,6 @@ branches
         provider.expects(:latest_revision).returns('testrev')
         expect(provider.latest?).to be_falsey
       end
-    end
-  end
-
-  describe 'convert_working_copy_to_bare' do
-    it do
-      FileUtils.expects(:mv).returns(true)
-      FileUtils.expects(:rm_rf).returns(true)
-      FileUtils.expects(:mv).returns(true)
-
-      provider.instance_eval { convert_working_copy_to_bare }
-    end
-  end
-
-    describe 'convert_bare_to_working_copy' do
-    it do
-      FileUtils.expects(:mv).returns(true)
-      FileUtils.expects(:mkdir).returns(true)
-      FileUtils.expects(:mv).returns(true)
-      provider.expects(:has_commits?).returns(true)
-      # If you forget to stub these out you lose 3 hours of rspec work.
-      provider.expects(:reset).with('HEAD').returns(true)
-      provider.expects(:git_with_identity).returns(true)
-      provider.expects(:update_owner_and_excludes).returns(true)
-
-      provider.instance_eval { convert_bare_to_working_copy }
     end
   end
 
