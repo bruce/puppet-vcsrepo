@@ -8,6 +8,7 @@ Puppet::Type.type(:vcsrepo).provide(:hg, :parent => Puppet::Provider::Vcsrepo) d
   has_features :reference_tracking, :ssh_identity, :user, :basic_auth
 
   def create
+    check_force
     if !@resource.value(:source)
       create_repository(@resource.value(:path))
     else
@@ -17,7 +18,13 @@ Puppet::Type.type(:vcsrepo).provide(:hg, :parent => Puppet::Provider::Vcsrepo) d
   end
 
   def working_copy_exists?
-    File.directory?(File.join(@resource.value(:path), '.hg'))
+    return false if not File.directory?(@resource.value(:path))
+    begin
+      hg_wrapper('status', @resource.value(:path))
+      return true
+    rescue Puppet::ExecutionFailure
+      return false
+    end
   end
 
   def exists?
@@ -77,6 +84,16 @@ Puppet::Type.type(:vcsrepo).provide(:hg, :parent => Puppet::Provider::Vcsrepo) d
       hg_wrapper('update', '--clean', '-r', desired)
     end
     update_owner
+  end
+
+  def source
+    at_path do
+      hg_wrapper('paths')[/^default = (.*)/, 1]
+    end
+  end
+
+  def source=(desired)
+    create # recreate
   end
 
   private

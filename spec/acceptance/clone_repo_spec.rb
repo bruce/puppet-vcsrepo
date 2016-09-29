@@ -416,6 +416,11 @@ describe 'clones a remote repo' do
       it { is_expected.to be_directory }
       it { is_expected.to be_grouped_into 'testuser' }
     end
+
+    after(:all) do
+      pp = 'user { "testuser": ensure => absent }'
+      apply_manifest(pp, :catch_failures => true)
+    end
   end
 
   context 'non-origin remote name' do
@@ -436,11 +441,6 @@ describe 'clones a remote repo' do
 
     it 'remote name is "testorigin"' do
       shell("git --git-dir=#{tmpdir}/testrepo_remote/.git remote | grep 'testorigin'")
-    end
-
-    after(:all) do
-      pp = 'user { "testuser": ensure => absent }'
-      apply_manifest(pp, :catch_failures => true)
     end
   end
 

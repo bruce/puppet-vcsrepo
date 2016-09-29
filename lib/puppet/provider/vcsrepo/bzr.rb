@@ -7,6 +7,7 @@ Puppet::Type.type(:vcsrepo).provide(:bzr, :parent => Puppet::Provider::Vcsrepo) 
   has_features :reference_tracking
 
   def create
+    check_force
     if !@resource.value(:source)
       create_repository(@resource.value(:path))
     else
@@ -15,7 +16,13 @@ Puppet::Type.type(:vcsrepo).provide(:bzr, :parent => Puppet::Provider::Vcsrepo) 
   end
 
   def working_copy_exists?
-    File.directory?(File.join(@resource.value(:path), '.bzr'))
+    return false if not File.directory?(@resource.value(:path))
+    begin
+      bzr('status', @resource.value(:path))
+      return true
+    rescue Puppet::ExecutionFailure
+      return false
+    end
   end
 
   def exists?
@@ -53,6 +60,16 @@ Puppet::Type.type(:vcsrepo).provide(:bzr, :parent => Puppet::Provider::Vcsrepo) 
       end
     end
     update_owner
+  end
+
+  def source
+    at_path do
+      bzr('info')[/^\s+parent branch:\s+(\S+?)\/?$/m, 1]
+    end
+  end
+
+  def source=(desired)
+    create # recreate
   end
 
   def latest

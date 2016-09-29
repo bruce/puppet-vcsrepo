@@ -5,6 +5,17 @@ require 'fileutils'
 # Abstract
 class Puppet::Provider::Vcsrepo < Puppet::Provider
 
+  def check_force
+    if path_exists? and not path_empty?
+      if @resource.value(:force)
+        notice "Removing %s to replace with desired repository." % @resource.value(:path)
+        destroy
+      else
+        raise Puppet::Error, "Path %s exists and is not the desired repository." % @resource.value(:path)
+      end
+    end
+  end
+
   private
 
   def set_ownership

@@ -69,7 +69,8 @@ describe Puppet::Type.type(:vcsrepo).provider(:hg) do
 
   describe "checking existence" do
     it "should check for the directory" do
-      expects_directory?(true, File.join(resource.value(:path), '.hg'))
+      expects_directory?(true, resource.value(:path))
+      provider.expects(:hg).with('status', resource.value(:path))
       provider.exists?
     end
   end
@@ -132,6 +133,23 @@ describe Puppet::Type.type(:vcsrepo).provider(:hg) do
       provider.expects(:hg).with('merge')
       provider.expects(:hg).with('update', '--clean', '-r', @revision)
       provider.revision = @revision
+    end
+  end
+
+  describe "checking the source property" do
+    it "should return the default path" do
+      resource[:source] = 'http://selenic.com/hg'
+      expects_chdir
+      provider.expects(:hg_wrapper).with('paths').returns('default = http://selenic.com/hg')
+      expect(provider.source).to eq(resource.value(:source))
+    end
+  end
+
+  describe "setting the source property" do
+    it "should call 'create'" do
+      resource[:source] = 'some-example'
+      provider.expects(:create)
+      provider.source = resource.value(:source)
     end
   end
 

@@ -6,6 +6,7 @@ Puppet::Type.type(:vcsrepo).provide(:p4, :parent => Puppet::Provider::Vcsrepo) d
   has_features :filesystem_types, :reference_tracking, :p4config
 
   def create
+    check_force
     # create or update client
     create_client(client_name)
 
@@ -25,7 +26,7 @@ Puppet::Type.type(:vcsrepo).provide(:p4, :parent => Puppet::Provider::Vcsrepo) d
 
     # Check if workspace is setup
     args = ['where']
-    args.push(@resource.value(:path) + "...")
+    args.push(@resource.value(:path) + "/...")
     hash = p4(args, {:raise => false})
 
     return (hash['code'] != "error")
@@ -81,6 +82,18 @@ Puppet::Type.type(:vcsrepo).provide(:p4, :parent => Puppet::Provider::Vcsrepo) d
   def revision=(desired)
     sync_client(@resource.value(:source), desired)
     update_owner
+  end
+
+  def source
+    args = ['where']
+    args.push(@resource.value(:path) + "/...")
+    hash = p4(args, {:raise => false})
+
+    return hash['depotFile']
+  end
+
+  def source=(desired)
+    create # recreate
   end
 
   private

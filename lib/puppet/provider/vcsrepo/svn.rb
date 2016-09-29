@@ -10,6 +10,7 @@ Puppet::Type.type(:vcsrepo).provide(:svn, :parent => Puppet::Provider::Vcsrepo) 
   has_features :filesystem_types, :reference_tracking, :basic_auth, :configuration, :conflict, :depth
 
   def create
+    check_force
     if !@resource.value(:source)
       create_repository(@resource.value(:path))
     else
@@ -22,15 +23,22 @@ Puppet::Type.type(:vcsrepo).provide(:svn, :parent => Puppet::Provider::Vcsrepo) 
   end
 
   def working_copy_exists?
-    if File.directory?(@resource.value(:path))
-      # :path is an svn checkout
-      return true if File.directory?(File.join(@resource.value(:path), '.svn'))
-      if File.file?(File.join(@resource.value(:path), 'format'))
-        # :path is an svn server
-        return true if svnlook('uuid', @resource.value(:path))
+    return false if not File.directory?(@resource.value(:path))
+    if @resource.value(:source)
+      begin
+        svn('status', @resource.value(:path))
+        return true
+      rescue Puppet::ExecutionFailure
+        return false
+      end
+    else
+      begin
+        svnlook('uuid', @resource.value(:path))
+        return true
+      rescue Puppet::ExecutionFailure
+        return false
       end
     end
-    false
   end
 
   def exists?
@@ -77,11 +85,26 @@ Puppet::Type.type(:vcsrepo).provide(:svn, :parent => Puppet::Provider::Vcsrepo) 
     end
   end
 
-  def sourceurl
+  def source
     args = buildargs.push('info')
     at_path do
       svn(*args)[/^URL:\s+(\S+)/m, 1]
     end
+  end
+
+  def source=(desired)
+    args = buildargs.push('switch')
+    if @resource.value(:revision)
+      args.push('-r', @resource.value(:revision))
+    end
+    if @resource.value(:conflict)
+      args.push('--accept', @resource.value(:conflict))
+    end
+    args.push(desired)
+    at_path do
+      svn(*args)
+    end
+    update_owner
   end
 
   def revision

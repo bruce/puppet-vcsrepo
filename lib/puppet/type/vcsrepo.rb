@@ -143,8 +143,16 @@ Puppet::Type.newtype(:vcsrepo) do
     end
   end
 
-  newparam :source do
+  newproperty :source do
     desc "The source URI for the repository"
+    # Strip tailing slashes
+    munge do |value|
+      if value[-1] == '/'
+        value[0..-2]
+      else
+        value
+      end
+    end
   end
 
   newparam :fstype, :required_features => [:filesystem_types] do
@@ -199,7 +207,7 @@ Puppet::Type.newtype(:vcsrepo) do
     desc "SSH identity file"
   end
 
-  newparam :module, :required_features => [:modules] do
+  newproperty :module, :required_features => [:modules] do
     desc "The repository module to manage"
   end
 

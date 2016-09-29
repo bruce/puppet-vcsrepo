@@ -7,6 +7,7 @@ Puppet::Type.type(:vcsrepo).provide(:cvs, :parent => Puppet::Provider::Vcsrepo) 
   has_features :gzip_compression, :reference_tracking, :modules, :cvs_rsh, :user
 
   def create
+    check_force
     if !@resource.value(:source)
       create_repository(@resource.value(:path))
     else
@@ -16,16 +17,26 @@ Puppet::Type.type(:vcsrepo).provide(:cvs, :parent => Puppet::Provider::Vcsrepo) 
   end
 
   def exists?
-    if @resource.value(:source)
-      directory = File.join(@resource.value(:path), 'CVS')
-    else
-      directory = File.join(@resource.value(:path), 'CVSROOT')
-    end
-    File.directory?(directory)
+    working_copy_exists?
   end
 
   def working_copy_exists?
-    File.directory?(File.join(@resource.value(:path), 'CVS'))
+    if @resource.value(:source)
+      directory = File.join(@resource.value(:path), 'CVS')
+      return false if not File.directory?(directory)
+      begin
+        at_path { runcvs('-nqd', @resource.value(:path), 'status', '-l') }
+        return true
+      rescue Puppet::ExecutionFailure
+        return false
+      end
+    else
+      directory = File.join(@resource.value(:path), 'CVSROOT')
+      return false if not File.directory?(directory)
+      config = File.join(@resource.value(:path), 'CVSROOT', 'config,v')
+      return false if not File.exists?(config)
+      return true
+    end
   end
 
   def destroy
@@ -75,6 +86,22 @@ Puppet::Type.type(:vcsrepo).provide(:cvs, :parent => Puppet::Provider::Vcsrepo) 
     end
   end
 
+  def source
+    File.read(File.join(@resource.value(:path), 'CVS', 'Root')).chomp
+  end
+
+  def source=(desired)
+    create # recreate
+  end
+
+  def module
+    File.read(File.join(@resource.value(:path), 'CVS', 'Repository')).chomp
+  end
+
+  def module=(desired)
+    create # recreate
+  end
+
   private
 
   def tag_file
@@ -97,14 +124,9 @@ Puppet::Type.type(:vcsrepo).provide(:cvs, :parent => Puppet::Provider::Vcsrepo) 
     end
   end
 
-  # When the source:
-  # * Starts with ':' (eg, :pserver:...)
+  # If no module is provided, use '.', the root of the repo
   def module_name
-    if (m = @resource.value(:module))
-      m
-    elsif (source = @resource.value(:source))
-      source[0, 1] == ':' ? File.basename(source) : '.'
-    end
+    @resource.value(:module) or '.'
   end
 
   def create_repository(path)
@@ -127,9 +149,9 @@ Puppet::Type.type(:vcsrepo).provide(:cvs, :parent => Puppet::Provider::Vcsrepo) 
 
     if @resource.value(:user) and @resource.value(:user) != Facter['id'].value
       Puppet.debug "Running as user " + @resource.value(:user)
-      Puppet::Util::Execution.execute([:cvs, *args], :uid => @resource.value(:user), :custom_environment => e, :combine => true)
+      Puppet::Util::Execution.execute([:cvs, *args], :uid => @resource.value(:user), :custom_environment => e, :combine => true, :failonfail => true)
     else
-      Puppet::Util::Execution.execute([:cvs, *args], :custom_environment => e, :combine => true)
+      Puppet::Util::Execution.execute([:cvs, *args], :custom_environment => e, :combine => true, :failonfail => true)
     end
   end
 end
