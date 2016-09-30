@@ -52,6 +52,9 @@ Puppet::Type.newtype(:vcsrepo) do
   feature :conflict,
           "The provider supports automatic conflict resolution"
 
+  feature :include_paths,
+          "The provider supports checking out only specific paths"
+
   ensurable do
     attr_accessor :latest
 
@@ -195,7 +198,18 @@ Puppet::Type.newtype(:vcsrepo) do
   end
 
   newparam :excludes do
-    desc "Files to be excluded from the repository"
+    desc "Local paths which shouldn't be tracked by the repository"
+  end
+
+  newproperty :includes, :required_features => [:include_paths], :array_matching => :all do
+    desc "Paths to be included from the repository"
+    def insync?(is)
+      if is.is_a?(Array) and @should.is_a?(Array)
+        is.sort == @should.sort
+      else
+        is == @should
+      end
+    end
   end
 
   newparam :force do

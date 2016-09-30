@@ -7,17 +7,24 @@ Puppet::Type.type(:vcsrepo).provide(:svn, :parent => Puppet::Provider::Vcsrepo) 
            :svnadmin => 'svnadmin',
            :svnlook  => 'svnlook'
 
-  has_features :filesystem_types, :reference_tracking, :basic_auth, :configuration, :conflict, :depth
+  has_features :filesystem_types, :reference_tracking, :basic_auth, :configuration, :conflict, :depth,
+      :include_paths
 
   def create
     check_force
     if !@resource.value(:source)
+      if @resource.value(:includes)
+        raise Puppet::Error, "Specifying include paths on a nonexistent repo."
+      end
       create_repository(@resource.value(:path))
     else
       checkout_repository(@resource.value(:source),
                           @resource.value(:path),
                           @resource.value(:revision),
                           @resource.value(:depth))
+    end
+    if @resource.value(:includes)
+      update_includes(@resource.value(:includes))
     end
     update_owner
   end
@@ -131,14 +138,66 @@ Puppet::Type.type(:vcsrepo).provide(:svn, :parent => Puppet::Provider::Vcsrepo) 
     update_owner
   end
 
+  def includes
+    get_includes('.')
+  end
+
+  def includes=(desired)
+    exists = includes
+    old_paths = exists - desired
+    new_paths = desired - exists
+    # Remove paths that are no longer specified
+    old_paths.each { |path| delete_include(path) }
+    update_includes(new_paths)
+  end
+
+
   private
+
+  def get_includes(directory)
+    at_path do
+      args = buildargs.push('info', directory)
+      if svn(*args)[/^Depth:\s+(\w+)/m, 1] != 'empty'
+        return directory[2..-1].gsub(File::SEPARATOR, '/')
+      end
+      Dir.entries(directory).map { |entry|
+        next if entry == '.' or entry == '..' or entry == '.svn'
+        entry = File.join(directory, entry)
+        if File.directory?(entry)
+          get_includes(entry)
+        elsif File.file?(entry)
+          entry[2..-1].gsub(File::SEPARATOR, '/')
+        end
+      }.flatten.compact!
+    end
+  end
+
+  def delete_include(path)
+    at_path do
+      args = buildargs.push('update', '--set-depth', 'exclude', path)
+      svn(*args)
+      until (path, sep, tail = path.rpartition(File::SEPARATOR)) == ['', '', '']
+        Puppet.debug "#{sep} #{tail}"
+        begin
+          Dir.rmdir(path)
+          args = buildargs.push('update', '--set-depth', 'exclude', path)
+          svn(*args)
+        rescue SystemCallError
+          break
+        end
+      end
+    end
+  end
 
   def checkout_repository(source, path, revision, depth)
     args = buildargs.push('checkout')
     if revision
       args.push('-r', revision)
     end
-    if depth
+    if @resource.value(:includes)
+      # Make root checked out at empty depth to provide sparse directories
+      args.push('--depth', 'empty')
+    elsif depth
       args.push('--depth', depth)
     end
     args.push(source, path)
@@ -159,4 +218,20 @@ Puppet::Type.type(:vcsrepo).provide(:svn, :parent => Puppet::Provider::Vcsrepo) 
       set_ownership
     end
   end
+
+  def update_includes(paths)
+    at_path do
+      args = buildargs.push('update')
+      if @resource.value(:revision)
+        args.push('-r', @resource.value(:revision))
+      end
+      if @resource.value(:depth)
+        args.push('--depth', @resource.value(:depth))
+      end
+      args.push('--parents')
+      args.push(*paths)
+      svn(*args)
+    end
+  end
+
 end

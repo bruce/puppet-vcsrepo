@@ -519,7 +519,94 @@ vcsrepo { '/path/to/repo':
 }
 ~~~
 
-#### Use a specific Subversion configuration directory
+####Checking out only specific paths
+
+You can check out only specific paths in a particular repository by providing their relative paths to the `include` parameter, like so:
+
+~~~
+vcsrepo { '/path/to/repo':
+  ensure   => present,
+  provider => svn,
+  source   => 'http://svnrepo/hello/trunk',
+  includes => [
+    'root-file.txt',
+    'checkout-folder',
+    'file/this-file.txt',
+    'folder/this-folder/',
+  ]
+}
+~~~
+
+This will create files `/path/to/repo/file-at-root-path.txt` and `/path/to/repo/file/nested/within/repo.jmx`, with folders `/path/to/repo/some-folder` and `/path/to/repo/nested/folder/to/checkout` completely recreating their corresponding working tree path.
+
+When specified, the `depth` parameter will also be applied to the `includes` -- the root directory will be checked out using an `empty` depth, and the `includes` you specify will be checked out using the `depth` you provide.
+
+To illustrate this point, using the above snippet (with the specified `includes`) and a remote repository layout like this:
+
+~~~
+.
+├── checkout-folder
+│   ├── file1
+│   └── nested-1
+│       ├── nested-2
+│       │   └── nested-file-2
+│       └── nested-file-1
+├── file
+│   ├── NOT-this-file.txt
+│   └── this-file.txt
+├── folder
+│   ├── never-checked-out
+│   └── this-folder
+│       ├── deep-nested-1
+│       │   ├── deep-nested-2
+│       │   │   └── deep-nested-file-2
+│       │   └── deep-nested-file-1
+│       └── this-file.txt
+├── NOT-this-file.txt
+├── NOT-this-folder
+│   ├── NOT-this-file.txt
+│   └── NOT-this-one-either.txt
+└── root-file.txt
+~~~
+
+With no `depth` given, your local folder `/path/to/repo` will look like this:
+
+~~~
+.
+├── checkout-folder
+│   ├── file1
+│   └── nested-1
+│       ├── nested-2
+│       │   └── nested-file-2
+│       └── nested-file-1
+├── file
+│   └── this-file.txt
+├── folder
+│   └── this-folder
+│       ├── deep-nested-1
+│       │   ├── deep-nested-2
+│       │   │   └── deep-nested-file-2
+│       │   └── deep-nested-file-1
+│       └── this-file.txt
+└── root-file.txt
+~~~
+
+And with a `depth` of `files` will look like this:
+
+~~~
+.
+├── checkout-folder
+│   └── file1
+├── file
+│   └── this-file.txt
+├── folder
+│   └── this-folder
+│       └── this-file.txt
+└── root-file.txt
+~~~
+
+
+####Use a specific Subversion configuration directory 
 
 Use the `configuration` parameter to designate the directory that contains your Subversion configuration files (typically, '/path/to/.subversion'):
 
