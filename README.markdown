@@ -405,7 +405,7 @@ vcsrepo { '/path/to/repo':
   ensure   => present,
   provider => hg,
   source   => 'ssh://hg@hg.example.com/myrepo',
-  identity => '/home/user/.ssh/id_dsa1,
+  identity => '/home/user/.ssh/id_dsa1',
 }
 ~~~
 
