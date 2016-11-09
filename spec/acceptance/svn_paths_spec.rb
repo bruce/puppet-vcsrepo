@@ -2,7 +2,8 @@ require 'spec_helper_acceptance'
 
 tmpdir = default.tmpdir('vcsrepo')
 
-describe 'subversion :includes tests' do
+describe 'subversion :includes tests on SVN version > 1.7', :unless =>
+    (fact('osfamily') == 'RedHat' && fact('operatingsystemmajrelease') =~ /(5|6)/) do
 
   before(:all) do
     shell("mkdir -p #{tmpdir}") # win test
@@ -15,13 +16,13 @@ describe 'subversion :includes tests' do
   context "include paths" do
     it "can checkout specific paths from svn" do
       pp = <<-EOS
-      vcsrepo { "#{tmpdir}/svnrepo":
-        ensure   => present,
-        provider => svn,
-        includes => ['difftools/README', 'obsolete-notes',],
-        source   => "http://svn.apache.org/repos/asf/subversion/developer-resources/",
-        revision => 1000000,
-      }
+        vcsrepo { "#{tmpdir}/svnrepo":
+          ensure   => present,
+          provider => svn,
+          includes => ['difftools/README', 'obsolete-notes',],
+          source   => "http://svn.apache.org/repos/asf/subversion/developer-resources",
+          revision => 1000000,
+        }
       EOS
 
       # Run it twice and test for idempotency
@@ -55,13 +56,13 @@ describe 'subversion :includes tests' do
   context "add include paths" do
     it "can add paths to includes" do
       pp = <<-EOS
-      vcsrepo { "#{tmpdir}/svnrepo":
-        ensure   => present,
-        provider => svn,
-        includes => ['difftools/README', 'obsolete-notes', 'guis/pics/README', 'difftools/pics/README'],
-        source   => "http://svn.apache.org/repos/asf/subversion/developer-resources/",
-        revision => 1000000,
-      }
+        vcsrepo { "#{tmpdir}/svnrepo":
+          ensure   => present,
+          provider => svn,
+          includes => ['difftools/README', 'obsolete-notes', 'guis/pics/README', 'difftools/pics/README'],
+          source   => "http://svn.apache.org/repos/asf/subversion/developer-resources",
+          revision => 1000000,
+        }
       EOS
 
       # Run it twice and test for idempotency
@@ -80,13 +81,13 @@ describe 'subversion :includes tests' do
   context "remove include paths" do
     it "can remove paths (and empty parent directories) from includes" do
       pp = <<-EOS
-      vcsrepo { "#{tmpdir}/svnrepo":
-        ensure   => present,
-        provider => svn,
-        includes => ['difftools/README', 'obsolete-notes',],
-        source   => "http://svn.apache.org/repos/asf/subversion/developer-resources/",
-        revision => 1000000,
-      }
+        vcsrepo { "#{tmpdir}/svnrepo":
+          ensure   => present,
+          provider => svn,
+          includes => ['difftools/README', 'obsolete-notes',],
+          source   => "http://svn.apache.org/repos/asf/subversion/developer-resources",
+          revision => 1000000,
+        }
       EOS
 
       # Run it twice and test for idempotency
@@ -111,13 +112,13 @@ describe 'subversion :includes tests' do
   context "changing revisions" do
     it "can change revisions" do
       pp = <<-EOS
-      vcsrepo { "#{tmpdir}/svnrepo":
-        ensure   => present,
-        provider => svn,
-        includes => ['difftools/README', 'obsolete-notes',],
-        source   => "http://svn.apache.org/repos/asf/subversion/developer-resources/",
-        revision => 1700000,
-      }
+        vcsrepo { "#{tmpdir}/svnrepo":
+          ensure   => present,
+          provider => svn,
+          includes => ['difftools/README', 'obsolete-notes',],
+          source   => "http://svn.apache.org/repos/asf/subversion/developer-resources",
+          revision => 1700000,
+        }
       EOS
 
       # Run it twice and test for idempotency
@@ -130,6 +131,29 @@ describe 'subversion :includes tests' do
     end
     describe command("svn info #{tmpdir}/svnrepo/difftools/README") do
       its(:stdout) { should match( /.*Revision: 1700000.*/ ) }
+    end
+  end
+end
+
+describe 'subversion :includes tests on SVN version < 1.7', :if =>
+    (fact('osfamily') == 'RedHat' && fact('operatingsystemmajrelease') =~ /(5|6)/) do
+
+  context "include paths" do
+    it "fails when SVN version < 1.7" do
+      pp = <<-EOS
+        vcsrepo { "#{tmpdir}/svnrepo":
+          ensure   => present,
+          provider => svn,
+          includes => ['difftools/README', 'obsolete-notes',],
+          source   => "http://svn.apache.org/repos/asf/subversion/developer-resources",
+          revision => 1000000,
+        }
+      EOS
+
+      # Expect error when svn < 1.7 and includes is used
+      apply_manifest(pp, :expect_failures => true) do |r|
+        expect(r.stderr).to match /Includes option is not available for SVN versions < 1.7. Version installed:/
+      end
     end
   end
 
