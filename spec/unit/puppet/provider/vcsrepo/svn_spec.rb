@@ -12,6 +12,7 @@ describe Puppet::Type.type(:vcsrepo).provider(:svn) do
   let(:provider) { resource.provider }
 
   let(:test_paths) { ['path1/file1', 'path2/nested/deep/file2'] }
+  let(:test_paths_parents) { ['path1', 'path2', 'path2/nested', 'path2/nested/deep'] }
 
   before :each do
     Puppet::Util.stubs(:which).with('svn').returns('/usr/bin/svn')
@@ -99,7 +100,9 @@ describe Puppet::Type.type(:vcsrepo).provider(:svn) do
         provider.expects(:svn).with('--non-interactive', 'checkout', '--depth', 'empty',
           resource.value(:source),
           resource.value(:path))
-        provider.expects(:svn).with('--non-interactive', 'update', '--parents',
+        provider.expects(:svn).with('--non-interactive', 'update', '--depth', 'empty',
+          *test_paths_parents)
+        provider.expects(:svn).with('--non-interactive', 'update',
           *resource[:includes])
         provider.create
       end
@@ -113,9 +116,12 @@ describe Puppet::Type.type(:vcsrepo).provider(:svn) do
           '--depth', 'empty',
           resource.value(:source),
           resource.value(:path))
+        provider.expects(:svn).with('--non-interactive', 'update', 
+          '--depth', 'empty',
+          '-r', resource.value(:revision),
+          *test_paths_parents)
         provider.expects(:svn).with('--non-interactive', 'update', '-r',
           resource.value(:revision),
-          '--parents',
           *resource[:includes])
         provider.create
       end
@@ -128,8 +134,10 @@ describe Puppet::Type.type(:vcsrepo).provider(:svn) do
           resource.value(:source),
           resource.value(:path))
         provider.expects(:svn).with('--non-interactive', 'update',
+          '--depth', 'empty',
+          *test_paths_parents)
+        provider.expects(:svn).with('--non-interactive', 'update',
           '--depth', resource.value(:depth),
-          '--parents',
           *resource[:includes])
         provider.create
       end
@@ -145,9 +153,12 @@ describe Puppet::Type.type(:vcsrepo).provider(:svn) do
           resource.value(:source),
           resource.value(:path))
         provider.expects(:svn).with('--non-interactive', 'update',
+          '--depth', 'empty',
+          '-r', resource.value(:revision),
+          *test_paths_parents)
+        provider.expects(:svn).with('--non-interactive', 'update',
           '-r', resource.value(:revision),
           '--depth', resource.value(:depth),
-          '--parents',
           *resource[:includes])
         provider.create
       end
