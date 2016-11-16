@@ -16,6 +16,7 @@ describe Puppet::Type.type(:vcsrepo) do
         get(:ensure) != :absent
       end
       mk_resource_methods
+      has_features :include_paths
     end
   end
 
@@ -26,11 +27,16 @@ describe Puppet::Type.type(:vcsrepo) do
   let(:resource) do
     described_class.new(:name => '/repo',
                         :ensure => :present,
+                        :source => 'http://example.com/repo/',
                         :provider => provider)
   end
 
   let(:ensureprop) do
     resource.property(:ensure)
+  end
+
+  let(:sourceprop) do
+    resource.property(:source)
   end
 
   properties = [ :ensure, :source ]
@@ -49,10 +55,30 @@ describe Puppet::Type.type(:vcsrepo) do
     end
   end
 
-  describe "munging of 'source' property" do
-    it "should remove trailing /" do
-      resource[:source] = ':pserver:anonymous@cvs.sv.gnu.org:/sources/cvs/'
-      expect(resource[:source]).to eq(':pserver:anonymous@cvs.sv.gnu.org:/sources/cvs')
+  describe "with an include path that starts with a '/'" do
+    it "should raise a Puppet::ResourceError error" do
+      expect {
+        resource[:includes] = ['/path1/file1', '/path2/file2']
+      }.to raise_error(Puppet::ResourceError, /Include path '.*' starts with a '\/'/)
+    end
+  end
+
+  describe 'when using a provider that adds/removes a trailing / to the source' do
+    it "should stay in sync when it leaves it as-is" do
+      sourceprop.should = 'http://example.com/repo/'
+      expect(sourceprop.safe_insync?('http://example.com/repo/')).to eq(true)
+    end
+    it "should stay in sync when it adds a slash" do
+      sourceprop.should = 'http://example.com/repo'
+      expect(sourceprop.safe_insync?('http://example.com/repo/')).to eq(true)
+    end
+    it "should stay in sync when it removes a slash" do
+      sourceprop.should = 'http://example.com/repo/'
+      expect(sourceprop.safe_insync?('http://example.com/repo')).to eq(true)
+    end
+    it "should be out of sync with a different source" do
+      sourceprop.should = 'http://example.com/repo/asdf'
+      expect(sourceprop.safe_insync?('http://example.com/repo')).to eq(false)
     end
   end
 

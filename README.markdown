@@ -805,7 +805,7 @@ Specifies a source repository to serve as the upstream for your managed reposito
 * `cvs` - A string containing a CVS root.
 * `hg` - A string containing the local path or URL of a Mercurial repository.
 * `p4` - A string containing a Perforce depot path.
-* `svn` - A string containing a Subversion repository URL, without trailing slash.
+* `svn` - A string containing a Subversion repository URL.
 
 Default: none.
 

@@ -131,7 +131,7 @@ describe Puppet::Type.type(:vcsrepo).provider(:cvs) do
   describe "checking the source property" do
     it "should read the contents of file 'CVS/Root'" do
       File.expects(:read).with(File.join(resource.value(:path), 'CVS', 'Root')).
-        returns(':pserver:anonymous@cvs.sv.gnu.org:/sources/cvs')
+        returns(':pserver:anonymous@cvs.sv.gnu.org:/sources/cvs/')
       expect(provider.source).to eq(resource.value(:source))
     end
   end
