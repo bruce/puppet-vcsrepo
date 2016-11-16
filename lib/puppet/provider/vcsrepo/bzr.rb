@@ -64,7 +64,7 @@ Puppet::Type.type(:vcsrepo).provide(:bzr, :parent => Puppet::Provider::Vcsrepo) 
 
   def source
     at_path do
-      bzr('info')[/^\s+parent branch:\s+(\S+?)\/?$/m, 1]
+      bzr('info')[/^\s+parent branch:\s+(\S+?)$/m, 1]
     end
   end
 

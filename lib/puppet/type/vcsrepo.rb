@@ -166,13 +166,20 @@ Puppet::Type.newtype(:vcsrepo) do
 
   newproperty :source do
     desc "The source URI for the repository"
-    # Strip tailing slashes
-    munge do |value|
-      if value[-1] == '/'
-        value[0..-2]
-      else
-        value
+    # Tolerate versions/providers that strip/add trailing slashes
+    def insync?(is)
+      # unwrap @should
+      should = @should[0]
+      return true if is == should
+      begin
+        if should[-1] == '/'
+          return true if is == should[0..-2]
+        elsif is[-1] == '/'
+          return true if is[0..-2] == should
+        end
+      rescue
       end
+      return false
     end
   end
 
@@ -208,6 +215,13 @@ Puppet::Type.newtype(:vcsrepo) do
         is.sort == @should.sort
       else
         is == @should
+      end
+    end
+    validate do |path|
+      if path[0..0] == '/'
+        raise Puppet::Error, "Include path '#{path}' starts with a '/'; remove it"
+      else
+        super(path)
       end
     end
   end
