@@ -521,7 +521,7 @@ vcsrepo { '/path/to/repo':
 
 ####Checking out only specific paths
 
-**Note:** The `includes` param is only supported when subversion client version is >= 1.7.
+**Note:** The `includes` param is only supported when subversion client version is >= 1.6.
 
 You can check out only specific paths in a particular repository by providing their relative paths to the `includes` parameter, like so:
 
@@ -679,7 +679,7 @@ Parameters: `ensure`, `excludes`, `force`, `group`, `owner`, `p4config`, `path`,
 
 Features: `basic_auth`, `configuration`, `conflict`, `depth`, `filesystem_types`, `reference_tracking`
 
-Parameters: `basic_auth_password`, `basic_auth_username`, `configuration`, `conflict`, `ensure`, `excludes`, `force`, `fstype`, `group`, `owner`, `path`, `provider`, `revision`, `source`, `trust_server_cert`
+Parameters: `basic_auth_password`, `basic_auth_username`, `configuration`, `conflict`, `ensure`, `excludes`, `force`, `fstype`, `group`, `includes`, `owner`, `path`, `provider`, `revision`, `source`, `trust_server_cert`
 
 #### Features
 
@@ -693,6 +693,7 @@ Parameters: `basic_auth_password`, `basic_auth_username`, `configuration`, `conf
 * `depth` - Supports shallow clones in `git` or sets the scope limit in `svn`. (Available with `git` and `svn`.)
 * `filesystem_types` - Supports multiple types of filesystem. (Available with `svn`.)
 * `gzip_compression` - Supports explicit GZip compression levels. (Available with `cvs`.)
+* `include_paths` - Lets you checkout only certain paths. (Available with `svn`.)
 * `modules` - Lets you choose a specific repository module. (Available with `cvs`.)
 * `multiple_remotes` - Tracks multiple remote repositories. (Available with `git`.)
 * `reference_tracking` - Lets you track revision references that can change over time (e.g., some VCS tags and branch names). (Available with all providers)
@@ -758,6 +759,10 @@ Specifies a group to own the repository files. Valid options: a string containin
 ##### `identity`
 
 Specifies an identity file to use for SSH authentication. (Requires the `ssh_identity` feature.) Valid options: a string containing an absolute path. Default: none.
+
+##### `includes`
+
+Tells Subversion which paths should be checked out at the specified depth; all other paths are not checked out. Default: none (checkout all paths).
 
 ##### `module`
 
@@ -825,7 +830,7 @@ Specifies the user to run as for repository operations. (Requires the `user` fea
 
 Git is the only VCS provider officially [supported by Puppet Inc.](https://forge.puppet.com/supported)
 
-The includes parameter is only supported when SVN client version is >= 1.7
+The includes parameter is only supported when SVN client version is >= 1.6.
 
 This module has been tested with Puppet 2.7 and higher.
 

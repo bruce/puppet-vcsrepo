@@ -24,6 +24,7 @@ Puppet::Type.type(:vcsrepo).provide(:svn, :parent => Puppet::Provider::Vcsrepo) 
                           @resource.value(:depth))
     end
     if @resource.value(:includes)
+      validate_version
       update_includes(@resource.value(:includes))
     end
     update_owner
@@ -70,9 +71,6 @@ Puppet::Type.type(:vcsrepo).provide(:svn, :parent => Puppet::Provider::Vcsrepo) 
       args.push('--no-auth-cache')
     end
 
-    if @resource.value(:force)
-      args.push('--force')
-    end
 
     if @resource.value(:configuration)
       args.push('--config-dir', @resource.value(:configuration))
@@ -101,6 +99,9 @@ Puppet::Type.type(:vcsrepo).provide(:svn, :parent => Puppet::Provider::Vcsrepo) 
 
   def source=(desired)
     args = buildargs.push('switch')
+    if @resource.value(:force)
+      args.push('--force')
+    end
     if @resource.value(:revision)
       args.push('-r', @resource.value(:revision))
     end
@@ -128,6 +129,9 @@ Puppet::Type.type(:vcsrepo).provide(:svn, :parent => Puppet::Provider::Vcsrepo) 
              buildargs.push('update', '-r', desired)
            end
 
+    if @resource.value(:force)
+      args.push('--force')
+    end
     if @resource.value(:conflict)
       args.push('--accept', @resource.value(:conflict))
     end
@@ -139,10 +143,12 @@ Puppet::Type.type(:vcsrepo).provide(:svn, :parent => Puppet::Provider::Vcsrepo) 
   end
 
   def includes
+    return nil if Gem::Version.new(get_svn_client_version) < Gem::Version.new('1.6.0')
     get_includes('.')
   end
 
   def includes=(desired)
+    validate_version
     exists = includes
     old_paths = exists - desired
     new_paths = desired - exists
@@ -174,18 +180,37 @@ Puppet::Type.type(:vcsrepo).provide(:svn, :parent => Puppet::Provider::Vcsrepo) 
 
   def delete_include(path)
     at_path do
-      args = buildargs.push('update', '--set-depth', 'exclude', path)
-      svn(*args)
-      until (path, sep, tail = path.rpartition(File::SEPARATOR)) == ['', '', '']
-        Puppet.debug "#{sep} #{tail}"
-        begin
-          Dir.rmdir(path)
-          args = buildargs.push('update', '--set-depth', 'exclude', path)
-          svn(*args)
-        rescue SystemCallError
-          break
+      # svn version 1.6 has an incorrect implementation of the `exclude`
+      # parameter to `--set-depth`; it doesn't handle files, only
+      # directories. I know, I rolled my eyes, too.
+      svn_ver = get_svn_client_version
+      if Gem::Version.new(svn_ver) < Gem::Version.new('1.7.0') and not File.directory?(path)
+        # In the non-happy case, we delete the file, and check if the only
+        # thing left in that directory is the .svn folder. If that's the case,
+        # the loop below will take care of excluding the parent directory, and
+        # we're back to a happy case. But, if that's not the case, we need to
+        # fire off a warning telling the user the path can't be excluded.
+        Puppet.debug "Vcsrepo[#{@resource.name}]: Need to handle #{path} removal specially"
+        File.delete(path)
+        if Dir.entries(File.dirname(path)).sort != ['.', '..', '.svn']
+          Puppet.warning "Unable to exclude #{path} from Vcsrepo[#{@resource.name}]; update to subversion >= 1.7"
         end
+
+      else
+        Puppet.debug "Vcsrepo[#{@resource.name}]: Can remove #{path} directly using svn"
+        args = buildargs.push('update', '--set-depth', 'exclude', path)
+        svn(*args)
       end
+
+      # Keep walking up the parent directories of this include until we find
+      # a non-empty folder, excluding as we go.
+      while ((path = path.rpartition(File::SEPARATOR)[0]) != '') do
+        entries = Dir.entries(path).sort
+        break if entries != ['.', '..'] and entries != ['.', '..', '.svn']
+        args = buildargs.push('update', '--set-depth', 'exclude', path)
+        svn(*args)
+      end
+
     end
   end
 
@@ -220,12 +245,17 @@ Puppet::Type.type(:vcsrepo).provide(:svn, :parent => Puppet::Provider::Vcsrepo) 
   end
 
   def update_includes(paths)
-    #If svn version < 1.7, '--parents' isn't supported. Raise legible error.
-    svn_ver = get_svn_client_version
-    if Gem::Version.new(svn_ver) < Gem::Version.new('1.7.0')
-      raise "Includes option is not available for SVN versions < 1.7. Version installed: #{svn_ver}"
-    end
     at_path do
+      args = buildargs.push('update')
+      args.push('--depth', 'empty')
+      if @resource.value(:revision)
+        args.push('-r', @resource.value(:revision))
+      end
+      parents = paths.map { |path| File.dirname(path) }
+      parents = make_include_paths(parents)
+      args.push(*parents)
+      svn(*args)
+
       args = buildargs.push('update')
       if @resource.value(:revision)
         args.push('-r', @resource.value(:revision))
@@ -233,13 +263,29 @@ Puppet::Type.type(:vcsrepo).provide(:svn, :parent => Puppet::Provider::Vcsrepo) 
       if @resource.value(:depth)
         args.push('--depth', @resource.value(:depth))
       end
-      args.push('--parents')
       args.push(*paths)
       svn(*args)
     end
   end
 
+  def make_include_paths(includes)
+    includes.map { |inc|
+      prefix = nil
+      inc.split("/").map { |path|
+        prefix = [prefix, path].compact.join('/')
+      }
+    }.flatten
+  end
+
   def get_svn_client_version
     return Facter.value('vcsrepo_svn_ver')
   end
+
+  def validate_version
+    svn_ver = get_svn_client_version
+    if Gem::Version.new(svn_ver) < Gem::Version.new('1.6.0')
+      raise "Includes option is not available for SVN versions < 1.6. Version installed: #{svn_ver}"
+    end
+  end
+
 end
