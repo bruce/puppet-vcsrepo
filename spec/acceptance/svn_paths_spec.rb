@@ -142,8 +142,8 @@ describe 'subversion :includes tests on SVN version >= 1.7', :unless => (
 end
 
 describe 'subversion :includes tests on SVN version == 1.6', :if => (
-    (fact('osfamily') == 'RedHat' && fact('operatingsystemmajrelease') =~ /(5|6)/) or
-    (fact('osfamily') == 'Debian' && fact('operatingsystemmajrelease') =~ /(6|7|10.04|12.04)/)
+    (fact('osfamily') == 'RedHat' && fact('operatingsystemmajrelease') =~ /^(5|6)$/) or
+    (fact('osfamily') == 'Debian' && fact('operatingsystemmajrelease') =~ /^(6|7|10\.04|12\.04)$/)
 ) do
 
   after(:all) do
