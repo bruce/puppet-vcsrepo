@@ -278,7 +278,7 @@ Puppet::Type.type(:vcsrepo).provide(:svn, :parent => Puppet::Provider::Vcsrepo) 
   end
 
   def get_svn_client_version
-    return Facter.value('vcsrepo_svn_ver')
+    return Facter.value('vcsrepo_svn_ver').dup
   end
 
   def validate_version
