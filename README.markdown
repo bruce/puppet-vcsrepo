@@ -209,6 +209,17 @@ vcsrepo { '/path/to/repo':
 }
 ~~~
 
+To use SSH over a nonstandard port, use the full SSH scheme and include the port number:
+
+~~~ puppet
+vcsrepo { '/path/to/repo':
+  ensure   => latest,
+  provider => git,
+  source   => 'ssh://username@example.com:7999/repo.git',
+}
+~~~
+
+
 ### Bazaar
 
 #### Create a blank repository
