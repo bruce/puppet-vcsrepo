@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.5.0] - 2016-12-19 Supported Release
+
+### Summary
+Release featuring some refactoring and improvements around git's `ensurable`.
+
+### Bugfixes
+- `ensure => absent` fix
+
+### Features
+- `:source` property added
+- Improved `ensure` handling for git provider
+- General refactoring for all providers
+- Various test improvements
+
 ## [1.4.0] - 2015-09-06 Supported Release
 
 ### Summary
