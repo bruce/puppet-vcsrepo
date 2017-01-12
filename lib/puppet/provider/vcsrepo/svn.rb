@@ -59,7 +59,7 @@ Puppet::Type.type(:vcsrepo).provide(:svn, :parent => Puppet::Provider::Vcsrepo) 
 
   def latest?
     at_path do
-      (self.revision >= self.latest) and (@resource.value(:source) == self.sourceurl)
+      (self.revision >= self.latest) and (@resource.value(:source) == self.source)
     end
   end
 
