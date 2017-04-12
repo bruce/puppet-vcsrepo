@@ -134,7 +134,7 @@ describe Puppet::Type.type(:vcsrepo) do
   describe 'when running the type it should autorequire packages' do
     before :each do
       @catalog = Puppet::Resource::Catalog.new
-      ['git', 'git-core', 'mercurial'].each do |pkg|
+      ['git', 'git-core', 'mercurial', 'subversion'].each do |pkg|
         @catalog.add_resource(Puppet::Type.type(:package).new(:name => pkg))
       end
     end
@@ -143,7 +143,7 @@ describe Puppet::Type.type(:vcsrepo) do
       @resource = described_class.new(:name => '/foo', :provider => provider)
       @catalog.add_resource(@resource)
       req = @resource.autorequire
-      expect(req.size).to eq(3)
+      expect(req.size).to eq(4)
     end
   end
 end
