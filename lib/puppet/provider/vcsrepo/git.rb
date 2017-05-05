@@ -132,7 +132,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
     at_path do
       if @resource.value(:source)
         begin
-          git('config', '--get', "remote.#{@resource.value(:remote)}.url").chomp == default_url
+          return git('config', '--get', "remote.#{@resource.value(:remote)}.url").chomp == default_url
         rescue Puppet::ExecutionFailure
           return false
         end
