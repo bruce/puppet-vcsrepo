@@ -352,7 +352,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, :parent => Puppet::Provider::Vcsrepo) 
     args = ['clone']
     if @resource.value(:depth) and @resource.value(:depth).to_i > 0
       args.push('--depth', @resource.value(:depth).to_s)
-      if @resource.value(:revision)
+      if @resource.value(:revision) and not @resource.value(:branch)
         args.push('--branch', @resource.value(:revision).to_s)
       end
     end
