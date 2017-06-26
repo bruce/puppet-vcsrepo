@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## Supported Release [2.0.0]
+
+### Summary
+This is a major release that **drops support for Puppet 3** and addresses an issue with the subversion provider.
+
+### Added
+- Documentation for using an non-standard ssh port ([MODULES-1910](https://tickets.puppet.com/browse/MODULES-1910))
+- Autorequire for the subversion package in the vcsrepo type ([MODULES-4722](https://tickets.puppetlabs.com/browse/MODULES-4722))
+- Puppet 5 support in metadata ([MODULES-5144](https://tickets.puppet.com/browse/MODULES-5144))
+
+### Changed
+- Lower bound of Puppet requirement to 4.7.0 ([MODULES-4823](https://tickets.puppetlabs.com/browse/MODULES-4823))
+
+### Fixed
+- Solaris `SSH_AUTH_SOCKET` issue 
+- Issue with subversion provider ([MODULES-4280](https://tickets.puppetlabs.com/browse/MODULES-4280))
+- `force` parameter to return a boolean instead of a string ([MODULES-4864](https://tickets.puppetlabs.com/browse/MODULES-4864))
+
 ## [1.5.0] - 2016-12-19 Supported Release
 
 ### Summary
@@ -195,6 +213,9 @@ our many contributors for all of these fixes!
 - CVS:
  - Documented the "module" attribute.
 
+[2.0.0]: https://github.com/puppetlabs/puppetlabs-vcsrepo/compare/1.5.0...2.0.0
+[1.5.0]: https://github.com/puppetlabs/puppetlabs-vcsrepo/compare/1.4.0...1.5.0
+[1.4.0]: https://github.com/puppetlabs/puppetlabs-vcsrepo/compare/1.3.2...1.4.0
 [1.3.2]: https://github.com/puppetlabs/puppetlabs-vcsrepo/compare/1.3.1...1.3.2
 [1.3.1]: https://github.com/puppetlabs/puppetlabs-vcsrepo/compare/1.3.0...1.3.1
 [1.3.0]: https://github.com/puppetlabs/puppetlabs-vcsrepo/compare/1.2.0...1.3.0
