@@ -51,10 +51,10 @@ describe Puppet::Type.type(:vcsrepo).provider(:hg) do
         provider.expects(:hg).with('clone',
           resource.value(:source),
           resource.value(:path),
-            "--config","\"auth.x.prefix=" + resource.value(:source) + "\"",
-            "--config","\"auth.x.username=" + resource.value(:basic_auth_username) + "\"",
-            "--config","\"auth.x.password=" + resource.value(:basic_auth_password) + "\"",
-            "--config","\"auth.x.schemes=http https" + "\"")
+            "--config","auth.x.prefix=" + resource.value(:source),
+            "--config","auth.x.username=" + resource.value(:basic_auth_username),
+            "--config","auth.x.password=" + resource.value(:basic_auth_password),
+            "--config","auth.x.schemes=http https")
         provider.create
       end
     end
