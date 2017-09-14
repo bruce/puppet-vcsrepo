@@ -175,10 +175,10 @@ describe Puppet::Type.type(:vcsrepo).provider(:svn) do
   end
 
   describe "checking existence" do
-    it "should run `svn status` on the path when there's a source" do
+    it "should run `svn info` on the path when there's a source" do
       resource[:source] = 'dummy'
       expects_directory?(true, resource.value(:path))
-      provider.expects(:svn).with('status', resource[:path])
+      provider.expects(:svn).with('info', resource[:path])
       provider.exists?
     end
     it "should run `svnlook uuid` on the path when there's no source" do
