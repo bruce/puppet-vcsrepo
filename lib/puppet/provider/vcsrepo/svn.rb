@@ -34,7 +34,7 @@ Puppet::Type.type(:vcsrepo).provide(:svn, :parent => Puppet::Provider::Vcsrepo) 
     return false if not File.directory?(@resource.value(:path))
     if @resource.value(:source)
       begin
-        svn('status', @resource.value(:path))
+        svn('info', @resource.value(:path))
         return true
       rescue Puppet::ExecutionFailure
         return false
