@@ -203,7 +203,7 @@ To use SSH keys associated with a user, specify the username in the `user` param
 vcsrepo { '/path/to/repo':
   ensure   => latest,
   provider => git,
-  source   => 'git://username@example.com/repo.git',
+  source   => 'ssh://username@example.com/repo.git',
   user     => 'toto', #uses toto's $HOME/.ssh setup
   require  => File['/home/toto/.ssh/id_rsa'],
 }
