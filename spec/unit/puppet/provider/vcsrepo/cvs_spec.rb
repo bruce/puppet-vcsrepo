@@ -75,7 +75,7 @@ describe Puppet::Type.type(:vcsrepo).provider(:cvs) do
         resource[:source] = ':ext:source@example.com:/foo/bar'
         File.expects(:directory?).with(File.join(resource.value(:path), 'CVS')).returns(true)
         expects_chdir
-        Puppet::Util::Execution.expects(:execute).with([:cvs, '-nqd', resource.value(:path), 'status', '-l'], :custom_environment => {}, :combine => true, :failonfail => true)
+        Puppet::Util::Execution.expects(:execute).with([:cvs, '-nq', 'status', '-l'], :custom_environment => {}, :combine => true, :failonfail => true)
         provider.exists?
       end
     end
