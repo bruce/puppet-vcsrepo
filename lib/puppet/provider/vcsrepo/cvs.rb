@@ -25,7 +25,7 @@ Puppet::Type.type(:vcsrepo).provide(:cvs, :parent => Puppet::Provider::Vcsrepo) 
       directory = File.join(@resource.value(:path), 'CVS')
       return false if not File.directory?(directory)
       begin
-        at_path { runcvs('-nqd', @resource.value(:path), 'status', '-l') }
+        at_path { runcvs('-nq', 'status', '-l') }
         return true
       rescue Puppet::ExecutionFailure
         return false
