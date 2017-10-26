@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## Supported Release [2.1.0]
+
+### Summary
+This is to provide a clean release from which to run Rebucop
+
+### Added
+- Debian 9 as supported platform
+
+### Fixed
+- CVS working copy detection ([MODULES-5704](https://tickets.puppet.com/browse/MODULES-5704))
+- typo error for sshed-git-source
+- Update to existence test, Use 'svn info' instead of 'svn status'. 'svn status' does not return proper exit codes, while 'svn info' does.
+- working_copy_exists in svn provider. Change method 'working_copy_exists' to use 'svn info' instead of 'svn status'. 'svn status' does not return proper exit codes, while 'svn info' does. ([MODULES-5615](https://tickets.puppet.com/browse/MODULES-5615))
+- tests associated with hg
+- hg provider: remove escaped quotes - authentication fix
+
+### Removed
+- Support for Ubuntu 10.04 and 12.04, existing compatibility is unaffected ([MODULES-5501](https://tickets.puppet.com/browse/MODULES-5501))
+- Support for Debian 6 and SLES 10, existing compatibility is unaffected
+- Commented out test ([MODULES-5162](https://tickets.puppet.com/browse/MODULES-5162))
+
 ## Supported Release [2.0.0]
 
 ### Summary
@@ -213,6 +234,7 @@ our many contributors for all of these fixes!
 - CVS:
  - Documented the "module" attribute.
 
+[2.1.0]: https://github.com/puppetlabs/puppetlabs-vcsrepo/compare/2.0.0...2.1.0
 [2.0.0]: https://github.com/puppetlabs/puppetlabs-vcsrepo/compare/1.5.0...2.0.0
 [1.5.0]: https://github.com/puppetlabs/puppetlabs-vcsrepo/compare/1.4.0...1.5.0
 [1.4.0]: https://github.com/puppetlabs/puppetlabs-vcsrepo/compare/1.3.2...1.4.0
