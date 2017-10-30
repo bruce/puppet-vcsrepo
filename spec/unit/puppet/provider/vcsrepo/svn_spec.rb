@@ -254,14 +254,14 @@ describe Puppet::Type.type(:vcsrepo).provider(:svn) do
       it 'fails' do
         resource[:source] = 'an-unimportant-value'
         resource[:basic_auth_username] = 'dummy_user'
-        expect { provider.create }.to raise_error Puppet::Error, %r{you must specify the HTTP basic authentication password.+}i
+        expect { provider.create }.to raise_error RuntimeError, %r{you must specify the HTTP basic authentication password.+}i
       end
     end
     context 'when basic_auth_username is not set and basic_auth_password is set' do
       it 'fails' do
         resource[:source] = 'an-unimportant-value'
         resource[:basic_auth_password] = 'dummy_pass'
-        expect { provider.create }.to raise_error Puppet::Error, %r{you must specify the HTTP .+username.*}i
+        expect { provider.create }.to raise_error RuntimeError, %r{you must specify the HTTP .+username.*}i
       end
     end
   end
