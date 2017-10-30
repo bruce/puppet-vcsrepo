@@ -19,11 +19,11 @@ Puppet::Type.type(:vcsrepo).provide(:svn, parent: Puppet::Provider::Vcsrepo) do
       create_repository(@resource.value(:path))
     else
       if @resource.value(:basic_auth_username) && !@resource.value(:basic_auth_password)
-          fail("You must specify the HTTP basic authentication password for user '#{@resource.value(:basic_auth_username)}'")
+        raise("You must specify the HTTP basic authentication password for user '#{@resource.value(:basic_auth_username)}'")
       end
 
       if !@resource.value(:basic_auth_username) && @resource.value(:basic_auth_password)
-          fail("You must specify the HTTP basic authentication username")
+        raise('You must specify the HTTP basic authentication username')
       end
 
       checkout_repository(@resource.value(:source),
