@@ -498,4 +498,32 @@ branches
       end
     end
   end
+
+  describe 'trust_server_cert' do
+    context 'true' do
+      before :each do
+        resource[:trust_server_cert] = true
+      end
+
+      it 'raises error with git 1.7.0' do
+        provider.stubs(:git).with('--version').returns '1.7.0'
+        expect { provider.create }.to raise_error RuntimeError, %r{Can't set sslVerify to false}
+      end
+
+      # rubocop:disable RSpec/ExampleLength
+      it 'compiles with git 2.13.0' do
+        resource[:revision] = 'only/remote'
+        Dir.expects(:chdir).with('/').at_least_once.yields
+        Dir.expects(:chdir).with('/tmp/test').at_least_once.yields
+        provider.expects(:git).with('-c', 'http.sslVerify=false', 'clone', resource.value(:source), resource.value(:path))
+        provider.expects(:update_submodules)
+        provider.expects(:update_remote_url).with('origin', resource.value(:source)).returns false
+        provider.expects(:git).with('-c', 'http.sslVerify=false', 'branch', '-a').returns(branch_a_list(resource.value(:revision)))
+        provider.expects(:git).with('-c', 'http.sslVerify=false', 'checkout', '--force', resource.value(:revision))
+
+        provider.stubs(:git).with('--version').returns '2.13.0'
+        expect { provider.create }.not_to raise_error
+      end
+    end
+  end
 end
