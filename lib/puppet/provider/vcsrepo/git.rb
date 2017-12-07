@@ -29,7 +29,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, parent: Puppet::Provider::Vcsrepo) do
       if @resource.value(:revision)
         checkout
       end
-      if !ensure_bare_or_mirror? && @resource.value(:submodules) == :true
+      if !ensure_bare_or_mirror? && @resource.value(:submodules) == :true # rubocop:disable Lint/BooleanSymbol : Test's break if Boolean symbol is removed
         update_submodules
       end
 
@@ -92,7 +92,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, parent: Puppet::Provider::Vcsrepo) do
       end
     end
     # TODO: Would this ever reach here if it is bare?
-    if !ensure_bare_or_mirror? && @resource.value(:submodules) == :true
+    if !ensure_bare_or_mirror? && @resource.value(:submodules) == :true # rubocop:disable Lint/BooleanSymbol : Test's break if Boolean symbol is removed
       update_submodules
     end
     update_owner_and_excludes
@@ -191,7 +191,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, parent: Puppet::Provider::Vcsrepo) do
     # logic.
     current = source
     if current.is_a?(Hash)
-      current.keys.each do |remote|
+      current.each_key do |remote|
         remove_remote(remote) if desired.is_a?(Hash) && !desired.key?(remote)
         remove_remote(remote) if desired.is_a?(String) && remote != @resource.value(:remote)
       end
@@ -291,7 +291,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, parent: Puppet::Provider::Vcsrepo) do
       if @resource.value(:source).is_a?(String)
         git('config', "remote.#{@resource.value(:remote)}.mirror", 'true')
       else
-        @resource.value(:source).keys.each do |remote|
+        @resource.value(:source).each_key do |remote|
           git('config', "remote.#{remote}.mirror", 'true')
         end
       end
@@ -307,7 +307,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, parent: Puppet::Provider::Vcsrepo) do
           next
         end
       else
-        @resource.value(:source).keys.each do |remote|
+        @resource.value(:source).each_key do |remote|
           begin
             git('config', '--unset', "remote.#{remote}.mirror")
           rescue Puppet::ExecutionFailure
@@ -549,7 +549,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, parent: Puppet::Provider::Vcsrepo) do
 
   # @!visibility private
   def git_with_identity(*args)
-    if @resource.value(:trust_server_cert) == :true
+    if @resource.value(:trust_server_cert) == :true # rubocop:disable Lint/BooleanSymbol : Test's break if Boolean symbol is removed
       git_ver = git_version
       git_ver_err = "Can't set sslVerify to false, the -c parameter is not supported in Git #{git_ver}. Please install Git 1.7.2 or higher."
       return raise(git_ver_err) unless Gem::Version.new(git_ver) >= Gem::Version.new('1.7.2')

@@ -66,14 +66,14 @@ describe Puppet::Type.type(:vcsrepo).provider(:svn) do
     context 'with trust_server_cert' do
       it "executes 'svn checkout' without a trust-server-cert" do
         resource[:source] = 'exists'
-        resource[:trust_server_cert] = :false
+        resource[:trust_server_cert] = false
         provider.expects(:svn).with('--non-interactive', 'checkout',
                                     resource.value(:source), resource.value(:path))
         provider.create
       end
       it "executes 'svn checkout' with a trust-server-cert" do
         resource[:source] = 'exists'
-        resource[:trust_server_cert] = :true
+        resource[:trust_server_cert] = true
         provider.expects(:svn).with('--non-interactive', '--trust-server-cert', 'checkout',
                                     resource.value(:source), resource.value(:path))
         provider.create
