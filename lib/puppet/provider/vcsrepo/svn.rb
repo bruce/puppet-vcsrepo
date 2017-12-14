@@ -83,7 +83,7 @@ Puppet::Type.type(:vcsrepo).provide(:svn, parent: Puppet::Provider::Vcsrepo) do
       args.push('--config-dir', @resource.value(:configuration))
     end
 
-    if @resource.value(:trust_server_cert) != :false # rubocop:disable Lint/BooleanSymbol
+    if @resource.value(:trust_server_cert) != :false
       args.push('--trust-server-cert')
     end
 
