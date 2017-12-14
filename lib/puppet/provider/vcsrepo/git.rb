@@ -29,7 +29,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, parent: Puppet::Provider::Vcsrepo) do
       if @resource.value(:revision)
         checkout
       end
-      if !ensure_bare_or_mirror? && @resource.value(:submodules) == :true # rubocop:disable Lint/BooleanSymbol : Test's break if Boolean symbol is removed
+      if !ensure_bare_or_mirror? && @resource.value(:submodules) == :true
         update_submodules
       end
 
@@ -92,7 +92,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, parent: Puppet::Provider::Vcsrepo) do
       end
     end
     # TODO: Would this ever reach here if it is bare?
-    if !ensure_bare_or_mirror? && @resource.value(:submodules) == :true # rubocop:disable Lint/BooleanSymbol : Test's break if Boolean symbol is removed
+    if !ensure_bare_or_mirror? && @resource.value(:submodules) == :true
       update_submodules
     end
     update_owner_and_excludes
@@ -549,7 +549,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, parent: Puppet::Provider::Vcsrepo) do
 
   # @!visibility private
   def git_with_identity(*args)
-    if @resource.value(:trust_server_cert) == :true # rubocop:disable Lint/BooleanSymbol : Test's break if Boolean symbol is removed
+    if @resource.value(:trust_server_cert) == :true
       git_ver = git_version
       git_ver_err = "Can't set sslVerify to false, the -c parameter is not supported in Git #{git_ver}. Please install Git 1.7.2 or higher."
       return raise(git_ver_err) unless Gem::Version.new(git_ver) >= Gem::Version.new('1.7.2')

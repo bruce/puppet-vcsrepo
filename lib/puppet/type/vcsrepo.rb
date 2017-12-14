@@ -286,7 +286,7 @@ Puppet::Type.newtype(:vcsrepo) do
   newparam :trust_server_cert do
     desc 'Trust server certificate'
     newvalues(true, false)
-    defaultto :false # rubocop:disable Lint/BooleanSymbol
+    defaultto :false
   end
 
   autorequire(:package) do
