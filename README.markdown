@@ -151,7 +151,7 @@ vcsrepo { '/path/to/repo':
 }
 ~~~
 
-To keep the repository at the latest revision, set `ensure` to 'latest'.
+To keep the repository at the latest revision, set `ensure` to 'latest'. The 'latest' option requires `source` to be specified.
 
 **WARNING:** This overwrites any local changes to the repository.
 
