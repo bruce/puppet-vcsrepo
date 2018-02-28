@@ -12,10 +12,14 @@ Puppet::Type.type(:vcsrepo).provide(:git, parent: Puppet::Provider::Vcsrepo) do
 
   def create
     check_force
-    raise("Cannot set a revision (#{@resource.value(:revision)}) on a bare repository") if @resource.value(:revision) && ensure_bare_or_mirror?
-    raise('Cannot init repository with mirror option, try bare instead') if !@resource.value(:source) && @resource.value(:ensure) == :mirror
-    raise('Cannot init repository with latest option without specifying a source') if !@resource.value(:source) && @resource.value(:ensure) == :latest
+    if @resource.value(:revision) && ensure_bare_or_mirror?
+      raise("Cannot set a revision (#{@resource.value(:revision)}) on a bare repository")
+    end
     if !@resource.value(:source)
+      if @resource.value(:ensure) == :mirror
+        raise('Cannot init repository with mirror option, try bare instead')
+      end
+
       init_repository
     else
       clone_repository(default_url, @resource.value(:path))
@@ -448,7 +452,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, parent: Puppet::Provider::Vcsrepo) do
   def on_branch?
     at_path do
       matches = git_with_identity('branch', '-a').match %r{\*\s+(.*)}
-      matches[1] unless matches.nil? || matches[1] =~ %r{(\(detached from|\(HEAD detached at|\(no branch)}
+      matches[1] unless matches[1] =~ %r{(\(detached from|\(HEAD detached at|\(no branch)}
     end
   end
 

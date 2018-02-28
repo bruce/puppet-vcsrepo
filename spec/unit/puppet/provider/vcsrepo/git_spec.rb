@@ -211,14 +211,6 @@ BRANCHES
     end
   end
 
-  context 'when with an ensure of latest - without a source' do
-    it 'raises an exeption' do
-      resource[:ensure] = :latest
-      resource.delete(:source)
-      expect { provider.create }.to raise_error(RuntimeError, %r{Cannot init repository with latest option without specifying a source}i)
-    end
-  end
-
   context 'when when converting repo type' do
     context 'when with working copy to bare' do
       it 'converts the repo' do
