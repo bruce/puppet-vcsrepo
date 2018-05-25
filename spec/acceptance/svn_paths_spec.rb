@@ -5,7 +5,6 @@ tmpdir = default.tmpdir('vcsrepo')
 describe 'subversion :includes tests on SVN version >= 1.7', unless: ( # rubocop:disable RSpec/MultipleDescribes : The
     # test's on this page must be kept seperate as they are for different operating systems.
     (fact('osfamily') == 'RedHat' && fact('operatingsystemmajrelease') =~ %r{^(5|6)$}) ||
-    (fact('osfamily') == 'Debian' && fact('operatingsystemmajrelease') =~ %r{^(6|7|10\.04|12\.04)$}) ||
     (fact('osfamily') == 'SLES')
 ) do
 
@@ -139,8 +138,7 @@ describe 'subversion :includes tests on SVN version >= 1.7', unless: ( # rubocop
 end
 
 describe 'subversion :includes tests on SVN version == 1.6', if: (
-    (fact('osfamily') == 'RedHat' && fact('operatingsystemmajrelease') =~ %r{^(5|6)$}) ||
-    (fact('osfamily') == 'Debian' && fact('operatingsystemmajrelease') =~ %r{^(6|7|10\.04|12\.04)$})
+    (fact('osfamily') == 'RedHat' && fact('operatingsystemmajrelease') =~ %r{^(5|6)$})
 ) do
 
   after(:all) do
