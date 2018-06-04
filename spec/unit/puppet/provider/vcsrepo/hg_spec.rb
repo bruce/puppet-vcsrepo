@@ -41,7 +41,7 @@ describe Puppet::Type.type(:vcsrepo).provider(:hg) do
     end
 
     context 'when basic auth is used' do
-      it "executes 'hg clone'" do # rubocop:disable RSpec/ExampleLength: unable to shrink further without violating another rule
+      it "executes 'hg clone'" do
         resource[:source] = 'something'
         resource[:basic_auth_username] = 'user'
         resource[:basic_auth_password] = 'pass'
