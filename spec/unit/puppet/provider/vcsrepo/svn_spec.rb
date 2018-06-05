@@ -86,7 +86,7 @@ describe Puppet::Type.type(:vcsrepo).provider(:svn) do
         expect { provider.create }.to raise_error(Puppet::Error, %r{Specifying include paths on a nonexistent repo.})
       end
 
-      it 'performs a sparse checkout' do # rubocop:disable RSpec/ExampleLength : Unable to shrink
+      it 'performs a sparse checkout' do
         resource[:source] = 'exists'
         resource[:includes] = test_paths
         Dir.expects(:chdir).with('/tmp/vcsrepo').at_least_once.yields
@@ -99,7 +99,7 @@ describe Puppet::Type.type(:vcsrepo).provider(:svn) do
                                     *resource[:includes])
         provider.create
       end
-      it 'performs a sparse checkout at a specific revision' do # rubocop:disable RSpec/ExampleLength : Unable to shrink
+      it 'performs a sparse checkout at a specific revision' do
         resource[:source] = 'exists'
         resource[:revision] = 1
         resource[:includes] = test_paths
@@ -118,7 +118,7 @@ describe Puppet::Type.type(:vcsrepo).provider(:svn) do
                                     *resource[:includes])
         provider.create
       end
-      it 'performs a sparse checkout with a specific depth' do # rubocop:disable RSpec/ExampleLength : Unable to shrink
+      it 'performs a sparse checkout with a specific depth' do
         resource[:source] = 'exists'
         resource[:depth] = 'files'
         resource[:includes] = test_paths
@@ -134,7 +134,7 @@ describe Puppet::Type.type(:vcsrepo).provider(:svn) do
                                     *resource[:includes])
         provider.create
       end
-      it 'performs a sparse checkout at a specific depth and revision' do # rubocop:disable RSpec/ExampleLength : Unable to shrink
+      it 'performs a sparse checkout at a specific depth and revision' do
         resource[:source] = 'exists'
         resource[:revision] = 1
         resource[:depth] = 'files'

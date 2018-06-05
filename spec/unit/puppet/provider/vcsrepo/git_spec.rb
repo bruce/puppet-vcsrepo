@@ -27,8 +27,6 @@ BRANCHES
     Puppet::Util.stubs(:which).with('git').returns('/usr/bin/git')
   end
 
-  # rubocop:disable RSpec/ExampleLength : Multiple examples that I am unable to shrink to the required level exist within
-
   context 'when with an ensure of present' do
     context 'when with an ensure of present - with a revision that is a remote branch' do
       it "executes 'git clone' and 'git checkout -b'" do
@@ -509,8 +507,6 @@ BRANCHES
         provider.stubs(:git).with('--version').returns '1.7.0'
         expect { provider.create }.to raise_error RuntimeError, %r{Can't set sslVerify to false}
       end
-
-      # rubocop:disable RSpec/ExampleLength
       it 'compiles with git 2.13.0' do
         resource[:revision] = 'only/remote'
         Dir.expects(:chdir).with('/').at_least_once.yields

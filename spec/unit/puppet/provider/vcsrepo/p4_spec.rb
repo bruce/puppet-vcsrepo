@@ -21,7 +21,7 @@ describe Puppet::Type.type(:vcsrepo).provider(:p4) do
 
   describe 'creating' do
     context 'with source and revision' do
-      it "executes 'p4 sync' with the revision" do # rubocop:disable RSpec/ExampleLength : Unable to shrink
+      it "executes 'p4 sync' with the revision" do
         resource[:source] = 'something'
         resource[:revision] = '1'
         ENV['P4CLIENT'] = 'client_ws1'
@@ -34,7 +34,7 @@ describe Puppet::Type.type(:vcsrepo).provider(:p4) do
     end
 
     context 'without revision' do
-      it "justs execute 'p4 sync' without a revision" do # rubocop:disable RSpec/ExampleLength : Unable to shrink
+      it "justs execute 'p4 sync' without a revision" do
         resource[:source] = 'something'
         ENV['P4CLIENT'] = 'client_ws2'
 
@@ -46,7 +46,7 @@ describe Puppet::Type.type(:vcsrepo).provider(:p4) do
     end
 
     context 'when a client and source are not given' do
-      it "executes 'p4 client'" do # rubocop:disable RSpec/ExampleLength : Unable to shrink
+      it "executes 'p4 client'" do
         ENV['P4CLIENT'] = nil
 
         path = resource.value(:path)

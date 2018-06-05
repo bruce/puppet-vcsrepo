@@ -69,7 +69,7 @@ describe 'clones a remote repo' do
       shell("rm -rf #{tmpdir}/testrepo_sha")
     end
 
-    it 'clones a repo' do # rubocop:disable RSpec/ExampleLength : The assignment must be within the example for the test to pass.
+    it 'clones a repo' do
       pp = <<-MANIFEST
       vcsrepo { "#{tmpdir}/testrepo_sha":
         ensure => present,
@@ -311,7 +311,7 @@ describe 'clones a remote repo' do
       shell("mkdir -p #{tmpdir}/testrepo_force/folder")
       shell("touch #{tmpdir}/testrepo_force/temp.txt")
     end
-    it 'applies the manifest' do # rubocop:disable RSpec/ExampleLength : The assignment must be placed within the example for the test to pass
+    it 'applies the manifest' do
       pp = <<-MANIFEST
       vcsrepo { "#{tmpdir}/testrepo_force":
         ensure => present,

@@ -53,7 +53,7 @@ describe 'MODULES-660' do
       apply_manifest(pp, catch_changes: true)
     end
 
-    it 'checks out the sha' do # rubocop:disable RSpec/ExampleLength : The assignment's must be within the example for the test to pass.
+    it 'checks out the sha' do
       sha = shell("cd #{tmpdir}/testrepo && git rev-parse origin/master").stdout.chomp
       pp = <<-MANIFEST
       vcsrepo { "#{tmpdir}/testrepo":

@@ -18,7 +18,7 @@ describe Puppet::Type.type(:vcsrepo).provider(:cvs) do
 
   describe 'creating' do
     context 'with a source' do
-      it "executes 'cvs checkout'" do # rubocop:disable RSpec/ExampleLength : Unable to reduce example length
+      it "executes 'cvs checkout'" do
         resource[:source] = ':ext:source@example.com:/foo/bar'
         resource[:revision] = 'an-unimportant-value'
         expects_chdir('/tmp')
@@ -27,7 +27,7 @@ describe Puppet::Type.type(:vcsrepo).provider(:cvs) do
         provider.create
       end
 
-      it "executes 'cvs checkout' as user 'muppet'" do # rubocop:disable RSpec/ExampleLength : Unable to reduce example length
+      it "executes 'cvs checkout' as user 'muppet'" do
         resource[:source] = ':ext:source@example.com:/foo/bar'
         resource[:revision] = 'an-unimportant-value'
         resource[:user] = 'muppet'
@@ -47,7 +47,7 @@ describe Puppet::Type.type(:vcsrepo).provider(:cvs) do
     end
 
     context 'with a compression' do
-      it "justs execute 'cvs checkout' without a revision" do # rubocop:disable RSpec/ExampleLength : Unable to reduce example length
+      it "justs execute 'cvs checkout' without a revision" do
         resource[:source] = ':ext:source@example.com:/foo/bar'
         resource[:compression] = '3'
         resource.delete(:revision)
