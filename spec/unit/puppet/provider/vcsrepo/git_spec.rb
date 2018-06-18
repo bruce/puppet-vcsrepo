@@ -298,8 +298,8 @@ BRANCHES
       it 'returns the current SHA' do
         resource[:revision] = 'currentsha'
         provider.stubs(:git).with('branch', '-a').returns(branch_a_list)
-        provider.expects(:git).with('rev-parse', '--revs-only', resource.value(:revision)).returns('currentsha')
-        provider.expects(:update_references)
+        provider.expects(:git).with('rev-parse', '--revs-only', resource.value(:revision)).never
+        provider.expects(:update_references).never
         expect(provider.revision).to eq(resource.value(:revision))
       end
     end

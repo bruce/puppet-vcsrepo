@@ -503,9 +503,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, parent: Puppet::Provider::Vcsrepo) do
   # @return [String] Returns the tag/branch of the current repo if it's up to
   #                  date; otherwise returns the sha of the requested revision.
   def get_revision(rev = 'HEAD')
-    if @resource.value(:source)
-      update_references
-    else
+    unless @resource.value(:source)
       status = at_path { git_with_identity('status') }
       is_it_new = status =~ %r{Initial commit}
       if is_it_new
@@ -515,6 +513,13 @@ Puppet::Type.type(:vcsrepo).provide(:git, parent: Puppet::Provider::Vcsrepo) do
       end
     end
     current = at_path { git_with_identity('rev-parse', rev).strip }
+    if @resource.value(:revision) == current
+      # if already pointed at desired revision, it must be a SHA, so just return it
+      return current
+    end
+    if @resource.value(:source)
+      update_references
+    end
     if @resource.value(:revision)
       canonical = if tag_revision?
                     # git-rev-parse will give you the hash of the tag object itself rather
