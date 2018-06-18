@@ -209,7 +209,7 @@ BRANCHES
     end
   end
 
-  context 'when when converting repo type' do
+  context 'when converting repo type' do
     context 'when with working copy to bare' do
       it 'converts the repo' do
         resource[:ensure] = :bare
@@ -276,14 +276,14 @@ BRANCHES
     end
   end
 
-  context 'when when destroying' do
+  context 'when destroying' do
     it 'removes the directory' do
       expects_rm_rf
       provider.destroy
     end
   end
 
-  context 'when when checking the revision property' do
+  context 'when checking the revision property' do
     before(:each) do
       expects_chdir('/tmp/test')
       resource[:revision] = 'currentsha'
@@ -296,7 +296,7 @@ BRANCHES
       provider.stubs(:git).with('tag', '-l').returns('Hello')
     end
 
-    context 'when when its SHA is not different than the current SHA' do
+    context 'when its SHA is not different than the current SHA' do
       it 'returns the ref' do
         provider.expects(:git).with('rev-parse', resource.value(:revision)).returns('currentsha')
         provider.expects(:update_references)
@@ -304,7 +304,7 @@ BRANCHES
       end
     end
 
-    context 'when when its SHA is different than the current SHA' do
+    context 'when its SHA is different than the current SHA' do
       it 'returns the current SHA' do
         provider.expects(:git).with('rev-parse', resource.value(:revision)).returns('othersha')
         provider.expects(:update_references)
@@ -312,7 +312,7 @@ BRANCHES
       end
     end
 
-    context 'when when its a ref to a remote head' do
+    context 'when its a ref to a remote head' do
       it 'returns the revision' do
         provider.stubs(:git).with('branch', '-a').returns("  remotes/origin/#{resource.value(:revision)}")
         provider.expects(:git).with('rev-parse', "origin/#{resource.value(:revision)}").returns('newsha')
@@ -321,7 +321,7 @@ BRANCHES
       end
     end
 
-    context 'when when its a ref to non existant remote head' do
+    context 'when its a ref to non existant remote head' do
       it 'fails' do
         provider.expects(:git).with('branch', '-a').returns(branch_a_list)
         provider.expects(:git).with('rev-parse', '--revs-only', resource.value(:revision)).returns('')
