@@ -209,7 +209,7 @@ BRANCHES
     end
   end
 
-  context 'when when converting repo type' do
+  context 'when converting repo type' do
     context 'when with working copy to bare' do
       it 'converts the repo' do
         resource[:ensure] = :bare
@@ -276,54 +276,78 @@ BRANCHES
     end
   end
 
-  context 'when when destroying' do
+  context 'when destroying' do
     it 'removes the directory' do
       expects_rm_rf
       provider.destroy
     end
   end
 
-  context 'when when checking the revision property' do
+  context 'when checking the revision property' do
     before(:each) do
       expects_chdir('/tmp/test')
-      resource[:revision] = 'currentsha'
       resource[:source] = 'http://example.com'
       provider.stubs(:git).with('config', 'remote.origin.url').returns('')
       provider.stubs(:git).with('fetch', 'origin') # FIXME
       provider.stubs(:git).with('fetch', '--tags', 'origin')
       provider.stubs(:git).with('rev-parse', 'HEAD').returns('currentsha')
-      provider.stubs(:git).with('branch', '-a').returns(branch_a_list(resource.value(:revision)))
       provider.stubs(:git).with('tag', '-l').returns('Hello')
     end
 
-    context 'when when its SHA is not different than the current SHA' do
+    context 'when its a SHA and is not different than the current SHA' do
+      it 'returns the current SHA' do
+        resource[:revision] = 'currentsha'
+        provider.stubs(:git).with('branch', '-a').returns(branch_a_list)
+        provider.expects(:git).with('rev-parse', '--revs-only', resource.value(:revision)).never
+        provider.expects(:update_references).never
+        expect(provider.revision).to eq(resource.value(:revision))
+      end
+    end
+
+    context 'when its a SHA and is different than the current SHA' do
+      it 'returns the current SHA' do
+        resource[:revision] = 'othersha'
+        provider.stubs(:git).with('branch', '-a').returns(branch_a_list)
+        provider.expects(:git).with('rev-parse', '--revs-only', resource.value(:revision)).returns('othersha')
+        provider.expects(:update_references)
+        expect(provider.revision).to eq('currentsha')
+      end
+    end
+
+    context 'when its a local branch and is not different than the current SHA' do
       it 'returns the ref' do
+        resource[:revision] = 'localbranch'
+        provider.stubs(:git).with('branch', '-a').returns(branch_a_list('localbranch'))
         provider.expects(:git).with('rev-parse', resource.value(:revision)).returns('currentsha')
         provider.expects(:update_references)
         expect(provider.revision).to eq(resource.value(:revision))
       end
     end
 
-    context 'when when its SHA is different than the current SHA' do
+    context 'when its a local branch and is different than the current SHA' do
       it 'returns the current SHA' do
+        resource[:revision] = 'localbranch'
+        provider.stubs(:git).with('branch', '-a').returns(branch_a_list('localbranch'))
         provider.expects(:git).with('rev-parse', resource.value(:revision)).returns('othersha')
         provider.expects(:update_references)
-        expect(provider.revision).to eq(resource.value(:revision))
+        expect(provider.revision).to eq('currentsha')
       end
     end
 
-    context 'when when its a ref to a remote head' do
-      it 'returns the revision' do
+    context 'when its a ref to a remote head' do
+      it 'returns the ref' do
+        resource[:revision] = 'remotebranch'
         provider.stubs(:git).with('branch', '-a').returns("  remotes/origin/#{resource.value(:revision)}")
-        provider.expects(:git).with('rev-parse', "origin/#{resource.value(:revision)}").returns('newsha')
+        provider.expects(:git).with('rev-parse', "origin/#{resource.value(:revision)}").returns('currentsha')
         provider.expects(:update_references)
         expect(provider.revision).to eq(resource.value(:revision))
       end
     end
 
-    context 'when when its a ref to non existant remote head' do
+    context 'when its a ref to non existant remote head' do
       it 'fails' do
-        provider.expects(:git).with('branch', '-a').returns(branch_a_list)
+        resource[:revision] = 'remotebranch'
+        provider.stubs(:git).with('branch', '-a').returns(branch_a_list)
         provider.expects(:git).with('rev-parse', '--revs-only', resource.value(:revision)).returns('')
         provider.expects(:update_references)
         expect { provider.revision }.to raise_error(RuntimeError, %r{not a local or remote ref$})
@@ -332,7 +356,10 @@ BRANCHES
 
     context "when there's no source" do
       it 'returns the revision' do
+        resource[:revision] = 'localbranch'
         resource.delete(:source)
+        provider.stubs(:git).with('branch', '-a').returns(branch_a_list('localbranch'))
+        provider.expects(:update_references).never
         provider.expects(:git).with('status')
         provider.expects(:git).with('rev-parse', resource.value(:revision)).returns('currentsha')
         expect(provider.revision).to eq(resource.value(:revision))
