@@ -505,7 +505,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, parent: Puppet::Provider::Vcsrepo) do
   def get_revision(rev = 'HEAD')
     unless @resource.value(:source)
       status = at_path { git_with_identity('status') }
-      is_it_new = status =~ %r{Initial commit}
+      is_it_new = status =~ %r{Initial commit|No commits yet}
       if is_it_new
         status =~ %r{On branch (.*)}
         branch = Regexp.last_match(1)
