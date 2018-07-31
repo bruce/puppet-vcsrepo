@@ -37,7 +37,7 @@ describe 'clones a remote repo' do
     end
   end
 
-  context 'with using a https source on github' do
+  context 'with using a https source on github', unless: only_supports_weak_encryption do
     pp = <<-MANIFEST
       vcsrepo { "#{tmpdir}/httpstestrepo":
         ensure => present,
