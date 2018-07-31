@@ -49,3 +49,10 @@ RSpec.configure do |c|
     end
   end
 end
+
+# git with 3.18 changes the maximum enabled TLS protocol version, older OSes will fail these tests
+def only_supports_weak_encryption
+  return_val = (fact('osfamily') == 'RedHat' && fact('operatingsystemmajrelease') == '5') ||
+               (fact('operatingsystem') == 'OracleLinux' && fact('operatingsystemmajrelease') == '6')
+  return_val
+end

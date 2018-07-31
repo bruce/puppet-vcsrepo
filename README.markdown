@@ -850,23 +850,24 @@ Specifies the user to run as for repository operations. (Requires the `user` fea
 
 ## Limitations
 
-Git is the only VCS provider officially [supported by Puppet Inc.](https://forge.puppet.com/supported)
+Git is the only VCS provider officially [supported by Puppet Inc.](https://forge.puppet.com/supported) Git with 3.18 changes the maximum enabled TLS protocol version, this breaks some HTTPS functionality on older OSes. They are Enterprise Linux 5 OSes and OracleLinux 6
 
 The includes parameter is only supported when SVN client version is >= 1.6.
 
-This module has been tested with Puppet 2.7 and higher.
+This module has been tested with Puppet 4.7 and higher.
 
 The module has been tested on:
 
 * CentOS 5/6/7
-* Debian 6/7/8
+* Debian 8/9
 * Oracle 5/6/7
 * Red Hat Enterprise Linux 5/6/7
-* Scientific Linux 5/6/7
-* SLES 10/11/12
-* Ubuntu 10.04/12.04/14.04/16.04
+* Scientific Linux 6/7
+* SLES 11/12
+* Ubuntu 14.04/16.04/18.04
 
 Testing on other platforms has been light and cannot be guaranteed.
+
 
 ## Development
 
