@@ -854,20 +854,7 @@ Git is the only VCS provider officially [supported by Puppet Inc.](https://forge
 
 The includes parameter is only supported when SVN client version is >= 1.6.
 
-This module has been tested with Puppet 4.7 and higher.
-
-The module has been tested on:
-
-* CentOS 5/6/7
-* Debian 8/9
-* Oracle 5/6/7
-* Red Hat Enterprise Linux 5/6/7
-* Scientific Linux 6/7
-* SLES 11/12
-* Ubuntu 14.04/16.04/18.04
-
-Testing on other platforms has been light and cannot be guaranteed.
-
+For an extensive list of supported operating systems, see [metadata.json](https://github.com/puppetlabs/puppetlabs-vcsrepo/blob/master/metadata.json)
 
 ## Development
 
