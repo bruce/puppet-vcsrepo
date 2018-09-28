@@ -850,7 +850,7 @@ Specifies the user to run as for repository operations. (Requires the `user` fea
 
 ## Limitations
 
-Git is the only VCS provider officially [supported by Puppet Inc.](https://forge.puppet.com/supported) Git with 3.18 changes the maximum enabled TLS protocol version, this breaks some HTTPS functionality on older OSes. They are Enterprise Linux 5 OSes and OracleLinux 6
+Git is the only VCS provider officially [supported by Puppet Inc.](https://forge.puppet.com/supported) Git with 3.18 changes the maximum enabled TLS protocol version, this breaks some HTTPS functionality on older operating systems. They are Enterprise Linux 5 and OracleLinux 6.
 
 The includes parameter is only supported when SVN client version is >= 1.6.
 
