@@ -22,10 +22,12 @@
 5. [Limitations - OS compatibility, etc.](#limitations)
 6. [Development - Guide for contributing to the module](#development)
 
+<a id="overview"></a>
 ## Overview
 
 The vcsrepo module lets you use Puppet to easily deploy content from your version control system (VCS).
 
+<a id="module-description"></a>
 ## Module description
 
 The vcsrepo module provides a single type with providers to support the following version control systems:
@@ -39,14 +41,17 @@ The vcsrepo module provides a single type with providers to support the followin
 
 **Note:** `git` is the only vcs provider officially [supported by Puppet Inc.](https://forge.puppet.com/supported)
 
+<a id="setup"></a>
 ## Setup
 
+<a id="setup-requirements"></a>
 ### Setup requirements
 
 The vcsrepo module does not install any VCS software for you. You must install a VCS before you can use this module.
 
 Like Puppet in general, the vcsrepo module does not automatically create parent directories for the files it manages. Set up any needed directory structures before you start.
 
+<a id="beginning-with-vcsrepo"></a>
 ### Beginning with vcsrepo
 
 To create and manage a blank repository, define the type `vcsrepo` with a path to your repository and supply the `provider` parameter based on the [VCS you're using](#usage).
@@ -58,10 +63,12 @@ vcsrepo { '/path/to/repo':
 }
 ~~~
 
+<a id="usage"></a>
 ## Usage
 
 **Note:** `git` is the only vcsrepo provider officially [supported by Puppet Inc.](https://forge.puppet.com/supported)
 
+<a id="git"></a>
 ### Git
 
 #### Create a blank repository
@@ -230,7 +237,7 @@ vcsrepo { '/path/to/repo':
 }
 ~~~
 
-
+<a id="bazaar"></a>
 ### Bazaar
 
 #### Create a blank repository
@@ -279,6 +286,7 @@ vcsrepo { '/path/to/repo':
 }
 ~~~
 
+<a id="cvs"></a>
 ### CVS
 
 #### Create a blank repository
@@ -362,6 +370,7 @@ vcsrepo { '/path/to/repo':
 }
 ~~~
 
+<a id="mercurial"></a>
 ### Mercurial
 
 #### Create a blank repository
@@ -457,6 +466,7 @@ vcsrepo { '/path/to/repo':
 }
 ~~~
 
+<a id="perforce"></a>
 ### Perforce
 
 #### Create an empty workspace
@@ -507,6 +517,7 @@ vcsrepo { '/path/to/repo':
 }
 ~~~
 
+<a id="subversion"></a>
 ### Subversion
 
 #### Create a blank repository
@@ -657,12 +668,15 @@ vcsrepo { '/path/to/repo':
 }
 ~~~
 
+<a id="reference"></a> 
 ## Reference
 
+<a id="type-vcsrepo"></a> 
 ### Type: vcsrepo
 
 The vcsrepo module adds only one type with several providers. Each provider abstracts a different VCS, and each provider includes a set of features according to its needs.
 
+<a id="providers"></a> 
 #### Providers
 
 **Note:** Not all features are available with all providers.
@@ -703,6 +717,7 @@ Features: `basic_auth`, `configuration`, `conflict`, `depth`, `filesystem_types`
 
 Parameters: `basic_auth_password`, `basic_auth_username`, `configuration`, `conflict`, `ensure`, `excludes`, `force`, `fstype`, `group`, `includes`, `owner`, `path`, `provider`, `revision`, `source`, `trust_server_cert`
 
+<a id="features"></a> 
 #### Features
 
 **Note:** Not all features are available with all providers.
@@ -724,6 +739,7 @@ Parameters: `basic_auth_password`, `basic_auth_username`, `configuration`, `conf
 * `p4config` - Supports setting the `P4CONFIG` environment. (Available with `p4`.)
 * `submodules` - Supports repository submodules which can be optionally initialized. (Available with `git`.)
 
+<a id="parameters"></a> 
 #### Parameters
 
 All parameters are optional, except where specified otherwise.
@@ -848,6 +864,7 @@ Instructs Subversion to accept SSL server certificates issued by unknown certifi
 
 Specifies the user to run as for repository operations. (Requires the `user` feature.) Valid options: a string containing a username or UID. Default: none.
 
+<a id="limitations"></a>
 ## Limitations
 
 Git is the only VCS provider officially [supported by Puppet Inc.](https://forge.puppet.com/supported) Git with 3.18 changes the maximum enabled TLS protocol version, this breaks some HTTPS functionality on older operating systems. They are Enterprise Linux 5 and OracleLinux 6.
@@ -856,6 +873,7 @@ The includes parameter is only supported when SVN client version is >= 1.6.
 
 For an extensive list of supported operating systems, see [metadata.json](https://github.com/puppetlabs/puppetlabs-vcsrepo/blob/master/metadata.json)
 
+<a id="development"></a> 
 ## Development
 
 Puppet Inc. modules on the Puppet Forge are open projects, and community contributions are essential for keeping them great. We can't access the huge number of platforms and myriad of hardware, software, and deployment configurations that Puppet is intended to serve.
