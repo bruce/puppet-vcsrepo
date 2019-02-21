@@ -11,7 +11,7 @@ describe Puppet::Type.type(:vcsrepo).provider(:p4) do
   let(:provider) { resource.provider }
 
   before :each do
-    Puppet::Util.stubs(:which).with('p4').returns('/usr/local/bin/p4')
+    allow(Puppet::Util).to receive(:which).with('p4').and_return('/usr/local/bin/p4')
   end
 
   spec = {
@@ -26,9 +26,9 @@ describe Puppet::Type.type(:vcsrepo).provider(:p4) do
         resource[:revision] = '1'
         ENV['P4CLIENT'] = 'client_ws1'
 
-        provider.expects(:p4).with(['client', '-o', 'client_ws1']).returns({})
-        provider.expects(:p4).with(['client', '-i'], spec)
-        provider.expects(:p4).with(['sync', resource.value(:source) + '@' + resource.value(:revision)])
+        expect(provider).to receive(:p4).with(['client', '-o', 'client_ws1']).and_return({})
+        expect(provider).to receive(:p4).with(['client', '-i'], spec)
+        expect(provider).to receive(:p4).with(['sync', resource.value(:source) + '@' + resource.value(:revision)])
         provider.create
       end
     end
@@ -38,9 +38,9 @@ describe Puppet::Type.type(:vcsrepo).provider(:p4) do
         resource[:source] = 'something'
         ENV['P4CLIENT'] = 'client_ws2'
 
-        provider.expects(:p4).with(['client', '-o', 'client_ws2']).returns({})
-        provider.expects(:p4).with(['client', '-i'], spec)
-        provider.expects(:p4).with(['sync', resource.value(:source)])
+        expect(provider).to receive(:p4).with(['client', '-o', 'client_ws2']).and_return({})
+        expect(provider).to receive(:p4).with(['client', '-i'], spec)
+        expect(provider).to receive(:p4).with(['sync', resource.value(:source)])
         provider.create
       end
     end
@@ -53,8 +53,8 @@ describe Puppet::Type.type(:vcsrepo).provider(:p4) do
         host = Facter.value('hostname')
         default = 'puppet-' + Digest::MD5.hexdigest(path + host)
 
-        provider.expects(:p4).with(['client', '-o', default]).returns({})
-        provider.expects(:p4).with(['client', '-i'], spec)
+        expect(provider).to receive(:p4).with(['client', '-o', default]).and_return({})
+        expect(provider).to receive(:p4).with(['client', '-i'], spec)
         provider.create
       end
     end
@@ -64,16 +64,16 @@ describe Puppet::Type.type(:vcsrepo).provider(:p4) do
     it 'removes the directory' do
       ENV['P4CLIENT'] = 'test_client'
 
-      provider.expects(:p4).with(['client', '-d', '-f', 'test_client'])
-      expects_rm_rf
+      expect(provider).to receive(:p4).with(['client', '-d', '-f', 'test_client'])
+      expect_rm_rf
       provider.destroy
     end
   end
 
   describe 'checking existence' do
     it 'checks for the directory' do
-      provider.expects(:p4).with(['info'], marshal: false).returns({})
-      provider.expects(:p4).with(['where', resource.value(:path) + '/...'], raise: false).returns({})
+      expect(provider).to receive(:p4).with(['info'], marshal: false).and_return({})
+      expect(provider).to receive(:p4).with(['where', resource.value(:path) + '/...'], raise: false).and_return({})
       provider.exists?
     end
   end
@@ -81,8 +81,8 @@ describe Puppet::Type.type(:vcsrepo).provider(:p4) do
   describe 'checking the source property' do
     it "runs 'p4 where'" do
       resource[:source] = '//public/something'
-      provider.expects(:p4).with(['where', resource.value(:path) + '/...'],
-                                 raise: false).returns('depotFile' => '//public/something')
+      expect(provider).to receive(:p4).with(['where', resource.value(:path) + '/...'],
+                                            raise: false).and_return('depotFile' => '//public/something')
       expect(provider.source).to eq(resource.value(:source))
     end
   end
@@ -90,7 +90,7 @@ describe Puppet::Type.type(:vcsrepo).provider(:p4) do
   describe 'setting the source property' do
     it "calls 'create'" do
       resource[:source] = '//public/something'
-      provider.expects(:create)
+      expect(provider).to receive(:create)
       provider.source = resource.value(:source)
     end
   end
