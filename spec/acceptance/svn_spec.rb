@@ -44,8 +44,7 @@ describe 'subversion tests' do
     MANIFEST
     it 'can checkout a specific revision of svn' do
       # Run it twice and test for idempotency
-      apply_manifest(pp, catch_failures: true)
-      apply_manifest(pp, catch_changes: true)
+      idempotent_apply(default, pp)
     end
 
     describe file("#{tmpdir}/svnrepo/.svn") do
@@ -70,8 +69,7 @@ describe 'subversion tests' do
     MANIFEST
     it 'can switch revisions' do
       # Run it twice and test for idempotency
-      apply_manifest(pp, catch_failures: true)
-      apply_manifest(pp, catch_changes: true)
+      idempotent_apply(default, pp)
     end
 
     describe file("#{tmpdir}/svnrepo/.svn") do
@@ -96,8 +94,7 @@ describe 'subversion tests' do
     MANIFEST
     it 'can checkout tag=1.9.0' do
       # Run it twice and test for idempotency
-      apply_manifest(pp, catch_failures: true)
-      apply_manifest(pp, catch_changes: true)
+      idempotent_apply(default, pp)
     end
     describe file("#{tmpdir}/svnrepo/.svn") do
       it { is_expected.to be_directory }
@@ -117,8 +114,7 @@ describe 'subversion tests' do
     MANIFEST
     it 'can switch to tag=1.9.4' do
       # Run it twice and test for idempotency
-      apply_manifest(pp, catch_failures: true)
-      apply_manifest(pp, catch_changes: true)
+      idempotent_apply(default, pp)
     end
 
     describe file("#{tmpdir}/svnrepo/.svn") do

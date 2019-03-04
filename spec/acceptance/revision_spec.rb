@@ -2,7 +2,7 @@ require 'spec_helper_acceptance'
 
 tmpdir = default.tmpdir('vcsrepo')
 
-describe 'MODULES-660' do
+describe 'changing revision' do
   before(:all) do
     # Create testrepo.git
     my_root = File.expand_path(File.join(File.dirname(__FILE__), '..'))
@@ -36,8 +36,7 @@ describe 'MODULES-660' do
       }
     MANIFEST
     it 'pulls the new branch commits' do
-      apply_manifest(pp, expect_changes: true)
-      apply_manifest(pp, catch_changes: true)
+      idempotent_apply(default, pp)
     end
 
     pp = <<-MANIFEST
@@ -49,8 +48,7 @@ describe 'MODULES-660' do
       }
     MANIFEST
     it 'checks out the tag' do
-      apply_manifest(pp, expect_changes: true)
-      apply_manifest(pp, catch_changes: true)
+      idempotent_apply(default, pp)
     end
 
     it 'checks out the sha' do
@@ -63,8 +61,7 @@ describe 'MODULES-660' do
         source   => "file://#{tmpdir}/testrepo.git",
       }
       MANIFEST
-      apply_manifest(pp, expect_changes: true)
-      apply_manifest(pp, catch_changes: true)
+      idempotent_apply(default, pp)
     end
   end
 
