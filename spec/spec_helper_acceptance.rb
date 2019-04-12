@@ -24,8 +24,8 @@ RSpec.configure do |c|
           will_install_git = on(host, 'which git', acceptable_exit_codes: [0, 1]).exit_code == 1
 
           if will_install_git
-            on host, puppet('module install stahnma-epel')
-            apply_manifest_on(host, 'include epel')
+            on(host, 'rpm -ivh http://repository.it4i.cz/mirrors/repoforge/redhat/el5/en/x86_64/rpmforge/RPMS/rpmforge-release-0.5.3-1.el5.rf.x86_64.rpm', acceptable_exit_codes: [0])
+            on(host, 'yum install -y git', acceptable_exit_codes: [0])
           end
 
         end
