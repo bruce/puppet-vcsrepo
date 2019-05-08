@@ -57,6 +57,7 @@ Puppet::Type.newtype(:vcsrepo) do
           'The provider supports checking out only specific paths'
 
   ensurable do
+    desc 'Ensure the version control repository.'
     attr_accessor :latest
 
     def insync?(is)
