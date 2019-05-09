@@ -18,7 +18,6 @@
     * [Type: vcsrepo](#type-vcsrepo)
         * [Providers](#providers)
         * [Features](#features)
-        * [Parameters](#parameters)
 5. [Limitations - OS compatibility, etc.](#limitations)
 6. [Development - Guide for contributing to the module](#development)
 
@@ -674,7 +673,9 @@ vcsrepo { '/path/to/repo':
 <a id="type-vcsrepo"></a> 
 ### Type: vcsrepo
 
-The vcsrepo module adds only one type with several providers. Each provider abstracts a different VCS, and each provider includes a set of features according to its needs.
+The vcsrepo module adds only one type with several providers.
+
+For information on the classes and types, see the [REFERENCE.md](https://github.com/puppetlabs/puppetlabs-vcsrepo/blob/master/REFERENCE.md)
 
 <a id="providers"></a> 
 #### Providers
@@ -738,131 +739,6 @@ Parameters: `basic_auth_password`, `basic_auth_username`, `configuration`, `conf
 * `user` - Can run as a different user. (Available with `git`, `hg` and `cvs`.)
 * `p4config` - Supports setting the `P4CONFIG` environment. (Available with `p4`.)
 * `submodules` - Supports repository submodules which can be optionally initialized. (Available with `git`.)
-
-<a id="parameters"></a> 
-#### Parameters
-
-All parameters are optional, except where specified otherwise.
-
-##### `basic_auth_password`
-
-Specifies the password for HTTP Basic authentication. (Requires the `basic_auth` feature.) Valid options: a string or Sensitive string. Default: none.
-
-##### `basic_auth_username`
-
-Specifies the username for HTTP Basic authentication. (Requires the `basic_auth` feature.) Valid options: a string. Default: none.
-
-##### `compression`
-
-Sets the GZIP compression level for the repository history. (Requires the `gzip_compression` feature.) Valid options: an integer between 0 and 6. Default: none.
-
-##### `configuration`
-
-Sets the configuration directory to use. (Requires the `configuration` feature.) Valid options: a string containing an absolute path. Default: none.
-
-##### `conflict`
-
-Tells Subversion how to resolve any conflicts between the source repository and your working copy. (Requires the `conflict` feature.) Valid options: 'base', 'mine-full', 'theirs-full', and 'working'. Default: none.
-
-##### `cvs_rsh`
-
-Provides a value for the `CVS_RSH` environment variable. (Requires the `cvs_rsh` feature.) Valid options: a string. Default: none.
-
-##### `depth`
-
-In `git`, `depth` sets the number of commits to include when creating a shallow clone. (Requires the `depth` feature.) Valid options: an integer. Default: none.
-
-In `svn`, `depth` limits the scope of an operation to the specified tree depth. (Requires the `depth` feature.) Valid options: 'empty', 'files', 'immediates', 'infinity'. Default: none.
-
-##### `ensure`
-
-Specifies whether the repository should exist. Valid options: 'present', 'bare', 'absent', and 'latest'. Default: 'present'.
-
-##### `excludes`
-
-Lists any files the repository shouldn't track (similar to .gitignore). Valid options: a string (separate multiple values with the newline character). Default: none.
-
-##### `force`
-
-Specifies whether to delete any existing files in the repository path if creating a new repository. **Use with care.** Valid options: 'true' and 'false'. Default: 'false'.
-
-##### `fstype`
-
-Sets the filesystem type. (Requires the `filesystem_types` feature.) Valid options: 'fsfs' or 'bdb'. Default: none.
-
-##### `group`
-
-Specifies a group to own the repository files. Valid options: a string containing a group name or GID. Default: none.
-
-##### `identity`
-
-Specifies an identity file to use for SSH authentication. (Requires the `ssh_identity` feature.) Valid options: a string containing an absolute path. Default: none.
-
-##### `includes`
-
-Tells Subversion which paths should be checked out at the specified depth; all other paths are not checked out. Default: none (checkout all paths).
-
-##### `module`
-
-Specifies the repository module to manage. (Requires the `modules` feature.) Valid options: a string containing the name of a CVS module. Default: none.
-
-##### `owner`
-
-Specifies a user to own the repository files. Valid options: a string containing a username or UID. Default: none.
-
-##### `p4config`
-
-Specifies a config file that contains settings for connecting to the Perforce service. (Requires the `p4config` feature.) Valid options: a string containing the absolute path to a valid [Perforce config file](http://www.perforce.com/perforce/doc.current/manuals/p4guide/chapter.configuration.html#configuration.process.configfiles). Default: none.
-
-##### `path`
-
-Specifies a location for the managed repository. Valid options: a string containing an absolute path. Default: the title of your declared resource.
-
-##### `provider`
-
-*Required.* Specifies the backend to use for this vcsrepo resource. Valid options: 'bzr', 'cvs', 'git', 'hg', 'p4', and 'svn'.
-
-##### `remote`
-
-Specifies the remote repository to track. (Requires the `multiple_remotes` feature.) Valid options: a string containing one of the remote names specified in `source`. Default: 'origin'.
-
-##### `revision`
-
-Sets the revision of the repository. Valid options vary by provider:
-
-* `git` - A string containing a Git branch name, or a commit SHA or tag.
-* `bzr` - A string containing a Bazaar [revision spec](http://wiki.bazaar.canonical.com/BzrRevisionSpec).
-* `cvs` - A string containing a CVS [tag or revision number](http://www.thathost.com/wincvs-howto/cvsdoc/cvs_4.html).
-* `hg` - A string containing a Mercurial [changeset ID](https://www.mercurial-scm.org/wiki/ChangeSetID) or [tag](https://www.mercurial-scm.org/wiki/Tag).
-* `p4` - A string containing a Perforce [change number, label name, client name, or date spec](http://www.perforce.com/perforce/r12.1/manuals/cmdref/o.fspecs.html).
-* `svn` - A string containing a Subversion [revision number](http://svnbook.red-bean.com/en/1.7/svn.basic.in-action.html#svn.basic.in-action.revs), [revision keyword, or revision date](http://svnbook.red-bean.com/en/1.7/svn.tour.revs.specifiers.html).
-
-Default: none.
-
-##### `source`
-
-Specifies a source repository to serve as the upstream for your managed repository. Default: none. Valid options vary by provider:
-
-* `git` - A string containing a [Git repository URL](https://www.kernel.org/pub/software/scm/git/docs/git-clone.html#_git_urls_a_id_urls_a) or a hash of `name => URL` mappings. See also [`remote`](#remote).
-* `bzr` - A string containing a Bazaar branch location.
-* `cvs` - A string containing a CVS root.
-* `hg` - A string containing the local path or URL of a Mercurial repository.
-* `p4` - A string containing a Perforce depot path.
-* `svn` - A string containing a Subversion repository URL.
-
-Default: none.
-
-##### `submodules`
-
-Specifies whether to initialize and update each submodule in the repository. (Requires the `submodules` feature.) Valid options: 'true' and 'false'. Default: 'true'.
-
-##### `trust_server_cert`
-
-Instructs Subversion to accept SSL server certificates issued by unknown certificate authorities. Valid options: 'true' and 'false'. Default: 'false'.
-
-##### `user`
-
-Specifies the user to run as for repository operations. (Requires the `user` feature.) Valid options: a string containing a username or UID. Default: none.
 
 <a id="limitations"></a>
 ## Limitations
