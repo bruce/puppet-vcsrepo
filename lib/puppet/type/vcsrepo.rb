@@ -56,6 +56,9 @@ Puppet::Type.newtype(:vcsrepo) do
   feature :include_paths,
           'The provider supports checking out only specific paths'
 
+  feature :keep_local_changes,
+          'The provider supports keeping local changes on files tracked by the repository when changing revision'
+
   ensurable do
     desc 'Ensure the version control repository.'
     attr_accessor :latest
@@ -286,6 +289,12 @@ Puppet::Type.newtype(:vcsrepo) do
 
   newparam :trust_server_cert do
     desc 'Trust server certificate'
+    newvalues(true, false)
+    defaultto :false
+  end
+
+  newparam :keep_local_changes do
+    desc 'Keep local changes on files tracked by the repository when changing revision'
     newvalues(true, false)
     defaultto :false
   end
