@@ -398,6 +398,8 @@ Puppet::Type.type(:vcsrepo).provide(:git, parent: Puppet::Provider::Vcsrepo) do
   # handle upstream branch changes
   # @!visibility private
   def checkout(revision = @resource.value(:revision))
+    keep_local_changes = @resource.value(:keep_local_changes)
+    stash if keep_local_changes == :true
     if !local_branch_revision?(revision) && remote_branch_revision?(revision)
       # non-locally existant branches (perhaps switching to a branch that has never been checked out)
       at_path { git_with_identity('checkout', '--force', '-b', revision, '--track', "#{@resource.value(:remote)}/#{revision}") }
@@ -405,6 +407,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, parent: Puppet::Provider::Vcsrepo) do
       # tags, locally existant branches (perhaps outdated), and shas
       at_path { git_with_identity('checkout', '--force', revision) }
     end
+    unstash if keep_local_changes == :true
   end
 
   # @!visibility private
@@ -473,6 +476,16 @@ Puppet::Type.type(:vcsrepo).provide(:git, parent: Puppet::Provider::Vcsrepo) do
         end
       end
     end
+  end
+
+  # @!visibility private
+  def stash
+    at_path { git_with_identity('stash', 'save') }
+  end
+
+  # @!visibility private
+  def unstash
+    at_path { git_with_identity('stash', 'pop') }
   end
 
   # Finds the latest revision or sha of the current branch if on a branch, or

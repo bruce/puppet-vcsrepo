@@ -402,6 +402,20 @@ BRANCHES
         provider.revision = resource.value(:revision)
       end
     end
+    context 'when ignoring local changes' do
+      it "uses 'git stash'" do
+        resource[:revision] = 'a-commit-or-tag'
+        resource[:keep_local_changes] = true
+        expect(provider).to receive(:git).with('stash', 'save')
+        expect(provider).to receive(:git).with('branch', '-a').once.and_return(fixture(:git_branch_a))
+        expect(provider).to receive(:git).with('checkout', '--force', resource.value(:revision))
+        expect(provider).to receive(:git).with('branch', '-a').and_return(fixture(:git_branch_a))
+        expect(provider).to receive(:git).with('branch', '-a').and_return(fixture(:git_branch_a))
+        expect(provider).to receive(:git).with('submodule', 'update', '--init', '--recursive')
+        expect(provider).to receive(:git).with('stash', 'pop')
+        provider.revision = resource.value(:revision)
+      end
+    end
   end
 
   context 'when checking the source property' do

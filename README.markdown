@@ -157,6 +157,19 @@ vcsrepo { '/path/to/repo':
 }
 ~~~
 
+To keep local changes while changing revision, use the `keep_local_changes`:
+
+~~~ puppet
+vcsrepo { '/path/to/repo':
+  ensure             => present,
+  provider           => git,
+  source             => 'git://example.com/repo.git',
+  revision           => '0c466b8a5a45f6cd7de82c08df2fb4ce1e920a31',
+  keep_local_changes => true,
+  user               => 'someUser',
+}
+~~~
+
 To keep the repository at the latest revision, set `ensure` to 'latest'.
 
 **WARNING:** This overwrites any local changes to the repository.
