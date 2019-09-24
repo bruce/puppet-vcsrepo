@@ -460,6 +460,7 @@ describe 'clones a remote repo' do
         managehome => true,
       }
       MANIFEST
+      sleep 10
       apply_manifest(pp, catch_failures: true)
     end
   end
