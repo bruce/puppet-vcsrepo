@@ -1,15 +1,15 @@
 require 'spec_helper_acceptance'
 
-tmpdir = default.tmpdir('vcsrepo')
+tmpdir = '/tmp/vcsrepo'
 
 describe 'clones a remote repo', unless: only_supports_weak_encryption do
   before(:all) do
     File.expand_path(File.join(File.dirname(__FILE__), '..'))
-    shell("mkdir -p #{tmpdir}") # win test
+    run_shell("mkdir -p #{tmpdir}") # win test
   end
 
   after(:all) do
-    shell("rm -rf #{tmpdir}/vcsrepo")
+    run_shell("rm -rf #{tmpdir}/vcsrepo")
   end
 
   context 'with clone with single remote' do
@@ -25,13 +25,13 @@ describe 'clones a remote repo', unless: only_supports_weak_encryption do
     end
 
     it 'git config output should contain the remote' do
-      shell("/usr/bin/git config -l -f #{tmpdir}/vcsrepo/.git/config") do |r|
+      run_shell("/usr/bin/git config -l -f #{tmpdir}/vcsrepo/.git/config") do |r|
         expect(r.stdout).to match(%r{remote.origin.url=https://github.com/puppetlabs/puppetlabs-vcsrepo.git})
       end
     end
 
     after(:all) do
-      shell("rm -rf #{tmpdir}/vcsrepo")
+      run_shell("rm -rf #{tmpdir}/vcsrepo")
     end
   end
 
@@ -44,22 +44,22 @@ describe 'clones a remote repo', unless: only_supports_weak_encryption do
       }
     MANIFEST
     it 'clones from default remote and adds 2 remotes to config file' do
-      idempotent_apply(default, pp)
+      idempotent_apply(pp)
     end
 
     it 'git config output should contain the remotes - origin' do
-      shell("/usr/bin/git config -l -f #{tmpdir}/vcsrepo/.git/config") do |r|
+      run_shell("/usr/bin/git config -l -f #{tmpdir}/vcsrepo/.git/config") do |r|
         expect(r.stdout).to match(%r{remote.origin.url=https://github.com/puppetlabs/puppetlabs-vcsrepo.git})
       end
     end
     it 'git config output should contain the remotes - test1' do
-      shell("/usr/bin/git config -l -f #{tmpdir}/vcsrepo/.git/config") do |r|
+      run_shell("/usr/bin/git config -l -f #{tmpdir}/vcsrepo/.git/config") do |r|
         expect(r.stdout).to match(%r{remote.test1.url=https://github.com/puppetlabs/puppetlabs-vcsrepo.git})
       end
     end
 
     after(:all) do
-      shell("rm -rf #{tmpdir}/vcsrepo")
+      run_shell("rm -rf #{tmpdir}/vcsrepo")
     end
   end
 end

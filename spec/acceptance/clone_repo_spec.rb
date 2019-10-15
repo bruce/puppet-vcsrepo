@@ -1,17 +1,18 @@
 require 'spec_helper_acceptance'
 
-tmpdir = default.tmpdir('vcsrepo')
+tmpdir = '/tmp/vcsrepo'
 
 describe 'clones a remote repo' do
   before(:all) do
     my_root = File.expand_path(File.join(File.dirname(__FILE__), '..'))
-    shell("mkdir -p #{tmpdir}") # win test
-    scp_to(default, "#{my_root}/acceptance/files/create_git_repo.sh", tmpdir)
-    shell("cd #{tmpdir} && ./create_git_repo.sh")
+    run_shell("rm -rf #{tmpdir}")
+    bolt_upload_file("#{my_root}/acceptance/files", tmpdir, 'create_git_repo.sh')
+    run_shell("cd #{tmpdir} && ./create_git_repo.sh")
   end
 
   after(:all) do
-    shell("rm -rf #{tmpdir}/testrepo.git")
+    run_shell("rm -rf #{tmpdir}/testrepo")
+    run_shell("rm -rf #{tmpdir}/testrepo_mirror_repo")
   end
 
   context 'with get the current master HEAD' do
@@ -24,7 +25,7 @@ describe 'clones a remote repo' do
     MANIFEST
     it 'clones a repo' do
       # Run it twice and test for idempotency
-      idempotent_apply(default, pp)
+      idempotent_apply(pp)
     end
 
     describe file("#{tmpdir}/testrepo/.git") do
@@ -46,7 +47,7 @@ describe 'clones a remote repo' do
     MANIFEST
     it 'clones a repo' do
       # Run it twice and test for idempotency
-      idempotent_apply(default, pp)
+      idempotent_apply(pp)
     end
 
     describe file("#{tmpdir}/httpstestrepo/.git") do
@@ -60,11 +61,11 @@ describe 'clones a remote repo' do
 
   context 'with using a commit SHA' do
     let(:sha) do
-      shell("git --git-dir=#{tmpdir}/testrepo.git rev-list HEAD | tail -1").stdout.chomp
+      run_shell("git --git-dir=#{tmpdir}/testrepo.git rev-list HEAD | tail -1").stdout.chomp
     end
 
     after(:all) do
-      shell("rm -rf #{tmpdir}/testrepo_sha")
+      run_shell("rm -rf #{tmpdir}/testrepo_sha")
     end
 
     it 'clones a repo' do
@@ -77,7 +78,7 @@ describe 'clones a remote repo' do
       }
       MANIFEST
       # Run it twice and test for idempotency
-      idempotent_apply(default, pp)
+      idempotent_apply(pp)
     end
 
     describe file("#{tmpdir}/testrepo_sha/.git") do
@@ -100,7 +101,7 @@ describe 'clones a remote repo' do
     MANIFEST
     it 'clones a repo' do
       # Run it twice and test for idempotency
-      idempotent_apply(default, pp)
+      idempotent_apply(pp)
     end
 
     describe file("#{tmpdir}/testrepo_tag/.git") do
@@ -108,7 +109,7 @@ describe 'clones a remote repo' do
     end
 
     it 'has the tag as the HEAD' do
-      shell("git --git-dir=#{tmpdir}/testrepo_tag/.git name-rev HEAD | grep '0.0.2'")
+      run_shell("git --git-dir=#{tmpdir}/testrepo_tag/.git name-rev HEAD | grep '0.0.2'")
     end
   end
 
@@ -123,7 +124,7 @@ describe 'clones a remote repo' do
     MANIFEST
     it 'clones a repo' do
       # Run it twice and test for idempotency
-      idempotent_apply(default, pp)
+      idempotent_apply(pp)
     end
 
     describe file("#{tmpdir}/testrepo_branch/.git") do
@@ -146,12 +147,12 @@ describe 'clones a remote repo' do
     MANIFEST
     it 'clones a repo' do
       # Run it twice and test for idempotency
-      idempotent_apply(default, pp)
+      idempotent_apply(pp)
     end
 
     it 'verifies the HEAD commit SHA on remote and local match' do
-      remote_commit = shell("git ls-remote file://#{tmpdir}/testrepo_latest HEAD | head -1").stdout
-      local_commit = shell("git --git-dir=#{tmpdir}/testrepo_latest/.git rev-parse HEAD").stdout.chomp
+      remote_commit = run_shell("git ls-remote file://#{tmpdir}/testrepo_latest HEAD | head -1").stdout
+      local_commit = run_shell("git --git-dir=#{tmpdir}/testrepo_latest/.git rev-parse HEAD").stdout.chomp
       expect(remote_commit).to include(local_commit)
     end
   end
@@ -166,12 +167,12 @@ describe 'clones a remote repo' do
     MANIFEST
     it 'clones a repo' do
       # Run it twice and test for idempotency
-      idempotent_apply(default, pp)
+      idempotent_apply(pp)
     end
 
     it 'verifies the HEAD commit SHA on remote and local match' do
-      remote_commit = shell("git ls-remote file://#{tmpdir}/testrepo_latest HEAD | head -1").stdout
-      local_commit = shell("git --git-dir=#{tmpdir}/testrepo_latest/.git rev-parse HEAD").stdout.chomp
+      remote_commit = run_shell("git ls-remote file://#{tmpdir}/testrepo_latest HEAD | head -1").stdout
+      local_commit = run_shell("git --git-dir=#{tmpdir}/testrepo_latest/.git rev-parse HEAD").stdout.chomp
       expect(remote_commit).to include(local_commit)
     end
   end
@@ -187,7 +188,7 @@ describe 'clones a remote repo' do
     MANIFEST
     it 'does a shallow clone' do
       # Run it twice and test for idempotency
-      idempotent_apply(default, pp)
+      idempotent_apply(pp)
     end
 
     describe file("#{tmpdir}/testrepo_shallow/.git/shallow") do
@@ -197,8 +198,8 @@ describe 'clones a remote repo' do
 
   context 'with path is not empty and not a repository' do
     before(:all) do
-      shell("mkdir #{tmpdir}/not_a_repo", acceptable_exit_codes: [0, 1])
-      shell("touch #{tmpdir}/not_a_repo/file1.txt", acceptable_exit_codes: [0, 1])
+      run_shell("mkdir #{tmpdir}/not_a_repo", acceptable_exit_codes: [0, 1])
+      run_shell("touch #{tmpdir}/not_a_repo/file1.txt", acceptable_exit_codes: [0, 1])
     end
 
     pp = <<-MANIFEST
@@ -231,7 +232,7 @@ describe 'clones a remote repo' do
     MANIFEST
     it 'clones a repo' do
       # Run it twice and test for idempotency
-      idempotent_apply(default, pp)
+      idempotent_apply(pp)
     end
 
     describe file("#{tmpdir}/testrepo_owner") do
@@ -259,7 +260,7 @@ describe 'clones a remote repo' do
     MANIFEST
     it 'clones a repo' do
       # Run it twice and test for idempotency
-      idempotent_apply(default, pp)
+      idempotent_apply(pp)
     end
 
     describe file("#{tmpdir}/testrepo_group") do
@@ -279,7 +280,7 @@ describe 'clones a remote repo' do
     MANIFEST
     it 'clones a repo' do
       # Run it twice and test for idempotency
-      idempotent_apply(default, pp)
+      idempotent_apply(pp)
     end
 
     describe file("#{tmpdir}/testrepo_excludes/.git/info/exclude") do
@@ -297,8 +298,8 @@ describe 'clones a remote repo' do
 
   context 'with with force' do
     before(:all) do
-      shell("mkdir -p #{tmpdir}/testrepo_force/folder")
-      shell("touch #{tmpdir}/testrepo_force/temp.txt")
+      run_shell("mkdir -p #{tmpdir}/testrepo_force/folder")
+      run_shell("touch #{tmpdir}/testrepo_force/temp.txt")
     end
     it 'applies the manifest' do
       pp = <<-MANIFEST
@@ -311,7 +312,7 @@ describe 'clones a remote repo' do
       MANIFEST
 
       # Run it twice and test for idempotency
-      idempotent_apply(default, pp)
+      idempotent_apply(pp)
     end
 
     describe file("#{tmpdir}/testrepo_force/folder") do
@@ -328,12 +329,12 @@ describe 'clones a remote repo' do
 
     context 'with and noop' do
       before(:all) do
-        shell("mkdir #{tmpdir}/testrepo_already_exists")
-        shell("cd #{tmpdir}/testrepo_already_exists && git init")
-        shell("cd #{tmpdir}/testrepo_already_exists && touch a && git add a && git commit -m 'a'")
+        run_shell("mkdir #{tmpdir}/testrepo_already_exists")
+        run_shell("cd #{tmpdir}/testrepo_already_exists && git init")
+        run_shell("cd #{tmpdir}/testrepo_already_exists && touch a && git add a && git commit -m 'a'")
       end
       after(:all) do
-        shell("rm -rf #{tmpdir}/testrepo_already_exists")
+        run_shell("rm -rf #{tmpdir}/testrepo_already_exists")
       end
 
       pp = <<-MANIFEST
@@ -353,7 +354,7 @@ describe 'clones a remote repo' do
 
   context 'with as a user' do
     before(:all) do
-      shell("chmod 707 #{tmpdir}")
+      run_shell("chmod 707 #{tmpdir}")
       pp = <<-MANIFEST
       group { 'testuser':
         ensure => present,
@@ -377,7 +378,7 @@ describe 'clones a remote repo' do
     MANIFEST
     it 'applies the manifest' do
       # Run it twice and test for idempotency
-      idempotent_apply(default, pp)
+      idempotent_apply(pp)
     end
 
     describe file("#{tmpdir}/testrepo_user") do
@@ -407,11 +408,11 @@ describe 'clones a remote repo' do
     MANIFEST
     it 'applies the manifest' do
       # Run it twice and test for idempotency
-      idempotent_apply(default, pp)
+      idempotent_apply(pp)
     end
 
     it 'remote name is "testorigin"' do
-      shell("git --git-dir=#{tmpdir}/testrepo_remote/.git remote | grep 'testorigin'")
+      run_shell("git --git-dir=#{tmpdir}/testrepo_remote/.git remote | grep 'testorigin'")
     end
   end
 
@@ -431,13 +432,13 @@ describe 'clones a remote repo' do
       apply_manifest(pp, catch_failures: true)
 
       # create ssh keys
-      shell('mkdir -p /home/testuser-ssh/.ssh')
-      shell('ssh-keygen -q -t rsa -f /home/testuser-ssh/.ssh/id_rsa -N ""')
+      run_shell('mkdir -p /home/testuser-ssh/.ssh')
+      run_shell('ssh-keygen -q -t rsa -f /home/testuser-ssh/.ssh/id_rsa -N ""')
 
       # copy public key to authorized_keys
-      shell('cat /home/testuser-ssh/.ssh/id_rsa.pub > /home/testuser-ssh/.ssh/authorized_keys')
-      shell('echo -e "Host localhost\n\tStrictHostKeyChecking no\n" > /home/testuser-ssh/.ssh/config')
-      shell('chown -R testuser-ssh:testuser-ssh /home/testuser-ssh/.ssh')
+      run_shell('cat /home/testuser-ssh/.ssh/id_rsa.pub > /home/testuser-ssh/.ssh/authorized_keys')
+      run_shell('echo -e "Host localhost\n\tStrictHostKeyChecking no\n" > /home/testuser-ssh/.ssh/config')
+      run_shell('chown -R testuser-ssh:testuser-ssh /home/testuser-ssh/.ssh')
     end
 
     pp = <<-MANIFEST
@@ -450,7 +451,7 @@ describe 'clones a remote repo' do
     MANIFEST
     it 'applies the manifest' do
       # Run it twice and test for idempotency
-      idempotent_apply(default, pp)
+      idempotent_apply(pp)
     end
 
     after(:all) do
@@ -476,13 +477,13 @@ describe 'clones a remote repo' do
       apply_manifest(pp, catch_failures: true)
 
       # create ssh keys
-      shell('mkdir -p /home/testuser-ssh/.ssh')
-      shell('ssh-keygen -q -t rsa -f /home/testuser-ssh/.ssh/id_rsa -N ""')
+      run_shell('mkdir -p /home/testuser-ssh/.ssh')
+      run_shell('ssh-keygen -q -t rsa -f /home/testuser-ssh/.ssh/id_rsa -N ""')
 
       # copy public key to authorized_keys
-      shell('cat /home/testuser-ssh/.ssh/id_rsa.pub > /home/testuser-ssh/.ssh/authorized_keys')
-      shell('echo -e "Host localhost\n\tStrictHostKeyChecking no\n" > /home/testuser-ssh/.ssh/config')
-      shell('chown -R testuser-ssh:testuser-ssh /home/testuser-ssh/.ssh')
+      run_shell('cat /home/testuser-ssh/.ssh/id_rsa.pub > /home/testuser-ssh/.ssh/authorized_keys')
+      run_shell('echo -e "Host localhost\n\tStrictHostKeyChecking no\n" > /home/testuser-ssh/.ssh/config')
+      run_shell('chown -R testuser-ssh:testuser-ssh /home/testuser-ssh/.ssh')
     end
 
     pp = <<-MANIFEST
@@ -495,7 +496,7 @@ describe 'clones a remote repo' do
     MANIFEST
     it 'applies the manifest' do
       # Run it twice and test for idempotency
-      idempotent_apply(default, pp)
+      idempotent_apply(pp)
     end
   end
 
@@ -509,7 +510,7 @@ describe 'clones a remote repo' do
     MANIFEST
     it 'creates a bare repo' do
       # Run it twice and test for idempotency
-      idempotent_apply(default, pp)
+      idempotent_apply(pp)
     end
 
     describe file("#{tmpdir}/testrepo_bare_repo/config") do
@@ -533,7 +534,7 @@ describe 'clones a remote repo' do
     MANIFEST
     it 'creates a mirror repo' do
       # Run it twice and test for idempotency
-      idempotent_apply(default, pp)
+      idempotent_apply(pp)
     end
 
     describe file("#{tmpdir}/testrepo_mirror_repo/config") do
