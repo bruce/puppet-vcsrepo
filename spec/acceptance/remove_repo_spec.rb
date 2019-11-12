@@ -1,6 +1,6 @@
 require 'spec_helper_acceptance'
 
-tmpdir = default.tmpdir('vcsrepo')
+tmpdir = '/tmp/vcsrepo'
 
 describe 'remove a repo' do
   pp = <<-MANIFEST
