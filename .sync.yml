@@ -6,6 +6,8 @@
 ".yardopts":
   optional:
   - "--output-dir docs/"
+appveyor.yml:
+  delete: true
 Gemfile:
   optional:
     ":development":
