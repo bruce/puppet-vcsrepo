@@ -141,3 +141,11 @@ Trust server certificate
 
 Default value: `false`
 
+##### `keep_local_changes`
+
+Valid values: `true`, `false`
+
+Keep local changes on files tracked by the repository when changing revision
+
+Default value: `false`
+
