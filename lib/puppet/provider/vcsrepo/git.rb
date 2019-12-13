@@ -589,7 +589,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, parent: Puppet::Provider::Vcsrepo) do
         env_git_ssh_command_save = ENV['GIT_SSH_COMMAND']
 
         ENV['GIT_SSH']         = f.path
-        ENV['GIT_SSH_COMMAND'] = nil    # Unset GIT_SSH_COMMAND environment variable
+        ENV['GIT_SSH_COMMAND'] = nil # Unset GIT_SSH_COMMAND environment variable
 
         ret = git(*args)
 
