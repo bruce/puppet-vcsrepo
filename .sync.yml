@@ -1,6 +1,11 @@
 ---
 ".gitlab-ci.yml":
   delete: true
+".travis.yml":
+  unmanaged: true
+  notifications:
+    slack:
+      secure: XnFGMHjVwgUY0Dtxvent3sa6m7yAF7HH3kRsJ39Oje95cechyfuIIDKX80NBLRS/Zpjm5wCEA6l90hgZMw5H8WmqPyo1LrQGzBsk22abh/XI6y/+N1TKSavgegcf+NnU4w30QO4FNiQCoO8krJHoOPqcIpf/azrPPSWVimMovAE=
 ".yardopts":
   optional:
   - "--output-dir docs/"
