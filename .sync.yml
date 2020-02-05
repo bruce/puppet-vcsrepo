@@ -1,11 +1,6 @@
 ---
 ".gitlab-ci.yml":
   delete: true
-".travis.yml":
-  unmanaged: true
-  notifications:
-    slack:
-      secure: XnFGMHjVwgUY0Dtxvent3sa6m7yAF7HH3kRsJ39Oje95cechyfuIIDKX80NBLRS/Zpjm5wCEA6l90hgZMw5H8WmqPyo1LrQGzBsk22abh/XI6y/+N1TKSavgegcf+NnU4w30QO4FNiQCoO8krJHoOPqcIpf/azrPPSWVimMovAE=
 ".yardopts":
   optional:
   - "--output-dir docs/"
@@ -22,6 +17,8 @@ spec/spec_helper.rb:
   mock_with: ":rspec"
   coverage_report: true
 '.travis.yml':
+  global_env: 
+    - HONEYCOMB_WRITEKEY="7f3c63a70eecc61d635917de46bea4e6",HONEYCOMB_DATASET="litmus tests"
   deploy_to_forge:
     enabled: false
   branches:
@@ -45,7 +42,7 @@ spec/spec_helper.rb:
       sudo: required
     - bundler_args:
       dist: trusty
-      env: PLATFORM=centos:deb_puppet6
+      env: PLATFORM=deb_puppet6
       rvm: 2.5.3
       before_script:
         - bundle exec rake 'litmus:provision_list[travis_deb]'
@@ -73,7 +70,7 @@ spec/spec_helper.rb:
       sudo: required
     - bundler_args:
       dist: trusty
-      env: PLATFORM=centos:ub_puppet6
+      env: PLATFORM=ub_puppet6
       rvm: 2.5.3
       before_script:
         - bundle exec rake 'litmus:provision_list[travis_ub]'
@@ -100,7 +97,7 @@ spec/spec_helper.rb:
       stage: acceptance
     - bundler_args:
       dist: trusty
-      env: PLATFORM=centos:el6_puppet6
+      env: PLATFORM=el6_puppet6
       rvm: 2.5.3
       before_script:
         - bundle exec rake 'litmus:provision_list[travis_el6]'
@@ -126,7 +123,7 @@ spec/spec_helper.rb:
       stage: acceptance
     - bundler_args:
       dist: trusty
-      env: PLATFORM=centos:el7_puppet6
+      env: PLATFORM=el7_puppet6
       rvm: 2.5.3
       before_script:
         - bundle exec rake 'litmus:provision_list[travis_el7]'
@@ -138,3 +135,6 @@ spec/spec_helper.rb:
       stage: acceptance
       sudo: required
   simplecov: true
+  notifications:
+    slack:
+      secure: XnFGMHjVwgUY0Dtxvent3sa6m7yAF7HH3kRsJ39Oje95cechyfuIIDKX80NBLRS/Zpjm5wCEA6l90hgZMw5H8WmqPyo1LrQGzBsk22abh/XI6y/+N1TKSavgegcf+NnU4w30QO4FNiQCoO8krJHoOPqcIpf/azrPPSWVimMovAE=
