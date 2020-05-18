@@ -1,3 +1,10 @@
+require 'singleton'
+
+class LitmusHelper
+  include Singleton
+  include PuppetLitmus
+end
+
 RSpec.configure do |c|
   # Readable test descriptions
   c.formatter = :documentation
@@ -7,21 +14,21 @@ RSpec.configure do |c|
     case os[:family]
     when 'redhat'
       if os[:release][0] =~ %r{5}
-        run_shell('which git', expect_failures: true)
-        run_shell('rpm -ivh http://repository.it4i.cz/mirrors/repoforge/redhat/el5/en/x86_64/rpmforge/RPMS/rpmforge-release-0.5.3-1.el5.rf.x86_64.rpm', expect_failures: true)
-        run_shell('yum install -y git')
+        LitmusHelper.instance.run_shell('which git', expect_failures: true)
+        LitmusHelper.instance.run_shell('rpm -ivh http://repository.it4i.cz/mirrors/repoforge/redhat/el5/en/x86_64/rpmforge/RPMS/rpmforge-release-0.5.3-1.el5.rf.x86_64.rpm', expect_failures: true)
+        LitmusHelper.instance.run_shell('yum install -y git')
       end
       pp = <<-PP
       package { 'git': ensure => present, }
       package { 'subversion': ensure => present, }
       PP
-      apply_manifest(pp)
+      LitmusHelper.instance.apply_manifest(pp)
     when %r{(ubuntu|[dD]ebian|sles)}
       pp = <<-PP
       package { 'git-core': ensure => present, }
       package { 'subversion': ensure => present, }
       PP
-      apply_manifest(pp)
+      LitmusHelper.instance.apply_manifest(pp)
     else
       unless run_bolt_task('package', 'action' => 'status', 'name' => 'git')
         puts 'Git package is required for this module'
@@ -32,8 +39,8 @@ RSpec.configure do |c|
         exit
       end
     end
-    run_shell('git config --global user.email "root@localhost"')
-    run_shell('git config --global user.name "root"')
+    LitmusHelper.instance.run_shell('git config --global user.email "root@localhost"')
+    LitmusHelper.instance.run_shell('git config --global user.name "root"')
   end
 end
 
