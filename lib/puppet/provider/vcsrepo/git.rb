@@ -446,7 +446,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, parent: Puppet::Provider::Vcsrepo) do
 
   # @!visibility private
   def branches
-    at_path { git_with_identity('branch', '-a') }.tr('*', ' ').split(%r{\n}).map { |line| line.strip }
+    at_path { git_with_identity('branch', '--no-color', '-a') }.tr('*', ' ').split(%r{\n}).map { |line| line.strip }
   end
 
   # git < 2.4 returns 'detached from'
@@ -454,7 +454,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, parent: Puppet::Provider::Vcsrepo) do
   # @!visibility private
   def on_branch?
     at_path do
-      matches = git_with_identity('branch', '-a').match %r{\*\s+(.*)}
+      matches = git_with_identity('branch', '--no-color', '-a').match %r{\*\s+(.*)}
       matches[1] unless matches[1] =~ %r{(\(detached from|\(HEAD detached at|\(no branch)}
     end
   end
