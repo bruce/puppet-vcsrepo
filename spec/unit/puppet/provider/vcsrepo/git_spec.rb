@@ -36,7 +36,7 @@ BRANCHES
         expect(provider).to receive(:git).with('clone', resource.value(:source), resource.value(:path))
         expect(provider).to receive(:update_submodules)
         expect(provider).to receive(:update_remote_url).with('origin', resource.value(:source)).and_return false
-        expect(provider).to receive(:git).with('branch', '-a').and_return(branch_a_list(resource.value(:revision)))
+        expect(provider).to receive(:git).with('branch', '--no-color', '-a').and_return(branch_a_list(resource.value(:revision)))
         expect(provider).to receive(:git).with('checkout', '--force', resource.value(:revision))
         provider.create
       end
@@ -50,7 +50,7 @@ BRANCHES
         expect(provider).to receive(:git).with('clone', '--origin', 'not_origin', resource.value(:source), resource.value(:path))
         expect(provider).to receive(:update_submodules)
         expect(provider).to receive(:update_remote_url).with('not_origin', resource.value(:source)).and_return false
-        expect(provider).to receive(:git).with('branch', '-a').and_return(branch_a_list(resource.value(:revision)))
+        expect(provider).to receive(:git).with('branch', '--no-color', '-a').and_return(branch_a_list(resource.value(:revision)))
         expect(provider).to receive(:git).with('checkout', '--force', resource.value(:revision))
         provider.create
       end
@@ -65,7 +65,7 @@ BRANCHES
         expect(provider).to receive(:git).with('clone', '--depth', '1', '--branch', resource.value(:revision), resource.value(:source), resource.value(:path))
         expect(provider).to receive(:update_submodules)
         expect(provider).to receive(:update_remote_url).with('origin', resource.value(:source)).and_return false
-        expect(provider).to receive(:git).with('branch', '-a').and_return(branch_a_list(resource.value(:revision)))
+        expect(provider).to receive(:git).with('branch', '--no-color', '-a').and_return(branch_a_list(resource.value(:revision)))
         expect(provider).to receive(:git).with('checkout', '--force', resource.value(:revision))
         provider.create
       end
@@ -79,7 +79,7 @@ BRANCHES
         expect(provider).to receive(:git).with('clone', resource.value(:source), resource.value(:path))
         expect(provider).to receive(:update_submodules)
         expect(provider).to receive(:update_remote_url).with('origin', resource.value(:source)).and_return false
-        expect(provider).to receive(:git).with('branch', '-a').and_return(branch_a_list(resource.value(:revision)))
+        expect(provider).to receive(:git).with('branch', '--no-color', '-a').and_return(branch_a_list(resource.value(:revision)))
         expect(provider).to receive(:git).with('checkout', '--force', resource.value(:revision))
         provider.create
       end
@@ -195,7 +195,7 @@ BRANCHES
       expect(provider).to receive(:git).with('clone', resource.value(:source), resource.value(:path))
       expect(provider).to receive(:update_submodules)
       expect(provider).to receive(:update_remote_url).with('origin', resource.value(:source)).and_return false
-      expect(provider).to receive(:git).with('branch', '-a').and_return(branch_a_list(resource.value(:revision)))
+      expect(provider).to receive(:git).with('branch', '--no-color', '-a').and_return(branch_a_list(resource.value(:revision)))
       expect(provider).to receive(:git).with('checkout', '--force', resource.value(:revision))
       provider.create
     end
@@ -297,7 +297,7 @@ BRANCHES
     context 'when its a SHA and is not different than the current SHA' do
       it 'and_return the current SHA' do
         resource[:revision] = 'currentsha'
-        allow(provider).to receive(:git).with('branch', '-a').and_return(branch_a_list)
+        allow(provider).to receive(:git).with('branch', '--no-color', '-a').and_return(branch_a_list)
         expect(provider).to receive(:git).with('rev-parse', '--revs-only', resource.value(:revision)).never
         expect(provider).to receive(:update_references).never
         expect(provider.revision).to eq(resource.value(:revision))
@@ -307,7 +307,7 @@ BRANCHES
     context 'when its a SHA and is different than the current SHA' do
       it 'and_return the current SHA' do
         resource[:revision] = 'othersha'
-        allow(provider).to receive(:git).with('branch', '-a').and_return(branch_a_list)
+        allow(provider).to receive(:git).with('branch', '--no-color', '-a').and_return(branch_a_list)
         expect(provider).to receive(:git).with('rev-parse', '--revs-only', resource.value(:revision)).and_return('othersha')
         expect(provider).to receive(:update_references)
         expect(provider.revision).to eq('currentsha')
@@ -317,7 +317,7 @@ BRANCHES
     context 'when its a local branch and is not different than the current SHA' do
       it 'and_return the ref' do
         resource[:revision] = 'localbranch'
-        allow(provider).to receive(:git).with('branch', '-a').and_return(branch_a_list('localbranch'))
+        allow(provider).to receive(:git).with('branch', '--no-color', '-a').and_return(branch_a_list('localbranch'))
         expect(provider).to receive(:git).with('rev-parse', resource.value(:revision)).and_return('currentsha')
         expect(provider).to receive(:update_references)
         expect(provider.revision).to eq(resource.value(:revision))
@@ -327,7 +327,7 @@ BRANCHES
     context 'when its a local branch and is different than the current SHA' do
       it 'and_return the current SHA' do
         resource[:revision] = 'localbranch'
-        allow(provider).to receive(:git).with('branch', '-a').and_return(branch_a_list('localbranch'))
+        allow(provider).to receive(:git).with('branch', '--no-color', '-a').and_return(branch_a_list('localbranch'))
         expect(provider).to receive(:git).with('rev-parse', resource.value(:revision)).and_return('othersha')
         expect(provider).to receive(:update_references)
         expect(provider.revision).to eq('currentsha')
@@ -337,7 +337,7 @@ BRANCHES
     context 'when its a ref to a remote head' do
       it 'and_return the ref' do
         resource[:revision] = 'remotebranch'
-        allow(provider).to receive(:git).with('branch', '-a').and_return("  remotes/origin/#{resource.value(:revision)}")
+        allow(provider).to receive(:git).with('branch', '--no-color', '-a').and_return("  remotes/origin/#{resource.value(:revision)}")
         expect(provider).to receive(:git).with('rev-parse', "origin/#{resource.value(:revision)}").and_return('currentsha')
         expect(provider).to receive(:update_references)
         expect(provider.revision).to eq(resource.value(:revision))
@@ -347,7 +347,7 @@ BRANCHES
     context 'when its a ref to non existant remote head' do
       it 'fails' do
         resource[:revision] = 'remotebranch'
-        allow(provider).to receive(:git).with('branch', '-a').and_return(branch_a_list)
+        allow(provider).to receive(:git).with('branch', '--no-color', '-a').and_return(branch_a_list)
         expect(provider).to receive(:git).with('rev-parse', '--revs-only', resource.value(:revision)).and_return('')
         expect(provider).to receive(:update_references)
         expect { provider.revision }.to raise_error(RuntimeError, %r{not a local or remote ref$})
@@ -358,7 +358,7 @@ BRANCHES
       it 'and_return the revision' do
         resource[:revision] = 'localbranch'
         resource.delete(:source)
-        allow(provider).to receive(:git).with('branch', '-a').and_return(branch_a_list('localbranch'))
+        allow(provider).to receive(:git).with('branch', '--no-color', '-a').and_return(branch_a_list('localbranch'))
         expect(provider).to receive(:update_references).never
         expect(provider).to receive(:git).with('status')
         expect(provider).to receive(:git).with('rev-parse', resource.value(:revision)).and_return('currentsha')
@@ -375,7 +375,7 @@ BRANCHES
       it "uses 'git fetch' and 'git reset'" do
         resource[:revision] = 'feature/foo'
         expect(provider).to receive(:update_submodules)
-        expect(provider).to receive(:git).with('branch', '-a').at_least(:once).and_return(branch_a_list(resource.value(:revision)))
+        expect(provider).to receive(:git).with('branch', '--no-color', '-a').at_least(:once).and_return(branch_a_list(resource.value(:revision)))
         expect(provider).to receive(:git).with('checkout', '--force', resource.value(:revision))
         expect(provider).to receive(:git).with('reset', '--hard', "origin/#{resource.value(:revision)}")
         provider.revision = resource.value(:revision)
@@ -385,7 +385,7 @@ BRANCHES
       it "uses 'git fetch' and 'git reset'" do
         resource[:revision] = 'only/remote'
         expect(provider).to receive(:update_submodules)
-        expect(provider).to receive(:git).with('branch', '-a').at_least(:once).and_return(resource.value(:revision))
+        expect(provider).to receive(:git).with('branch', '--no-color', '-a').at_least(:once).and_return(resource.value(:revision))
         expect(provider).to receive(:git).with('checkout', '--force', resource.value(:revision))
         expect(provider).to receive(:git).with('reset', '--hard', "origin/#{resource.value(:revision)}")
         provider.revision = resource.value(:revision)
@@ -394,10 +394,10 @@ BRANCHES
     context "when it's a commit or tag" do
       it "uses 'git fetch' and 'git reset'" do
         resource[:revision] = 'a-commit-or-tag'
-        expect(provider).to receive(:git).with('branch', '-a').once.and_return(fixture(:git_branch_a))
+        expect(provider).to receive(:git).with('branch', '--no-color', '-a').once.and_return(fixture(:git_branch_a))
         expect(provider).to receive(:git).with('checkout', '--force', resource.value(:revision))
-        expect(provider).to receive(:git).with('branch', '-a').and_return(fixture(:git_branch_a))
-        expect(provider).to receive(:git).with('branch', '-a').and_return(fixture(:git_branch_a))
+        expect(provider).to receive(:git).with('branch', '--no-color', '-a').and_return(fixture(:git_branch_a))
+        expect(provider).to receive(:git).with('branch', '--no-color', '-a').and_return(fixture(:git_branch_a))
         expect(provider).to receive(:git).with('submodule', 'update', '--init', '--recursive')
         provider.revision = resource.value(:revision)
       end
@@ -407,10 +407,10 @@ BRANCHES
         resource[:revision] = 'a-commit-or-tag'
         resource[:keep_local_changes] = true
         expect(provider).to receive(:git).with('stash', 'save')
-        expect(provider).to receive(:git).with('branch', '-a').once.and_return(fixture(:git_branch_a))
+        expect(provider).to receive(:git).with('branch', '--no-color', '-a').once.and_return(fixture(:git_branch_a))
         expect(provider).to receive(:git).with('checkout', '--force', resource.value(:revision))
-        expect(provider).to receive(:git).with('branch', '-a').and_return(fixture(:git_branch_a))
-        expect(provider).to receive(:git).with('branch', '-a').and_return(fixture(:git_branch_a))
+        expect(provider).to receive(:git).with('branch', '--no-color', '-a').and_return(fixture(:git_branch_a))
+        expect(provider).to receive(:git).with('branch', '--no-color', '-a').and_return(fixture(:git_branch_a))
         expect(provider).to receive(:git).with('submodule', 'update', '--init', '--recursive')
         expect(provider).to receive(:git).with('stash', 'pop')
         provider.revision = resource.value(:revision)
@@ -425,7 +425,7 @@ BRANCHES
       allow(provider).to receive(:git).with('fetch', 'origin') # FIXME
       allow(provider).to receive(:git).with('fetch', '--tags', 'origin')
       allow(provider).to receive(:git).with('rev-parse', 'HEAD').and_return('currentsha')
-      allow(provider).to receive(:git).with('branch', '-a').and_return(branch_a_list(resource.value(:revision)))
+      allow(provider).to receive(:git).with('branch', '--no-color', '-a').and_return(branch_a_list(resource.value(:revision)))
       allow(provider).to receive(:git).with('tag', '-l').and_return('Hello')
     end
 
@@ -555,7 +555,7 @@ BRANCHES
         expect(provider).to receive(:git).with('-c', 'http.sslVerify=false', 'clone', resource.value(:source), resource.value(:path))
         expect(provider).to receive(:update_submodules)
         expect(provider).to receive(:update_remote_url).with('origin', resource.value(:source)).and_return false
-        expect(provider).to receive(:git).with('-c', 'http.sslVerify=false', 'branch', '-a').and_return(branch_a_list(resource.value(:revision)))
+        expect(provider).to receive(:git).with('-c', 'http.sslVerify=false', 'branch', '--no-color', '-a').and_return(branch_a_list(resource.value(:revision)))
         expect(provider).to receive(:git).with('-c', 'http.sslVerify=false', 'checkout', '--force', resource.value(:revision))
 
         allow(provider).to receive(:git).with('--version').and_return '2.13.0'
