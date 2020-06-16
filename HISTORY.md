@@ -211,7 +211,7 @@ new features for Bzr and Git.
  - Fix for issue with detached HEAD.
  - `force => true` will now destroy and recreate repo.
  - Actually use the remote parameter.
- - Use origin/master instead of origin/HEAD when on master.
+ - Use origin/main instead of origin/HEAD when on main.
 - SVN:
  - Fix svnlook behavior with plain directories.
 
@@ -233,7 +233,7 @@ our many contributors for all of these fixes!
  - "ensure => latest" support.
 - SVN:
  - Added configuration parameter.
- - Add support for master svn repositories.
+ - Add support for main svn repositories.
 - CVS:
  - Allow for setting the CVS_RSH environment variable.
 

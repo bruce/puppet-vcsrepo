@@ -6,9 +6,9 @@ describe Puppet::Type.type(:vcsrepo).provider(:git) do
   def branch_a_list(include_branch = nil?)
     <<BRANCHES
   end
-  #{'*  master' unless include_branch.nil?}
+  #{'*  main' unless include_branch.nil?}
   #{'*  ' + include_branch if include_branch}
-   remote/origin/master
+   remote/origin/main
    remote/origin/foo
 
 BRANCHES
@@ -533,7 +533,7 @@ BRANCHES
     end
     context 'when false' do
       it do
-        expect(provider).to receive(:revision).and_return('master')
+        expect(provider).to receive(:revision).and_return('main')
         expect(provider).to receive(:latest_revision).and_return('testrev')
         expect(provider).not_to be_latest
       end

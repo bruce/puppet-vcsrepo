@@ -3,7 +3,7 @@
   feature/baz
   feature/quux
   only/local
-  master
+  main
 * (no branch)  
   refactor/foo
   origin/HEAD
@@ -12,4 +12,4 @@
   origin/feature/baz
   origin/feature/quux
   origin/only/remote
-  origin/master
+  origin/main

@@ -2,11 +2,14 @@
 mkdir testrepo
 cd testrepo
 
-touch file1.txt file2.txt file3.txt
 git init
+touch file1.txt file2.txt file3.txt
+
 echo 'change 1' > file1.txt
 git add file1.txt
 git commit -m 'add file1'
+# Rename the initial branch
+git branch -m main
 git tag 0.0.1
 echo 'change 2' > file2.txt
 git add file2.txt
@@ -28,7 +31,7 @@ echo 'change 6' > file6.txt
 git add file6.txt
 git commit -m 'add file6'
 
-git checkout master
+git checkout main
 cd ..
 
 git --git-dir=testrepo/.git config core.bare true
