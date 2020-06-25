@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v3.1.1](https://github.com/puppetlabs/puppetlabs-vcsrepo/tree/v3.1.1) (2020-06-25)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-vcsrepo/compare/v3.1.0...v3.1.1)
+
+### Fixed
+
+- prevent ANSI color escape sequences from messing up git output [\#458](https://github.com/puppetlabs/puppetlabs-vcsrepo/pull/458) ([kenyon](https://github.com/kenyon))
+- Unset GIT\_SSH\_COMMAND before exec'ing git command [\#435](https://github.com/puppetlabs/puppetlabs-vcsrepo/pull/435) ([mzagrabe](https://github.com/mzagrabe))
+
 ## [v3.1.0](https://github.com/puppetlabs/puppetlabs-vcsrepo/tree/v3.1.0) (2019-12-10)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-vcsrepo/compare/v3.0.0...v3.1.0)
