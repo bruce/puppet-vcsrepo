@@ -288,7 +288,7 @@ describe Puppet::Type.type(:vcsrepo).provider(:svn) do
         resource[:source] = 'an-important-value'
         resource[:basic_auth_username] = 'dummy_user'
         resource[:basic_auth_password] = 'ÙöØÓqÃ¾BÐh¦¹XH8«'
-        expect { provider.create }.to raise_error RuntimeError, %r{The password contains non-ASCII characters}
+        expect { provider.create }.to raise_error RuntimeError, %r{The password can not contain non-ASCII characters}
       end
     end
     context 'when basic_auth_password contains only ASCII characters' do
