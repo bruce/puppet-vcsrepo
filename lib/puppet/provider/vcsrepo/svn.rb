@@ -26,6 +26,12 @@ Puppet::Type.type(:vcsrepo).provide(:svn, parent: Puppet::Provider::Vcsrepo) do
         raise('You must specify the HTTP basic authentication username')
       end
 
+      if @resource.value(:basic_auth_username) && @resource.value(:basic_auth_password)
+        if @resource.value(:basic_auth_password).to_s =~ %r{[\u007B-\u00BF\u02B0-\u037F\u2000-\u2BFF]}
+          raise('The password contains non-ASCII characters')
+        end
+      end
+
       checkout_repository(@resource.value(:source),
                           @resource.value(:path),
                           @resource.value(:revision),
