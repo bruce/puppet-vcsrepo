@@ -28,7 +28,7 @@ Puppet::Type.type(:vcsrepo).provide(:svn, parent: Puppet::Provider::Vcsrepo) do
 
       if @resource.value(:basic_auth_username) && @resource.value(:basic_auth_password)
         if @resource.value(:basic_auth_password).to_s =~ %r{[\u007B-\u00BF\u02B0-\u037F\u2000-\u2BFF]}
-          raise('The password contains non-ASCII characters')
+          raise('The password can not contain non-ASCII characters')
         end
       end
 
