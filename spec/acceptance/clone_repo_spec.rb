@@ -55,7 +55,7 @@ describe 'clones a remote repo' do
     end
 
     describe file("#{tmpdir}/httpstestrepo/.git/HEAD") do
-      it { is_expected.to contain 'ref: refs/heads/master' }
+      it { is_expected.to contain 'ref: refs/heads/main' }
     end
   end
 
