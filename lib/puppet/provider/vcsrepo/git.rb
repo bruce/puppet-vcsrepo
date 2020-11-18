@@ -577,29 +577,23 @@ Puppet::Type.type(:vcsrepo).provide(:git, parent: Puppet::Provider::Vcsrepo) do
     end
 
     if @resource.value(:identity)
-      Tempfile.open('git-helper', Puppet[:statedir]) do |f|
-        f.puts '#!/bin/sh'
-        f.puts 'SSH_AUTH_SOCKET='
-        f.puts 'export SSH_AUTH_SOCKET'
-        f.puts 'exec ssh -oStrictHostKeyChecking=no -oPasswordAuthentication=no -oKbdInteractiveAuthentication=no ' \
-               "-oChallengeResponseAuthentication=no -oConnectTimeout=120 -i #{@resource.value(:identity)} $*"
-        f.close
+      ssh_opts = {
+        IdentitiesOnly: 'yes',
+        IdentityAgent: 'none',
+        PasswordAuthentication: 'no',
+        KbdInteractiveAuthentication: 'no',
+      }
+      ssh_command = "ssh -i #{@resource.value(:identity)} "
+      ssh_command += ssh_opts.map { |option, value| "-o \"#{option} #{value}\"" }.join ' '
 
-        FileUtils.chmod(0o755, f.path)
+      env_git_ssh_command_save = ENV['GIT_SSH_COMMAND']
+      ENV['GIT_SSH_COMMAND'] = ssh_command
 
-        env_git_ssh_save         = ENV['GIT_SSH']
-        env_git_ssh_command_save = ENV['GIT_SSH_COMMAND']
+      ret = exec_git(*args)
 
-        ENV['GIT_SSH']         = f.path
-        ENV['GIT_SSH_COMMAND'] = nil # Unset GIT_SSH_COMMAND environment variable
+      ENV['GIT_SSH_COMMAND'] = env_git_ssh_command_save
 
-        ret = exec_git(*args)
-
-        ENV['GIT_SSH']         = env_git_ssh_save
-        ENV['GIT_SSH_COMMAND'] = env_git_ssh_command_save
-
-        return ret
-      end
+      return ret
     else
       exec_git(*args)
     end
@@ -607,12 +601,12 @@ Puppet::Type.type(:vcsrepo).provide(:git, parent: Puppet::Provider::Vcsrepo) do
 
   # Execute git with the given args, running it as the user specified.
   def exec_git(*args)
-    exec_args = { :failonfail => true, :combine => true }
+    exec_args = { failonfail => true, combine => true }
     if @resource.value(:user) && @resource.value(:user) != Facter['id'].value
       env = Etc.getpwnam(@resource.value(:user))
       exec_args[:custom_environment] = { 'HOME' => env['dir'] }
       exec_args[:uid] = @resource.value(:user)
     end
-    return Puppet::Util::Execution.execute([:git, args], **exec_args)
+    Puppet::Util::Execution.execute([:git, args], **exec_args)
   end
 end
