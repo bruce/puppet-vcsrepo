@@ -593,18 +593,26 @@ Puppet::Type.type(:vcsrepo).provide(:git, parent: Puppet::Provider::Vcsrepo) do
         ENV['GIT_SSH']         = f.path
         ENV['GIT_SSH_COMMAND'] = nil # Unset GIT_SSH_COMMAND environment variable
 
-        ret = git(*args)
+        ret = exec_git(*args)
 
         ENV['GIT_SSH']         = env_git_ssh_save
         ENV['GIT_SSH_COMMAND'] = env_git_ssh_command_save
 
         return ret
       end
-    elsif @resource.value(:user) && @resource.value(:user) != Facter['id'].value
-      env = Etc.getpwnam(@resource.value(:user))
-      Puppet::Util::Execution.execute("git #{args.join(' ')}", uid: @resource.value(:user), failonfail: true, custom_environment: { 'HOME' => env['dir'] }, combine: true)
     else
-      git(*args)
+      exec_git(*args)
     end
+  end
+
+  # Execute git with the given args, running it as the user specified.
+  def exec_git(*args)
+    exec_args = { :failonfail => true, :combine => true }
+    if @resource.value(:user) && @resource.value(:user) != Facter['id'].value
+      env = Etc.getpwnam(@resource.value(:user))
+      exec_args[:custom_environment] = { 'HOME' => env['dir'] }
+      exec_args[:uid] = @resource.value(:user)
+    end
+    return Puppet::Util::Execution.execute([:git, args], **exec_args)
   end
 end
