@@ -29,7 +29,7 @@ Puppet::Type.type(:vcsrepo).provide(:svn, parent: Puppet::Provider::Vcsrepo) do
       end
 
       if @resource.value(:basic_auth_username) && @resource.value(:basic_auth_password)
-        if @resource.value(:basic_auth_password).to_s =~ %r{[\u007B-\u00BF\u02B0-\u037F\u2000-\u2BFF]}
+        if %r{[\u007B-\u00BF\u02B0-\u037F\u2000-\u2BFF]}.match?(@resource.value(:basic_auth_password).to_s)
           raise('The password can not contain non-ASCII characters')
         end
       end
@@ -51,19 +51,19 @@ Puppet::Type.type(:vcsrepo).provide(:svn, parent: Puppet::Provider::Vcsrepo) do
     if @resource.value(:source)
       begin
         svn_wrapper('info', @resource.value(:path))
-        return true
+        true
       rescue Puppet::ExecutionFailure => detail
-        if detail.message =~ %r{This client is too old}
+        if %r{This client is too old}.match?(detail.message)
           raise Puppet::Error, detail.message
         end
-        return false
+        false
       end
     else
       begin
         svnlook('uuid', @resource.value(:path))
-        return true
+        true
       rescue Puppet::ExecutionFailure
-        return false
+        false
       end
     end
   end

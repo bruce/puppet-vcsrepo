@@ -161,14 +161,14 @@ Puppet::Type.type(:vcsrepo).provide(:git, parent: Puppet::Provider::Vcsrepo) do
     # If remote doesn't exist, add it
     if !current.include? "remote.#{remote_name}.url"
       git_with_identity('remote', 'add', remote_name, remote_url)
-      return true
+      true
 
     # If remote exists, but URL doesn't match, update URL
     elsif !current.include? "remote.#{remote_name}.url=#{remote_url}"
       git_with_identity('remote', 'set-url', remote_name, remote_url)
-      return true
+      true
     else
-      return false
+      false
     end
   end
 
@@ -327,9 +327,9 @@ Puppet::Type.type(:vcsrepo).provide(:git, parent: Puppet::Provider::Vcsrepo) do
     return false unless File.exist?(File.join(@resource.value(:path), 'config'))
     begin
       at_path { git('config', '--list', '--file', 'config') }
-      return true
+      true
     rescue Puppet::ExecutionFailure
-      return false
+      false
     end
   end
 
@@ -457,7 +457,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, parent: Puppet::Provider::Vcsrepo) do
   def on_branch?
     at_path do
       matches = git_with_identity('branch', '--no-color', '-a').match %r{\*\s+(.*)}
-      matches[1] unless matches[1] =~ %r{(\(detached from|\(HEAD detached at|\(no branch)}
+      matches[1] unless %r{(\(detached from|\(HEAD detached at|\(no branch)}.match?(matches[1])
     end
   end
 

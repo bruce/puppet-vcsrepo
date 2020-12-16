@@ -73,13 +73,13 @@ Puppet::Type.newtype(:vcsrepo) do
         return true unless [:absent, :purged, :held].include?(is)
       when :latest
         return true if is == :latest
-        return false
+        false
       when :bare
-        return is == :bare
+        is == :bare
       when :mirror
-        return is == :mirror
+        is == :mirror
       when :absent
-        return is == :absent
+        is == :absent
       end
     end
 

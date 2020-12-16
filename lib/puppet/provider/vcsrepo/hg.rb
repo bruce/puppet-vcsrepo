@@ -23,9 +23,9 @@ Puppet::Type.type(:vcsrepo).provide(:hg, parent: Puppet::Provider::Vcsrepo) do
     return false unless File.directory?(@resource.value(:path))
     begin
       hg_wrapper('status', @resource.value(:path))
-      return true
+      true
     rescue Puppet::ExecutionFailure
-      return false
+      false
     end
   end
 

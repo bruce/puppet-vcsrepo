@@ -8,8 +8,7 @@ describe 'subversion :includes tests on SVN version >= 1.7', unless: ( # rubocop
     # test's on this page must be kept seperate as they are for different operating systems.
     (os[:family] == 'redhat' && os[:release].start_with?('5', '6')) ||
     (os[:family] == 'sles')
-) do
-
+  ) do
   before(:all) do
     run_shell("mkdir -p #{tmpdir}") # win test
   end
@@ -142,8 +141,7 @@ end
 
 describe 'subversion :includes tests on SVN version == 1.6', if: (
     (os[:family] == 'redhat' && os[:release].start_with?('5', '6'))
-) do
-
+  ) do
   after(:all) do
     run_shell("rm -rf #{tmpdir}/svnrepo")
   end
