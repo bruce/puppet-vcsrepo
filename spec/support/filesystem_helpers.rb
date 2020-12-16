@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # filesystem_helpers.rb
 module FilesystemHelpers
   def expect_chdir(path = resource.value(:path))

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'pathname'
 require 'puppet/parameter/boolean'
 
@@ -305,7 +307,7 @@ Puppet::Type.newtype(:vcsrepo) do
 
   private
 
-  def set_sensitive_parameters(sensitive_parameters) # rubocop:disable Style/AccessorMethodName
+  def set_sensitive_parameters(sensitive_parameters) # rubocop:disable Naming/AccessorMethodName
     if sensitive_parameters.include?(:basic_auth_password)
       sensitive_parameters.delete(:basic_auth_password)
       parameter(:basic_auth_password).sensitive = true
