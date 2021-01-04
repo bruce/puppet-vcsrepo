@@ -185,6 +185,8 @@ Puppet::Type.type(:vcsrepo).provide(:svn, parent: Puppet::Provider::Vcsrepo) do
     (@resource.parameters.key?(:basic_auth_password) && @resource.parameters[:basic_auth_password].sensitive) ? true : false # Check if there is a sensitive parameter
   end
 
+  SKIP_DIRS = ['.', '..', '.svn'].freeze
+
   def get_includes(directory)
     at_path do
       args = buildargs.push('info', directory)
@@ -192,7 +194,7 @@ Puppet::Type.type(:vcsrepo).provide(:svn, parent: Puppet::Provider::Vcsrepo) do
         return directory[2..-1].gsub(File::SEPARATOR, '/')
       end
       Dir.entries(directory).map { |entry|
-        next if ['.', '..', '.svn'].include?(entry)
+        next if SKIP_DIRS.include?(entry)
         entry = File.join(directory, entry)
         if File.directory?(entry)
           get_includes(entry)
@@ -217,7 +219,7 @@ Puppet::Type.type(:vcsrepo).provide(:svn, parent: Puppet::Provider::Vcsrepo) do
         # fire off a warning telling the user the path can't be excluded.
         Puppet.debug "Vcsrepo[#{@resource.name}]: Need to handle #{path} removal specially"
         File.delete(path)
-        if Dir.entries(File.dirname(path)).sort != ['.', '..', '.svn']
+        if Dir.entries(File.dirname(path)).sort != SKIP_DIRS
           Puppet.warning "Unable to exclude #{path} from Vcsrepo[#{@resource.name}]; update to subversion >= 1.7"
         end
 
@@ -231,7 +233,7 @@ Puppet::Type.type(:vcsrepo).provide(:svn, parent: Puppet::Provider::Vcsrepo) do
       # a non-empty folder, excluding as we go.
       while (path = path.rpartition(File::SEPARATOR)[0]) != ''
         entries = Dir.entries(path).sort
-        break if entries != ['.', '..'] && entries != ['.', '..', '.svn']
+        break if entries != ['.', '..'] && entries != SKIP_DIRS
         args = buildargs.push('update', '--set-depth', 'exclude', path)
         svn_wrapper(*args)
       end
