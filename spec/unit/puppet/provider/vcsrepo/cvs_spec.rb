@@ -81,7 +81,7 @@ describe Puppet::Type.type(:vcsrepo).provider(:cvs) do
         expect(File).to receive(:directory?).with(File.join(resource.value(:path), 'CVS')).and_return(true)
         expect_chdir
         expect(Puppet::Util::Execution).to receive(:execute).with([:cvs, '-nq', 'status', '-l'], custom_environment: {}, combine: true, failonfail: true)
-        provider.exist?
+        provider.exists?
       end
     end
 
@@ -90,7 +90,7 @@ describe Puppet::Type.type(:vcsrepo).provider(:cvs) do
         resource.delete(:source)
         expect(File).to receive(:directory?).with(File.join(resource.value(:path), 'CVSROOT')).and_return(true)
         expect(File).to receive(:exist?).with(File.join(resource.value(:path), 'CVSROOT', 'config,v')).and_return(true)
-        provider.exist?
+        provider.exists?
       end
     end
   end
