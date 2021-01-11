@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # fixture_helpers.b
 module FixtureHelpers
   def fixture(name, ext = '.txt')

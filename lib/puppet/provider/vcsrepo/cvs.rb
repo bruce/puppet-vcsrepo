@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.join(File.dirname(__FILE__), '..', 'vcsrepo')
 
 Puppet::Type.type(:vcsrepo).provide(:cvs, parent: Puppet::Provider::Vcsrepo) do
@@ -26,9 +28,9 @@ Puppet::Type.type(:vcsrepo).provide(:cvs, parent: Puppet::Provider::Vcsrepo) do
       return false unless File.directory?(directory)
       begin
         at_path { runcvs('-nq', 'status', '-l') }
-        return true
+        true
       rescue Puppet::ExecutionFailure
-        return false
+        false
       end
     else
       directory = File.join(@resource.value(:path), 'CVSROOT')
@@ -68,7 +70,7 @@ Puppet::Type.type(:vcsrepo).provide(:cvs, parent: Puppet::Provider::Vcsrepo) do
     unless @rev
       if File.exist?(tag_file)
         contents = File.read(tag_file).strip
-        # Note: Doesn't differentiate between N and T entries
+        # NOTE: Doesn't differentiate between N and T entries
         @rev = contents[1..-1]
       else
         @rev = 'HEAD'

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.join(File.dirname(__FILE__), '..', 'vcsrepo')
 
 Puppet::Type.type(:vcsrepo).provide(:p4, parent: Puppet::Provider::Vcsrepo) do
@@ -191,7 +193,7 @@ Puppet::Type.type(:vcsrepo).provide(:p4, parent: Puppet::Provider::Vcsrepo) do
     hash.keys.sort.each do |k|
       v = hash[k]
       next if k == 'code'
-      if k.to_s =~ %r{View}
+      if %r{View}.match?(k.to_s)
         view += "\t#{v}\n"
       else
         spec += "#{k}: #{v}\n"

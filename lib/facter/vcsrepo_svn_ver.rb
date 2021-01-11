@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Facter.add(:vcsrepo_svn_ver) do
   setcode do
     begin

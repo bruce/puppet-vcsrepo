@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'tmpdir'
 require 'digest/md5'
 require 'fileutils'
@@ -42,7 +44,7 @@ class Puppet::Provider::Vcsrepo < Puppet::Provider
     d.read.nil?
   end
 
-  # Note: We don't rely on Dir.chdir's behavior of automatically returning the
+  # NOTE: We don't rely on Dir.chdir's behavior of automatically returning the
   # value of the last statement -- for easier stubbing.
   def at_path #:nodoc:
     value = nil

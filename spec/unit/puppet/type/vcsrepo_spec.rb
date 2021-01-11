@@ -1,4 +1,6 @@
 #! /usr/bin/env ruby
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Puppet::Type.type(:vcsrepo) do
@@ -43,7 +45,7 @@ describe Puppet::Type.type(:vcsrepo) do
   properties = [:ensure, :source]
 
   properties.each do |property|
-    it "should have a #{property} property" do
+    it "has a #{property} property" do
       expect(described_class.attrclass(property).ancestors).to be_include(Puppet::Property)
     end
   end
@@ -51,7 +53,7 @@ describe Puppet::Type.type(:vcsrepo) do
   parameters = [:ensure]
 
   parameters.each do |parameter|
-    it "should have a #{parameter} parameter" do
+    it "has a #{parameter} parameter" do
       expect(described_class.attrclass(parameter).ancestors).to be_include(Puppet::Parameter)
     end
   end
@@ -104,7 +106,7 @@ describe Puppet::Type.type(:vcsrepo) do
     }
 
     defaults.each_pair do |param, value|
-      it "should have #{param} parameter set to #{value}" do
+      it "has #{param} parameter set to #{value}" do
         expect(resource[param]).to eq(value)
       end
     end
