@@ -38,6 +38,7 @@ describe 'create a repo' do
         revision => 'master'
       }
     MANIFEST
+    # Can't remove the above master reference without failing the test
     it 'does not fail (MODULES-2125)' do
       # Run it twice and test for idempotency
       idempotent_apply(pp)
@@ -70,7 +71,7 @@ describe 'create a repo' do
       vcsrepo { "#{tmpdir}/testrepo_bare_repo_rev":
         ensure => bare,
         provider => git,
-        revision => 'master',
+        revision => 'main',
       }
     MANIFEST
     it 'does not create a bare repo when a revision is defined' do

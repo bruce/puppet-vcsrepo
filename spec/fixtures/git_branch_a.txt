@@ -3,7 +3,7 @@
   feature/baz
   feature/quux
   only/local
-* master
+* main
   refactor/foo
   origin/HEAD
   origin/feature/foo
@@ -11,4 +11,4 @@
   origin/feature/baz
   origin/feature/quux
   origin/only/remote
-  origin/master
+  origin/main

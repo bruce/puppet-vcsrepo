@@ -53,7 +53,7 @@ describe 'changing revision' do
     end
 
     it 'checks out the sha' do
-      sha = run_shell("cd #{tmpdir}/testrepo && git rev-parse origin/master").stdout.chomp
+      sha = run_shell("cd #{tmpdir}/testrepo && git rev-parse origin/main").stdout.chomp
       pp = <<-MANIFEST
       vcsrepo { "#{tmpdir}/testrepo":
         ensure   => latest,

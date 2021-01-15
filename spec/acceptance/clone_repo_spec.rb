@@ -17,7 +17,7 @@ describe 'clones a remote repo' do
     run_shell("rm -rf #{tmpdir}/testrepo_mirror_repo")
   end
 
-  context 'with get the current master HEAD' do
+  context 'with get the current main HEAD' do
     pp = <<-MANIFEST
       vcsrepo { "#{tmpdir}/testrepo":
         ensure => present,
@@ -35,7 +35,7 @@ describe 'clones a remote repo' do
     end
 
     describe file("#{tmpdir}/testrepo/.git/HEAD") do
-      it { is_expected.to contain 'ref: refs/heads/master' }
+      it { is_expected.to contain 'ref: refs/heads/main' }
     end
   end
 
@@ -523,7 +523,7 @@ describe 'clones a remote repo' do
       it { is_expected.not_to be_directory }
     end
     describe file("#{tmpdir}/testrepo_bare_repo/HEAD") do
-      it { is_expected.to contain 'ref: refs/heads/master' }
+      it { is_expected.to contain 'ref: refs/heads/main' }
     end
   end
 
@@ -548,7 +548,7 @@ describe 'clones a remote repo' do
       it { is_expected.not_to be_directory }
     end
     describe file("#{tmpdir}/testrepo_mirror_repo/HEAD") do
-      it { is_expected.to contain 'ref: refs/heads/master' }
+      it { is_expected.to contain 'ref: refs/heads/main' }
     end
   end
 end

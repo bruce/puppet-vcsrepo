@@ -110,7 +110,7 @@ vcsrepo { '/path/to/repo':
 }
 ~~~
 
-By default, `vcsrepo` will use the HEAD of the source repository's master branch. To use another branch or a specific commit, set `revision` to either a branch name or a commit SHA or tag.
+By default, `vcsrepo` will use the HEAD of the source repository's main branch. To use another branch or a specific commit, set `revision` to either a branch name or a commit SHA or tag.
 
 Branch name:
 
@@ -179,7 +179,7 @@ vcsrepo { '/path/to/repo':
   ensure   => latest,
   provider => git,
   source   => 'git://example.com/repo.git',
-  revision => 'master',
+  revision => 'main',
 }
 ~~~
 
@@ -688,7 +688,7 @@ vcsrepo { '/path/to/repo':
 
 The vcsrepo module adds only one type with several providers.
 
-For information on the classes and types, see the [REFERENCE.md](https://github.com/puppetlabs/puppetlabs-vcsrepo/blob/master/REFERENCE.md)
+For information on the classes and types, see the [REFERENCE.md](https://github.com/puppetlabs/puppetlabs-vcsrepo/blob/main/REFERENCE.md)
 
 <a id="providers"></a> 
 #### Providers
@@ -760,7 +760,7 @@ Git is the only VCS provider officially [supported by Puppet Inc.](https://forge
 
 The includes parameter is only supported when SVN client version is >= 1.6.
 
-For an extensive list of supported operating systems, see [metadata.json](https://github.com/puppetlabs/puppetlabs-vcsrepo/blob/master/metadata.json)
+For an extensive list of supported operating systems, see [metadata.json](https://github.com/puppetlabs/puppetlabs-vcsrepo/blob/main/metadata.json)
 
 <a id="development"></a> 
 ## Development
