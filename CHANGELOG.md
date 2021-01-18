@@ -60,9 +60,6 @@ All notable changes to this project will be documented in this file. The format 
 - \(maint\) Add HTML anchor tag [\#404](https://github.com/puppetlabs/puppetlabs-vcsrepo/pull/404) ([clairecadman](https://github.com/clairecadman))
 - pdksync - \(FM-7655\) Fix rubygems-update for ruby \< 2.3 [\#401](https://github.com/puppetlabs/puppetlabs-vcsrepo/pull/401) ([tphoney](https://github.com/tphoney))
 
-### UNCATEGORIZED PRS; LABEL THEM ON GITHUB
-
-- \(MODULES-8857\) - 2.5.0 Release Preparation [\#410](https://github.com/puppetlabs/puppetlabs-vcsrepo/pull/410) ([Lavinia-Dan](https://github.com/Lavinia-Dan))
 
 ## [2.4.0](https://github.com/puppetlabs/puppetlabs-vcsrepo/tree/2.4.0) (2018-09-28)
 
