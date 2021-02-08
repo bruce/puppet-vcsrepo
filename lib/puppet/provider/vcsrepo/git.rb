@@ -589,7 +589,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, parent: Puppet::Provider::Vcsrepo) do
 
       ENV['GIT_SSH_COMMAND'] = env_git_ssh_command_save
 
-      return ret
+      ret
     else
       exec_git(*args)
     end
