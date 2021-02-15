@@ -3,6 +3,7 @@
 require 'spec_helper_acceptance'
 
 tmpdir = '/tmp/vcsrepo'
+homedir = '/tmp/' # set as /home/root/ for acceptance testing on containers
 
 describe 'clones a remote repo' do
   before(:all) do
@@ -470,31 +471,21 @@ describe 'clones a remote repo' do
 
   context 'with using an identity file' do
     before(:all) do
-      # create user
-      pp = <<-MANIFEST
-      user { 'testuser-ssh':
-        ensure => present,
-        managehome => true,
-      }
-      MANIFEST
-      apply_manifest(pp, catch_failures: true)
-
       # create ssh keys
-      run_shell('mkdir -p /home/testuser-ssh/.ssh')
-      run_shell('ssh-keygen -q -t rsa -f /home/testuser-ssh/.ssh/id_rsa -N ""')
+      run_shell("mkdir -p #{homedir}/.ssh")
+      run_shell("ssh-keygen -q -t rsa -f #{homedir}/.ssh/id_rsa -N ''")
 
       # copy public key to authorized_keys
-      run_shell('cat /home/testuser-ssh/.ssh/id_rsa.pub > /home/testuser-ssh/.ssh/authorized_keys')
-      run_shell('echo -e "Host localhost\n\tStrictHostKeyChecking no\n" > /home/testuser-ssh/.ssh/config')
-      run_shell('chown -R testuser-ssh:testuser-ssh /home/testuser-ssh/.ssh')
+      run_shell("cat #{homedir}/.ssh/id_rsa.pub > #{homedir}/.ssh/authorized_keys")
+      run_shell("echo -e \"Host localhost\\n\\tStrictHostKeyChecking no\\n\" > #{homedir}/.ssh/config")
     end
 
     pp = <<-MANIFEST
       vcsrepo { "#{tmpdir}/testrepo_user_ssh_id":
         ensure => present,
         provider => git,
-        source => "testuser-ssh@localhost:#{tmpdir}/testrepo.git",
-        identity => '/home/testuser-ssh/.ssh/id_rsa',
+        source => "root@localhost:#{tmpdir}/testrepo.git",
+        identity => '#{homedir}/.ssh/id_rsa',
       }
     MANIFEST
     it 'applies the manifest' do
