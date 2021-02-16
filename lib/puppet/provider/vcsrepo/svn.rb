@@ -86,7 +86,7 @@ Puppet::Type.type(:vcsrepo).provide(:svn, parent: Puppet::Provider::Vcsrepo) do
     args = ['--non-interactive']
     if @resource.value(:basic_auth_username) && @resource.value(:basic_auth_password)
       args.push('--username', @resource.value(:basic_auth_username))
-      args.push('--password', sensitive? ? @resource.value(:basic_auth_password).unwrap : @resource.value(:basic_auth_password))
+      args.push('--password', @resource.value(:basic_auth_password))
       args.push('--no-auth-cache')
     end
 

@@ -280,7 +280,7 @@ describe Puppet::Type.type(:vcsrepo).provider(:svn) do
 
       it 'works' do
         expect(provider).to receive(:svn_wrapper).with('--non-interactive', '--username', resource.value(:basic_auth_username),
-                                                       '--password', resource.value(:basic_auth_password).unwrap, '--no-auth-cache',
+                                                       '--password', resource.value(:basic_auth_password), '--no-auth-cache',
                                                        'checkout', resource.value(:source), resource.value(:path))
         provider.create
       end
