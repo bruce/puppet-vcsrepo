@@ -2,7 +2,15 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
-## [v3.2.0](https://github.com/puppetlabs/puppetlabs-vcsrepo/tree/v3.2.0) (2021-01-18)
+## [v3.2.1](https://github.com/puppetlabs/puppetlabs-vcsrepo/tree/v3.2.1) (2021-02-16)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-vcsrepo/compare/v3.2.0...v3.2.1)
+
+### Fixed
+
+- \(MODULES-9997\) - Removing extra unwrap on Sensitive value [\#490](https://github.com/puppetlabs/puppetlabs-vcsrepo/pull/490) ([pmcmaw](https://github.com/pmcmaw))
+
+## [v3.2.0](https://github.com/puppetlabs/puppetlabs-vcsrepo/tree/v3.2.0) (2021-01-20)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-vcsrepo/compare/v3.1.1...v3.2.0)
 
@@ -59,7 +67,6 @@ All notable changes to this project will be documented in this file. The format 
 - MODULES-8910 fix for failing git install using RepoForge instead of epel [\#414](https://github.com/puppetlabs/puppetlabs-vcsrepo/pull/414) ([Lavinia-Dan](https://github.com/Lavinia-Dan))
 - \(maint\) Add HTML anchor tag [\#404](https://github.com/puppetlabs/puppetlabs-vcsrepo/pull/404) ([clairecadman](https://github.com/clairecadman))
 - pdksync - \(FM-7655\) Fix rubygems-update for ruby \< 2.3 [\#401](https://github.com/puppetlabs/puppetlabs-vcsrepo/pull/401) ([tphoney](https://github.com/tphoney))
-
 
 ## [2.4.0](https://github.com/puppetlabs/puppetlabs-vcsrepo/tree/2.4.0) (2018-09-28)
 
