@@ -439,8 +439,8 @@ describe 'clones a remote repo' do
       run_shell('ssh-keygen -q -t rsa -f /home/testuser-ssh/.ssh/id_rsa -N ""')
 
       # add localhost to known_hosts
-      run_shell('ssh-keygen -R localhost', expect_failures: true)
-      run_shell("ssh-keyscan localhost >> /home/testuser-ssh/.ssh/known_hosts")
+      run_shell('rm /home/testuser-ssh/.ssh/known_hosts', expect_failures: true)
+      run_shell('ssh-keyscan localhost >> /home/testuser-ssh/.ssh/known_hosts')
 
       # copy public key to authorized_keys
       run_shell('cat /home/testuser-ssh/.ssh/id_rsa.pub > /home/testuser-ssh/.ssh/authorized_keys')
@@ -479,7 +479,7 @@ describe 'clones a remote repo' do
       run_shell("mkdir -p #{homedir}/.ssh")
       run_shell("ssh-keygen -q -t rsa -f #{homedir}/.ssh/id_rsa -N ''")
 
-      run_shell('ssh-keygen -R localhost', expect_failures: true)
+      run_shell('rm ${homedir}/.ssh/known_hosts', expect_failures: true)
       run_shell("ssh-keyscan localhost >> #{homedir}/.ssh/known_hosts")
 
       # copy public key to authorized_keys
