@@ -438,6 +438,10 @@ describe 'clones a remote repo' do
       run_shell('mkdir -p /home/testuser-ssh/.ssh')
       run_shell('ssh-keygen -q -t rsa -f /home/testuser-ssh/.ssh/id_rsa -N ""')
 
+      # add localhost to known_hosts
+      run_shell('ssh-keygen -R localhost', expect_failures: true)
+      run_shell("ssh-keyscan localhost >> /home/testuser-ssh/.ssh/known_hosts")
+
       # copy public key to authorized_keys
       run_shell('cat /home/testuser-ssh/.ssh/id_rsa.pub > /home/testuser-ssh/.ssh/authorized_keys')
       run_shell('echo -e "Host localhost\n\tStrictHostKeyChecking no\n" > /home/testuser-ssh/.ssh/config')
@@ -475,8 +479,9 @@ describe 'clones a remote repo' do
       run_shell("mkdir -p #{homedir}/.ssh")
       run_shell("ssh-keygen -q -t rsa -f #{homedir}/.ssh/id_rsa -N ''")
 
-      run_shell("ssh-keyscan github.com >> #{homedir}/.ssh/known_hosts")
- 
+      run_shell('ssh-keygen -R localhost', expect_failures: true)
+      run_shell("ssh-keyscan localhost >> #{homedir}/.ssh/known_hosts")
+
       # copy public key to authorized_keys
       run_shell("cat #{homedir}/.ssh/id_rsa.pub > #{homedir}/.ssh/authorized_keys")
       run_shell("echo -e \"Host localhost\\n\\tStrictHostKeyChecking no\\n\" > #{homedir}/.ssh/config")
