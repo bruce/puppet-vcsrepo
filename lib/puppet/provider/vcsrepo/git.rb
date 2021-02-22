@@ -574,6 +574,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, parent: Puppet::Provider::Vcsrepo) do
 
     if @resource.value(:identity)
       ssh_opts = {
+        IgnoreUnknown: 'IdentityAgent',
         IdentitiesOnly: 'yes',
         IdentityAgent: 'none',
         PasswordAuthentication: 'no',

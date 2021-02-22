@@ -475,6 +475,8 @@ describe 'clones a remote repo' do
       run_shell("mkdir -p #{homedir}/.ssh")
       run_shell("ssh-keygen -q -t rsa -f #{homedir}/.ssh/id_rsa -N ''")
 
+      run_shell("ssh-keyscan github.com >> #{homedir}/.ssh/known_hosts")
+ 
       # copy public key to authorized_keys
       run_shell("cat #{homedir}/.ssh/id_rsa.pub > #{homedir}/.ssh/authorized_keys")
       run_shell("echo -e \"Host localhost\\n\\tStrictHostKeyChecking no\\n\" > #{homedir}/.ssh/config")
