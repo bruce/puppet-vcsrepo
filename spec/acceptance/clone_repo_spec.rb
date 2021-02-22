@@ -3,7 +3,6 @@
 require 'spec_helper_acceptance'
 
 tmpdir = '/tmp/vcsrepo'
-homedir = '/tmp/' # set as /home/root/ for acceptance testing on containers
 
 describe 'clones a remote repo' do
   before(:all) do
