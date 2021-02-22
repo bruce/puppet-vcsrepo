@@ -477,22 +477,22 @@ describe 'clones a remote repo' do
     before(:all) do
       # create ssh keys
       run_shell("mkdir -p #{homedir}/.ssh")
-      run_shell("ssh-keygen -q -t rsa -f #{homedir}/.ssh/id_rsa -N ''")
+      run_shell("ssh-keygen -q -t rsa -f /home/testuser-ssh/.ssh/id_rsa -N ''")
 
-      run_shell('rm ${homedir}/.ssh/known_hosts', expect_failures: true)
-      run_shell("ssh-keyscan localhost >> #{homedir}/.ssh/known_hosts")
+      run_shell('rm /home/testuser-ssh/.ssh/known_hosts', expect_failures: true)
+      run_shell("ssh-keyscan localhost >> /home/testuser-ssh/.ssh/known_hosts")
 
       # copy public key to authorized_keys
-      run_shell("cat #{homedir}/.ssh/id_rsa.pub > #{homedir}/.ssh/authorized_keys")
-      run_shell("echo -e \"Host localhost\\n\\tStrictHostKeyChecking no\\n\" > #{homedir}/.ssh/config")
+      run_shell("cat /home/testuseruser-ssh/.ssh/id_rsa.pub > /home/testuser-ssh/.ssh/authorized_keys")
+      #run_shell("echo -e \"Host localhost\\n\\tStrictHostKeyChecking no\\n\" > /home/testuser-ssh/.ssh/config")
     end
 
     pp = <<-MANIFEST
       vcsrepo { "#{tmpdir}/testrepo_user_ssh_id":
         ensure => present,
         provider => git,
-        source => "root@localhost:#{tmpdir}/testrepo.git",
-        identity => '#{homedir}/.ssh/id_rsa',
+        source => "testuser-ssh@localhost:#{tmpdir}/testrepo.git",
+        identity => '/home/testuser-ssh/.ssh/id_rsa',
       }
     MANIFEST
     it 'applies the manifest' do
