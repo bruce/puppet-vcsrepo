@@ -506,6 +506,7 @@ describe 'clones a remote repo' do
         provider => git,
         source => "testuser-ssh@localhost:#{tmpdir}/testrepo.git",
         identity => '/home/testuser-ssh/.ssh/id_rsa',
+        user => 'testuser-ssh',
       }
     MANIFEST
     it 'applies the manifest' do
