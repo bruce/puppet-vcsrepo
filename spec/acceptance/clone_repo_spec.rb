@@ -475,16 +475,29 @@ describe 'clones a remote repo' do
 
   context 'with using an identity file' do
     before(:all) do
-      # create ssh keys
-      run_shell("mkdir -p #{homedir}/.ssh")
-      run_shell("ssh-keygen -q -t rsa -f /home/testuser-ssh/.ssh/id_rsa -N ''")
+      # create user
+      pp = <<-MANIFEST
+      group { 'testuser-ssh':
+        ensure => present,
+      }
+      user { 'testuser-ssh':
+        ensure => present,
+        groups => 'testuser-ssh',
+        managehome => true,
+      }
+      MANIFEST
+      apply_manifest(pp, catch_failures: true)
 
-      run_shell('rm /home/testuser-ssh/.ssh/known_hosts', expect_failures: true)
-      run_shell("ssh-keyscan localhost >> /home/testuser-ssh/.ssh/known_hosts")
+      # create ssh keys
+      run_shell('mkdir -p /home/testuser-ssh/.ssh')
+      run_shell('ssh-keygen -q -t rsa -f /home/testuser-ssh/.ssh/id_rsa -N ""')
+
+      # add localhost to known_hosts
+      run_shell('ssh-keyscan localhost > /home/testuser-ssh/.ssh/known_hosts')
 
       # copy public key to authorized_keys
-      run_shell("cat /home/testuseruser-ssh/.ssh/id_rsa.pub > /home/testuser-ssh/.ssh/authorized_keys")
-      #run_shell("echo -e \"Host localhost\\n\\tStrictHostKeyChecking no\\n\" > /home/testuser-ssh/.ssh/config")
+      run_shell('cat /home/testuser-ssh/.ssh/id_rsa.pub > /home/testuser-ssh/.ssh/authorized_keys')
+      run_shell('chown -R testuser-ssh:testuser-ssh /home/testuser-ssh/.ssh')
     end
 
     pp = <<-MANIFEST
