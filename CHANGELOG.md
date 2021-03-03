@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v4.0.0](https://github.com/puppetlabs/puppetlabs-vcsrepo/tree/v4.0.0) (2021-03-03)
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-vcsrepo/compare/v3.2.1...v4.0.0)
+
+### Changed
+
+- pdksync - Remove Puppet 5 from testing and bump minimal version to 6.0.0 [\#491](https://github.com/puppetlabs/puppetlabs-vcsrepo/pull/491) ([carabasdaniel](https://github.com/carabasdaniel))
+
 ## [v3.2.1](https://github.com/puppetlabs/puppetlabs-vcsrepo/tree/v3.2.1) (2021-02-16)
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-vcsrepo/compare/v3.2.0...v3.2.1)
@@ -40,7 +48,6 @@ All notable changes to this project will be documented in this file. The format 
 
 ### Added
 
-- \(FM-8234\) Port to Litmus [\#429](https://github.com/puppetlabs/puppetlabs-vcsrepo/pull/429) ([sheenaajay](https://github.com/sheenaajay))
 - pdksync - Add support on Debian10 [\#428](https://github.com/puppetlabs/puppetlabs-vcsrepo/pull/428) ([lionce](https://github.com/lionce))
 - feature\(git\): add keep local changes option [\#425](https://github.com/puppetlabs/puppetlabs-vcsrepo/pull/425) ([jfroche](https://github.com/jfroche))
 
@@ -58,6 +65,7 @@ All notable changes to this project will be documented in this file. The format 
 
 ### Added
 
+- \(FM-8234\) Port to Litmus [\#429](https://github.com/puppetlabs/puppetlabs-vcsrepo/pull/429) ([sheenaajay](https://github.com/sheenaajay))
 - \(FM-8035\) Add RedHat 8 support [\#419](https://github.com/puppetlabs/puppetlabs-vcsrepo/pull/419) ([eimlav](https://github.com/eimlav))
 - \(MODULES-8738\) Allow Sensitive value for basic\_auth\_password [\#416](https://github.com/puppetlabs/puppetlabs-vcsrepo/pull/416) ([eimlav](https://github.com/eimlav))
 - \(MODULES-8140\) - Add SLES 15 support [\#399](https://github.com/puppetlabs/puppetlabs-vcsrepo/pull/399) ([eimlav](https://github.com/eimlav))
