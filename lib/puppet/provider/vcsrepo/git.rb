@@ -5,10 +5,6 @@ require File.join(File.dirname(__FILE__), '..', 'vcsrepo')
 Puppet::Type.type(:vcsrepo).provide(:git, parent: Puppet::Provider::Vcsrepo) do
   desc 'Supports Git repositories'
 
-  has_command(:git, 'git') do
-    environment('HOME' => ENV['HOME'])
-  end
-
   has_features :bare_repositories, :reference_tracking, :ssh_identity, :multiple_remotes,
                :user, :depth, :branch, :submodules
 
@@ -128,13 +124,13 @@ Puppet::Type.type(:vcsrepo).provide(:git, parent: Puppet::Provider::Vcsrepo) do
     at_path do
       if @resource.value(:source)
         begin
-          return git('config', '--get', "remote.#{@resource.value(:remote)}.url").chomp == default_url
+          return git_with_identity('config', '--get', "remote.#{@resource.value(:remote)}.url").chomp == default_url
         rescue Puppet::ExecutionFailure
           return false
         end
       else
         begin
-          git('status')
+          git_with_identity('status')
           return true
         rescue Puppet::ExecutionFailure
           return false
@@ -174,11 +170,11 @@ Puppet::Type.type(:vcsrepo).provide(:git, parent: Puppet::Provider::Vcsrepo) do
 
   def source
     at_path do
-      remotes = git('remote').split("\n")
+      remotes = git_with_identity('remote').split("\n")
 
-      return git('config', '--get', "remote.#{remotes[0]}.url").chomp if remotes.size == 1
+      return git_with_identity('config', '--get', "remote.#{remotes[0]}.url").chomp if remotes.size == 1
       Hash[remotes.map do |remote|
-        [remote, git('config', '--get', "remote.#{remote}.url").chomp]
+        [remote, git_with_identity('config', '--get', "remote.#{remote}.url").chomp]
       end]
     end
   end
@@ -247,7 +243,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, parent: Puppet::Provider::Vcsrepo) do
     FileUtils.rm_rf(@resource.value(:path))
     FileUtils.mv(tempdir, @resource.value(:path))
     at_path do
-      git('config', '--local', '--bool', 'core.bare', 'true')
+      exec_git('config', '--local', '--bool', 'core.bare', 'true')
       return unless @resource.value(:ensure) == :mirror
       raise('Cannot have empty repository that is also a mirror.') unless @resource.value(:source)
       set_mirror
@@ -268,7 +264,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, parent: Puppet::Provider::Vcsrepo) do
     FileUtils.mv(tempdir, File.join(@resource.value(:path), '.git'))
     if commits?
       at_path do
-        git('config', '--local', '--bool', 'core.bare', 'false')
+        exec_git('config', '--local', '--bool', 'core.bare', 'false')
         reset('HEAD')
         git_with_identity('checkout', '--force')
         update_owner_and_excludes
@@ -280,7 +276,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, parent: Puppet::Provider::Vcsrepo) do
   def mirror?
     at_path do
       begin
-        git('config', '--get-regexp', 'remote\..*\.mirror')
+        git_with_identity('config', '--get-regexp', 'remote\..*\.mirror')
         return true
       rescue Puppet::ExecutionFailure
         return false
@@ -291,10 +287,10 @@ Puppet::Type.type(:vcsrepo).provide(:git, parent: Puppet::Provider::Vcsrepo) do
   def set_mirror
     at_path do
       if @resource.value(:source).is_a?(String)
-        git('config', "remote.#{@resource.value(:remote)}.mirror", 'true')
+        git_with_identity('config', "remote.#{@resource.value(:remote)}.mirror", 'true')
       else
         @resource.value(:source).each_key do |remote|
-          git('config', "remote.#{remote}.mirror", 'true')
+          git_with_identity('config', "remote.#{remote}.mirror", 'true')
         end
       end
     end
@@ -304,14 +300,14 @@ Puppet::Type.type(:vcsrepo).provide(:git, parent: Puppet::Provider::Vcsrepo) do
     at_path do
       if @resource.value(:source).is_a?(String)
         begin
-          git('config', '--unset', "remote.#{@resource.value(:remote)}.mirror")
+          exec_git('config', '--unset', "remote.#{@resource.value(:remote)}.mirror")
         rescue Puppet::ExecutionFailure
           next
         end
       else
         @resource.value(:source).each_key do |remote|
           begin
-            git('config', '--unset', "remote.#{remote}.mirror")
+            exec_git('config', '--unset', "remote.#{remote}.mirror")
           rescue Puppet::ExecutionFailure
             next
           end
@@ -326,7 +322,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, parent: Puppet::Provider::Vcsrepo) do
   def bare_git_config_exists?
     return false unless File.exist?(File.join(@resource.value(:path), 'config'))
     begin
-      at_path { git('config', '--list', '--file', 'config') }
+      at_path { git_with_identity('config', '--list', '--file', 'config') }
       true
     rescue Puppet::ExecutionFailure
       false
@@ -564,7 +560,7 @@ Puppet::Type.type(:vcsrepo).provide(:git, parent: Puppet::Provider::Vcsrepo) do
   end
 
   def git_version
-    git('--version').match(%r{[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?})[0]
+    exec_git('--version').match(%r{[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?})[0]
   end
 
   # @!visibility private
@@ -577,34 +573,37 @@ Puppet::Type.type(:vcsrepo).provide(:git, parent: Puppet::Provider::Vcsrepo) do
     end
 
     if @resource.value(:identity)
-      Tempfile.open('git-helper', Puppet[:statedir]) do |f|
-        f.puts '#!/bin/sh'
-        f.puts 'SSH_AUTH_SOCKET='
-        f.puts 'export SSH_AUTH_SOCKET'
-        f.puts 'exec ssh -oStrictHostKeyChecking=no -oPasswordAuthentication=no -oKbdInteractiveAuthentication=no ' \
-               "-oChallengeResponseAuthentication=no -oConnectTimeout=120 -i #{@resource.value(:identity)} $*"
-        f.close
+      ssh_opts = {
+        IgnoreUnknown: 'IdentityAgent',
+        IdentitiesOnly: 'yes',
+        IdentityAgent: 'none',
+        PasswordAuthentication: 'no',
+        KbdInteractiveAuthentication: 'no',
+      }
+      ssh_command = "ssh -i #{@resource.value(:identity)} "
+      ssh_command += ssh_opts.map { |option, value| "-o \"#{option} #{value}\"" }.join ' '
 
-        FileUtils.chmod(0o755, f.path)
+      env_git_ssh_command_save = ENV['GIT_SSH_COMMAND']
+      ENV['GIT_SSH_COMMAND'] = ssh_command
 
-        env_git_ssh_save         = ENV['GIT_SSH']
-        env_git_ssh_command_save = ENV['GIT_SSH_COMMAND']
+      ret = exec_git(*args)
 
-        ENV['GIT_SSH']         = f.path
-        ENV['GIT_SSH_COMMAND'] = nil # Unset GIT_SSH_COMMAND environment variable
+      ENV['GIT_SSH_COMMAND'] = env_git_ssh_command_save
 
-        ret = git(*args)
-
-        ENV['GIT_SSH']         = env_git_ssh_save
-        ENV['GIT_SSH_COMMAND'] = env_git_ssh_command_save
-
-        return ret
-      end
-    elsif @resource.value(:user) && @resource.value(:user) != Facter['id'].value
-      env = Etc.getpwnam(@resource.value(:user))
-      Puppet::Util::Execution.execute("git #{args.join(' ')}", uid: @resource.value(:user), failonfail: true, custom_environment: { 'HOME' => env['dir'] }, combine: true)
+      ret
     else
-      git(*args)
+      exec_git(*args)
     end
+  end
+
+  # Execute git with the given args, running it as the user specified.
+  def exec_git(*args)
+    exec_args = { failonfail: true, combine: true }
+    if @resource.value(:user) && @resource.value(:user) != Facter['id'].value
+      env = Etc.getpwnam(@resource.value(:user))
+      exec_args[:custom_environment] = { 'HOME' => env['dir'] }
+      exec_args[:uid] = @resource.value(:user)
+    end
+    Puppet::Util::Execution.execute([:git, args], **exec_args)
   end
 end

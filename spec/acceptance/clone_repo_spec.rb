@@ -437,6 +437,10 @@ describe 'clones a remote repo' do
       run_shell('mkdir -p /home/testuser-ssh/.ssh')
       run_shell('ssh-keygen -q -t rsa -f /home/testuser-ssh/.ssh/id_rsa -N ""')
 
+      # add localhost to known_hosts
+      run_shell('rm /home/testuser-ssh/.ssh/known_hosts', expect_failures: true)
+      run_shell('ssh-keyscan localhost >> /home/testuser-ssh/.ssh/known_hosts')
+
       # copy public key to authorized_keys
       run_shell('cat /home/testuser-ssh/.ssh/id_rsa.pub > /home/testuser-ssh/.ssh/authorized_keys')
       run_shell('echo -e "Host localhost\n\tStrictHostKeyChecking no\n" > /home/testuser-ssh/.ssh/config')
@@ -472,8 +476,12 @@ describe 'clones a remote repo' do
     before(:all) do
       # create user
       pp = <<-MANIFEST
+      group { 'testuser-ssh':
+        ensure => present,
+      }
       user { 'testuser-ssh':
         ensure => present,
+        groups => 'testuser-ssh',
         managehome => true,
       }
       MANIFEST
@@ -483,9 +491,11 @@ describe 'clones a remote repo' do
       run_shell('mkdir -p /home/testuser-ssh/.ssh')
       run_shell('ssh-keygen -q -t rsa -f /home/testuser-ssh/.ssh/id_rsa -N ""')
 
+      # add localhost to known_hosts
+      run_shell('ssh-keyscan localhost > /home/testuser-ssh/.ssh/known_hosts')
+
       # copy public key to authorized_keys
       run_shell('cat /home/testuser-ssh/.ssh/id_rsa.pub > /home/testuser-ssh/.ssh/authorized_keys')
-      run_shell('echo -e "Host localhost\n\tStrictHostKeyChecking no\n" > /home/testuser-ssh/.ssh/config')
       run_shell('chown -R testuser-ssh:testuser-ssh /home/testuser-ssh/.ssh')
     end
 
@@ -495,6 +505,7 @@ describe 'clones a remote repo' do
         provider => git,
         source => "testuser-ssh@localhost:#{tmpdir}/testrepo.git",
         identity => '/home/testuser-ssh/.ssh/id_rsa',
+        user => 'testuser-ssh',
       }
     MANIFEST
     it 'applies the manifest' do
