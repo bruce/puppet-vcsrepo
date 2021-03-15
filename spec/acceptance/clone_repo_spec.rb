@@ -445,6 +445,7 @@ describe 'clones a remote repo' do
       run_shell('cat /home/testuser-ssh/.ssh/id_rsa.pub > /home/testuser-ssh/.ssh/authorized_keys')
       run_shell('echo -e "Host localhost\n\tStrictHostKeyChecking no\n" > /home/testuser-ssh/.ssh/config')
       run_shell('chown -R testuser-ssh:testuser-ssh /home/testuser-ssh/.ssh')
+      run_shell('rm -rf /var/run/nologin')
     end
 
     pp = <<-MANIFEST
@@ -497,6 +498,7 @@ describe 'clones a remote repo' do
       # copy public key to authorized_keys
       run_shell('cat /home/testuser-ssh/.ssh/id_rsa.pub > /home/testuser-ssh/.ssh/authorized_keys')
       run_shell('chown -R testuser-ssh:testuser-ssh /home/testuser-ssh/.ssh')
+      run_shell('rm -rf /var/run/nologin')
     end
 
     pp = <<-MANIFEST
