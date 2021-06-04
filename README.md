@@ -39,6 +39,7 @@ The vcsrepo module provides a single type with providers to support the followin
 * [Subversion](#subversion)
 
 **Note:** `git` is the only vcs provider officially [supported by Puppet Inc.](https://forge.puppet.com/supported)
+**Note:** Release v4.0.1 has been removed from the Puppet Forge and was officially re-released as version v5.0.0 as it contained a breaking change. Details available [here](https://puppetlabs.github.io/iac/team/status/developer/2021/06/04/status-update.html)
 
 <a id="setup"></a>
 ## Setup
