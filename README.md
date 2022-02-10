@@ -250,6 +250,15 @@ vcsrepo { '/path/to/repo':
 }
 ~~~
 
+##### Important changes in version 5
+
+Prior to version 5.0.0 `StrictHostKeyChecking` was implicitly disabled when using the `identity` parameter. This meant that ssh would automatically add new hosts to `~/.ssh/known_hosts`, letting most connections succeed.
+
+`StrictHostKeyChecking=no` has now been removed from the options passed to ssh which will result in the option falling back to it's default, `ask`.
+
+It's also important to remember that if you use `identity` with `user`, the calling user must have read permissions to the given ssh key.
+
+
 <a id="bazaar"></a>
 ### Bazaar
 
